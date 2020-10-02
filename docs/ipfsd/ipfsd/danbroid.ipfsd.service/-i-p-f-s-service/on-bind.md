@@ -1,0 +1,11 @@
+//[ipfsd](../../index.md)/[danbroid.ipfsd.service](../index.md)/[IPFSService](index.md)/[onBind](on-bind.md)
+
+
+
+# onBind  
+[androidJvm]  
+Content  
+open override fun [onBind](on-bind.md)(intent: [Intent](https://developer.android.com/reference/kotlin/android/content/Intent.html)?): [IBinder](https://developer.android.com/reference/kotlin/android/os/IBinder.html)?  
+
+
+

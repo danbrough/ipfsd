@@ -1,0 +1,9 @@
+$dokka.format:gfm-v1
+$dokka.linkExtension:md
+
+danbroid.ipfsd.demo
+danbroid.ipfsd.demo.activities
+danbroid.ipfsd.demo.content
+danbroid.ipfsd.demo.sync
+danbroid.ipfsd.demo.ui.www
+

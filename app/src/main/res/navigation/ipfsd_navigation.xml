@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_ipfsd">
+
+
+  <action
+      android:id="@+id/action_global_navigation_menu"
+      app:destination="@id/navigation_menu" />
+
+  <action
+      android:id="@+id/action_global_navigation_browser"
+      app:destination="@id/navigation_browser"
+      app:enterAnim="@anim/menu_enter"
+      app:exitAnim="@anim/menu_exit"
+      app:popEnterAnim="@anim/menu_pop_enter"
+      app:popExitAnim="@anim/menu_pop_exit" />
+
+  <fragment
+      android:id="@+id/navigation_browser"
+      android:name="danbroid.ipfsd.demo.ui.www.BrowserFragment"
+      android:label="">
+
+    <argument
+        android:name="url"
+        android:defaultValue="https://www.rnz.co.nz/news" />
+
+    <deepLink
+        android:id="@+id/deeplink_rnz"
+        app:uri="www.rnz.co.nz" />
+  </fragment>
+
+  <deepLink
+      android:id="@+id/deeplink_app"
+      app:uri="ipfsdemo:///.*" />
+
+</navigation>
