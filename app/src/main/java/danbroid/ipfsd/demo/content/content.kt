@@ -5,18 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import danbroid.ipfs.api.API
-import danbroid.ipfs.api.ApiCall
 import danbroid.ipfsd.demo.R
+import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.util.menu.MenuActionContext
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
 
-const val URI_CONTENT_ROOT = "demo://content"
+const val URI_CONTENT_ROOT = "ipfsdemo://content"
 private const val DIR_XCCD = "QmdmQXB2mzChmMeKY47C43LxUdg1NDJ5MWcKMKxDu7RgQm"
 
 private val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
@@ -55,6 +57,19 @@ val rootContent: MenuItemBuilder by lazy {
     }
 
     menu {
+      title = "Add string"
+      onClick = {
+        val msg = "Hello from the ipfs demo at ${Date()}.\n"
+        api.add(msg,fileName = "ipfs_test_message.txt").exec { result->
+          log.debug("added $msg -> $result")
+          withContext(Dispatchers.Main) {
+            fragment?.activityInterface?.showSnackbar("Added: $msg")
+          }
+        }
+      }
+    }
+
+    menu {
       title = "GC"
       onClick = {
         System.gc()
@@ -67,7 +82,7 @@ val rootContent: MenuItemBuilder by lazy {
     menu {
       title = "PubSub Publish"
       onClick = {
-        api.pubSub.publish("poiqwe098123", "Hello from the IPFS app at ${Date()} ").exec {
+        api.pubSub.publish("poiqwe098123", "Hello from the IPFS app at ${Date()}\n ").exec {
           log.debug("RESULT: $it")
           false
         }

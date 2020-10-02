@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_browser.*
 class BrowserFragment : Fragment() {
 
 
-  val args: BrowserFragmentArgs by navArgs()
+  val url:String = "http://www.python.org"
 
   val loading = object : MutableLiveData<Boolean>() {
     override fun setValue(value: Boolean?) {
@@ -129,8 +129,8 @@ class BrowserFragment : Fragment() {
     //webView?.addJavascriptInterface(Console(), "audienz")
 
 
-    log.debug("loading url: ${args.url}")
-    webView?.loadUrl(args.url)
+    log.debug("loading url: ${url}")
+    webView?.loadUrl(url)
   }
 
 

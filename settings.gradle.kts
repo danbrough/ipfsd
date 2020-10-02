@@ -14,7 +14,7 @@ bootstrapRefreshVersionsAndDependencies()
 
 include(":app", ":ipfsd", ":api")
 
-rootProject.name = "ipfsdaemon"
+rootProject.name = "ipfs_daemon"
 
 //include(":menu")
 //project(":menu").projectDir = file("../androidutils/menu")

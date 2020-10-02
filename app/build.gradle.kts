@@ -13,6 +13,9 @@ plugins {
 
 android {
 
+  repositories {
+    maven("https://h1.danbrough.org/maven")
+  }
 
   compileSdkVersion(ProjectVersions.SDK_VERSION)
 
@@ -108,9 +111,9 @@ dependencies {
   //implementation(Libs.slf4j_android)
   implementation("org.slf4j:slf4j-api:_")
   //implementation(Libs.slf4j)
-  implementation("com.github.danbrough.androidutils:menu:_")
-  implementation("com.github.danbrough.androidutils:slf4j:_")
-  implementation("com.github.danbrough.androidutils:misc:_")
+  implementation(Danbroid.utils.menu)
+  implementation(Danbroid.utils.slf4j)
+  implementation(Danbroid.utils.misc)
 
 
   implementation(Square.okHttp3.okHttp)
