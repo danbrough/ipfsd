@@ -13,6 +13,10 @@ class IPFSClientModel(context: Application) : AndroidViewModel(context) {
 
   val client = ApiClient(context)
   val api = API(client)
+
+  override fun onCleared() {
+    client.close()
+  }
 }
 
 val Fragment.ipfsClient: IPFSClientModel

@@ -18,6 +18,10 @@ class ApiClient(
     ipfsClient.runWhenConnected {
       super.exec(call, handler)
     }
+
+  fun close(){
+    ipfsClient.disconnect()
+  }
 }
 
 

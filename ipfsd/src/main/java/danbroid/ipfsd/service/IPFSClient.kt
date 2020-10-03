@@ -12,10 +12,12 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 /**
@@ -105,6 +107,9 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
       context.unbindService(serviceConnection)
     }
     _connectionState.value = ConnectionState.CLOSED
+
+    coroutineScope.cancel("Disconnected")
+    coroutineScope = CoroutineScope(Dispatchers.Main)
   }
 
   protected fun finalize() {
@@ -129,9 +134,10 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
   }
 
   private var callCount = 0
+  private var coroutineScope = CoroutineScope(Dispatchers.Main)
 
-  suspend fun runWhenConnected(job: suspend () -> Unit) {
-    withContext(Dispatchers.Main) {
+  fun runWhenConnected(job: suspend () -> Unit) {
+    coroutineScope.launch {
       runCatching {
         if (callCount == 0)
           clearTimeout()
