@@ -133,8 +133,10 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
   suspend fun runWhenConnected(job: suspend () -> Unit) {
     withContext(Dispatchers.Main) {
       runCatching {
+        if (callCount == 0)
+          clearTimeout()
         callCount++
-        clearTimeout()
+        log.trace("callCount: $callCount")
         connect()
         if (connectionState.value == ConnectionState.STARTED) job.invoke()
         else {
@@ -146,7 +148,10 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
       }.also {
         callCount--
         log.trace("call complete: $callCount RESULT: $it")
-        setTimeout()
+        if (callCount == 0)
+          setTimeout().also {
+            log.trace("set timeout")
+          }
       }
     }
   }

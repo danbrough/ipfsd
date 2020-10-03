@@ -128,7 +128,7 @@ dependencies {
   androidTestImplementation(AndroidX.test.rules)
   androidTestImplementation(AndroidX.test.ext.junitKtx)
   androidTestImplementation("com.google.truth:truth:_")
-  androidTestImplementation("com.github.danbrough.androidutils:slf4j:_")
+  androidTestImplementation(Danbroid.utils.slf4j)
 
 
   testImplementation("ch.qos.logback:logback-classic:_")

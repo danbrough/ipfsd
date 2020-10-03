@@ -8,16 +8,20 @@ import android.view.*
 import android.webkit.*
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.fragment.navArgs
+import danbroid.ipfsd.demo.IPFSClientModel
 import danbroid.ipfsd.demo.R
 import kotlinx.android.synthetic.main.fragment_browser.*
 
 
 class BrowserFragment : Fragment() {
 
+  val model: IPFSClientModel by viewModels()
 
-  val url:String = "http://www.python.org"
+
+
+  val url: String = "http://www.python.org"
 
   val loading = object : MutableLiveData<Boolean>() {
     override fun setValue(value: Boolean?) {

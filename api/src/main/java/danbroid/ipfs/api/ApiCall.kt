@@ -35,7 +35,6 @@ open class ApiCall<T>(
     private val log = org.slf4j.LoggerFactory.getLogger(ApiCall::class.java)
 
     fun <T> jsonParser(jsonType: Class<T>): ResponseProcessor<T> = { reader, handler ->
-      log.trace("parsing json ..")
       val parser = JsonStreamParser(reader)
       while (parser.hasNext()) {
         val json = GsonBuilder().create().fromJson(parser.next(), jsonType)
@@ -93,16 +92,6 @@ open class ApiCall<T>(
     }
   }
 
-  @ExperimentalCoroutinesApi
-  fun exec(flowCallback: FlowCallback<T>) {
-    runBlocking(Dispatchers.IO) {
-      errorHandler = flowCallback::onCompletion
-      asFlow().onStart { flowCallback.onStart() }
-        .onCompletion { flowCallback.onCompletion(it) }
-        .collect(flowCallback::onResult)
-    }
-  }
-
   interface FlowCallback<T> {
     @JvmDefault
     fun onStart() = Unit
@@ -111,6 +100,16 @@ open class ApiCall<T>(
     fun onCompletion(thr: Throwable?) = Unit
 
     fun onResult(result: T?)
+  }
+
+  @ExperimentalCoroutinesApi
+  fun exec(flowCallback: FlowCallback<T>) {
+    runBlocking(Dispatchers.IO) {
+      errorHandler = flowCallback::onCompletion
+      asFlow().onStart { flowCallback.onStart() }
+        .onCompletion { flowCallback.onCompletion(it) }
+        .collect(flowCallback::onResult)
+    }
   }
 
   fun asFlow(): Flow<T?> = flow {

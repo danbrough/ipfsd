@@ -6,10 +6,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.Messenger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
 
@@ -19,6 +16,7 @@ class IPFSService : Service() {
   }
 
   var ipfs: IPFS? = null
+  private var coroutineScope = CoroutineScope(Dispatchers.IO)
 
   val clients = mutableSetOf<Messenger>()
   lateinit var messengerHandler: Handler
@@ -56,7 +54,7 @@ class IPFSService : Service() {
     messengerHandler = Handler(Looper.myLooper()!!, messengerCallback)
     messenger = Messenger(messengerHandler)
 
-    GlobalScope.launch(Dispatchers.IO) {
+    coroutineScope.launch {
       measureTimeMillis {
         ipfs = IPFS(this@IPFSService).apply {
           enableNamesysPubsub()
@@ -70,7 +68,6 @@ class IPFSService : Service() {
 
       readStats()
       withContext(Dispatchers.Main) {
-
         if (ipfs?.isStarted == true) {
           val msg = IPFSMessage.SERVICE_STARTED.toMessage()
           clients.forEach {
@@ -79,12 +76,10 @@ class IPFSService : Service() {
         }
       }
     }
-
-
   }
 
   private fun readStats() {
-    GlobalScope.launch(Dispatchers.IO) {
+    coroutineScope.launch {
       ipfs?.newRequest("stats/bw")?.send()?.also {
         it.decodeToString().also {
           log.trace(it)
@@ -105,12 +100,13 @@ class IPFSService : Service() {
     super.onDestroy()
     ipfs?.also {
       ipfs = null
-      GlobalScope.launch(Dispatchers.IO) {
+      runBlocking(Dispatchers.IO) {
         measureTimeMillis {
           it.stop()
         }.also {
           log.debug("stopped in $it")
         }
+        coroutineScope.cancel("Service stopped")
       }
     }
     messengerHandler.removeCallbacksAndMessages(null)

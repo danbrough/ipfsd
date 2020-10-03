@@ -9,7 +9,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.nio.file.Files
 import java.util.concurrent.TimeUnit
 
 open class OkHttpCallExecutor(
@@ -108,14 +107,15 @@ open class OkHttpCallExecutor(
       }
 
 
+  private var callCount = 0
+
   override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) {
     runCatching {
       log.trace("exec() url: ${call.path}")
       withContext(Dispatchers.IO) {
+        callCount++
         val httpCall = createRequest(call)
-        val response = httpCall.execute()
-        response.use { response ->
-
+        httpCall.execute().use { response ->
           if (!response.isSuccessful) {
             call.errorHandler.invoke(Exception("Request failed: ${response.message} code:${response.code}"))
             return@use
@@ -124,11 +124,11 @@ open class OkHttpCallExecutor(
           response.body!!.charStream().use { reader ->
             call.responseProcessor.invoke(reader, handler)
           }
-
         }
       }
-
     }.exceptionOrNull().also {
+      callCount--
+      log.trace("callCount: $callCount")
       when (it) {
         null -> {
           //no exception was thrown

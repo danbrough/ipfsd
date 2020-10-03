@@ -10,13 +10,15 @@ class ApiClient(
   urlBase: String = "http://localhost:$port/api/v0"
 ) : OkHttpCallExecutor(urlBase = urlBase) {
 
-  val ipfsClient = IPFSClient.getClient(context)
+  val ipfsClient = IPFSClient.getClient(context).also {
+    it.timeout = 10000L
+  }
 
   override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) =
     ipfsClient.runWhenConnected {
       super.exec(call, handler)
     }
-
 }
+
 
 private val log = org.slf4j.LoggerFactory.getLogger(ApiClient::class.java)

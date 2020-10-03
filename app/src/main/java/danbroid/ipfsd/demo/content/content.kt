@@ -1,12 +1,12 @@
 package danbroid.ipfsd.demo.content
 
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import danbroid.ipfs.api.API
 import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
+import danbroid.ipfsd.demo.ipfsClient
 import danbroid.util.menu.MenuActionContext
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
@@ -23,16 +23,8 @@ private const val DIR_XCCD = "QmdmQXB2mzChmMeKY47C43LxUdg1NDJ5MWcKMKxDu7RgQm"
 
 private val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 
-private var _api: API? = null
-
-private fun api(context: Context): API = _api ?: synchronized("lock") {
-  API(executor = danbroid.ipfsd.service.ApiClient(context)).also {
-    _api = it
-  }
-}
-
 private val MenuActionContext.api: API
-  get() = api(context)
+  get() = fragment!!.ipfsClient.api
 
 
 val rootContent: MenuItemBuilder by lazy {
@@ -60,7 +52,7 @@ val rootContent: MenuItemBuilder by lazy {
       title = "Add string"
       onClick = {
         val msg = "Hello from the ipfs demo at ${Date()}.\n"
-        api.add(msg,fileName = "ipfs_test_message.txt").exec { result->
+        api.add(msg, fileName = "ipfs_test_message.txt").exec { result ->
           log.debug("added $msg -> $result")
           withContext(Dispatchers.Main) {
             fragment?.activityInterface?.showSnackbar("Added: $msg")

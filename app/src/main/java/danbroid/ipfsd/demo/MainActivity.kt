@@ -3,6 +3,7 @@ package danbroid.ipfsd.demo
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.fragment
@@ -25,6 +26,8 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
       rootContent
     }
   }
+
+  val model: IPFSClientModel by viewModels()
 
 
   protected val navHostFragment: NavHostFragment

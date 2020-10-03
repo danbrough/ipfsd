@@ -135,7 +135,14 @@ dependencies {
   testImplementation("ch.qos.logback:logback-classic:_")
   // testImplementation("net.sf.kxml:kxml2-min:_")
   //testImplementation(Libs.robolectric)
+  androidTestImplementation(Testing.junit4)
+  androidTestImplementation(Danbroid.utils.slf4j)
 
+  androidTestImplementation(AndroidX.test.core)
+  androidTestImplementation(AndroidX.test.runner)
+  androidTestImplementation(AndroidX.test.rules)
+  androidTestImplementation(AndroidX.test.ext.junitKtx)
+  androidTestImplementation("com.google.truth:truth:_")
 }
 
 
