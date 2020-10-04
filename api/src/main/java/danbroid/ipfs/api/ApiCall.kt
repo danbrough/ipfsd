@@ -111,8 +111,10 @@ open class ApiCall<T>(
   }
 
   @ExperimentalCoroutinesApi
-  fun asFlow(): Flow<T?> = channelFlow {
-    executor.exec(this@ApiCall, ::send)
+  fun asFlow(): Flow<T?> = flow {
+    executor.exec(this@ApiCall) {
+      emit(it)
+    }
   }.flowOn(Dispatchers.IO)
 
 
