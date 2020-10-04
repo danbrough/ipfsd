@@ -107,13 +107,10 @@ open class OkHttpCallExecutor(
       }
 
 
-  private var callCount = 0
-
   override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) {
     runCatching {
       log.trace("exec() url: ${call.path}")
       withContext(Dispatchers.IO) {
-        callCount++
         val httpCall = createRequest(call)
         httpCall.execute().use { response ->
           if (!response.isSuccessful) {
@@ -127,8 +124,6 @@ open class OkHttpCallExecutor(
         }
       }
     }.exceptionOrNull().also {
-      callCount--
-      log.trace("callCount: $callCount")
       when (it) {
         null -> {
           //no exception was thrown
@@ -138,6 +133,7 @@ open class OkHttpCallExecutor(
         }
         else -> call.errorHandler.invoke(it)
       }
+
     }
   }
 }

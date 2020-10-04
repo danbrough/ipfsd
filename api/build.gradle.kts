@@ -35,6 +35,12 @@ dependencies {
 /* api(project(":common_domain")) {
    exclude(group = "com.android", module = "android")
  }*/
+
+  testImplementation(Testing.junit4)
+
+  testImplementation("ch.qos.logback:logback-core:_")
+  testImplementation("ch.qos.logback:logback-classic:_")
+
   implementation("org.slf4j:slf4j-api:_")
 //api(Libs.slf4j_api)
 //implementation(Libs.kotlin_stdlib_jdk8)
@@ -46,10 +52,6 @@ dependencies {
   implementation(Square.okHttp3.okHttp)
 
 
-  testImplementation(Testing.junit4)
-
-  testImplementation("ch.qos.logback:logback-core:_")
-  testImplementation("ch.qos.logback:logback-classic:_")
 //testImplementation(Libs.robolectric)
 
 }

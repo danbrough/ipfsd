@@ -1,7 +1,7 @@
 object Danbroid {
   object utils {
     private const val pkg = "com.github.danbrough.androidutils"
-    private const val version = "1.1.0-beta20"
+    private const val version = "1.1.0-beta24"
 
     const val misc = "${pkg}:misc:${version}"
 

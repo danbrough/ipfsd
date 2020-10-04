@@ -4,18 +4,12 @@ plugins {
   kotlin("kapt")
   kotlin("android.extensions")
 //kotlin("org.jetbrains.kotlin:kotlin-android-extensions-runtime:")
-  id("androidx.navigation.safeargs.kotlin")
   id("org.jetbrains.dokka")
-
 }
 
 
 
 android {
-
-  repositories {
-    maven("https://h1.danbrough.org/maven")
-  }
 
   compileSdkVersion(ProjectVersions.SDK_VERSION)
 
@@ -51,8 +45,6 @@ android {
     //freeCompilerArgs = listOf("-Xjsr305=strict")
   }
 
-
-/*
   kotlin.sourceSets.all {
     setOf(
       "kotlinx.coroutines.ExperimentalCoroutinesApi",
@@ -60,7 +52,7 @@ android {
     ).forEach {
       languageSettings.useExperimentalAnnotation(it)
     }
-  }*/
+  }
 }
 
 

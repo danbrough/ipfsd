@@ -10,10 +10,10 @@ buildscript {
   }
 
   dependencies {
-    // classpath("com.android.tools.build:gradle:4.1.0-rc02")
-    classpath("com.android.tools.build:gradle:4.2.0-alpha13")
+     classpath("com.android.tools.build:gradle:4.1.0-rc03")
+   // classpath("com.android.tools.build:gradle:4.2.0-alpha13")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
-    classpath(AndroidX.navigation.safeArgsGradlePlugin)
+   // classpath(AndroidX.navigation.safeArgsGradlePlugin)
     //classpath("org.jetbrains.dokka:dokka-gradle-plugin:_")
 
   }
@@ -28,7 +28,7 @@ allprojects {
   repositories {
     google()
     jcenter()
-    mavenLocal()
+    //maven("https://jitpack.io")
     maven("https://h1.danbrough.org/maven")
    //s maven("https://jitpack.io")
   }

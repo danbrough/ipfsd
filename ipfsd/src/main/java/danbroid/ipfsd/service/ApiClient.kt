@@ -10,9 +10,7 @@ class ApiClient(
   urlBase: String = "http://localhost:$port/api/v0"
 ) : OkHttpCallExecutor(urlBase = urlBase) {
 
-  val ipfsClient = IPFSClient.getClient(context).also {
-    it.timeout = 10000L
-  }
+  val ipfsClient = IPFSClient.getClient(context)
 
   override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) =
     ipfsClient.runWhenConnected {

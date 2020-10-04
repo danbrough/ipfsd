@@ -12,12 +12,10 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
 
 /**
@@ -108,8 +106,6 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
     }
     _connectionState.value = ConnectionState.CLOSED
 
-    coroutineScope.cancel("Disconnected")
-    coroutineScope = CoroutineScope(Dispatchers.Main)
   }
 
   protected fun finalize() {
@@ -134,23 +130,25 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
   }
 
   private var callCount = 0
-  private var coroutineScope = CoroutineScope(Dispatchers.Main)
 
-  fun runWhenConnected(job: suspend () -> Unit) {
-    coroutineScope.launch {
+  suspend fun runWhenConnected(job: suspend () -> Unit) {
+    withContext(Dispatchers.Main) {
       runCatching {
         if (callCount == 0)
           clearTimeout()
         callCount++
         log.trace("callCount: $callCount")
         connect()
-        if (connectionState.value == ConnectionState.STARTED) job.invoke()
-        else {
+
+        if (connectionState.value != ConnectionState.STARTED) {
           log.trace("waiting to be connected ..")
           connectionState.asFlow().filter { it == ConnectionState.STARTED }.first()
           log.trace("connection state: ${connectionState.value}")
-          if (connectionState.value == ConnectionState.STARTED) job.invoke()
         }
+
+        if (connectionState.value == ConnectionState.STARTED) job.invoke()
+        else throw IllegalStateException("Failed to connect")
+
       }.also {
         callCount--
         log.trace("call complete: $callCount RESULT: $it")

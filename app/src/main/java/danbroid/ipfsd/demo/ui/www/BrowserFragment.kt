@@ -8,20 +8,17 @@ import android.view.*
 import android.webkit.*
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
-import danbroid.ipfsd.demo.IPFSClientModel
+import danbroid.ipfsd.demo.DemoNavGraph
 import danbroid.ipfsd.demo.R
 import kotlinx.android.synthetic.main.fragment_browser.*
 
 
 class BrowserFragment : Fragment() {
 
-  val model: IPFSClientModel by viewModels()
-
-
-
-  val url: String = "http://www.python.org"
+  val url: String
+    get() = arguments?.getString(DemoNavGraph.args.url, null)
+      ?: throw IllegalArgumentException("${DemoNavGraph.args.url} not specified")
 
   val loading = object : MutableLiveData<Boolean>() {
     override fun setValue(value: Boolean?) {
@@ -114,12 +111,11 @@ class BrowserFragment : Fragment() {
     with(webView!!.settings)
     {
       // this.minimumFontSize=12
-
       javaScriptCanOpenWindowsAutomatically = true
       javaScriptEnabled = true
       cacheMode = WebSettings.LOAD_DEFAULT
-      setSupportZoom(true)
-      builtInZoomControls = true
+      setSupportZoom(false)
+      builtInZoomControls = false
       displayZoomControls = false
     }
 

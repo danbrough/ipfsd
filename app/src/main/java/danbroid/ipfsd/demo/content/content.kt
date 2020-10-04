@@ -3,16 +3,18 @@ package danbroid.ipfsd.demo.content
 
 import android.content.Intent
 import android.net.Uri
+import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.API
+import danbroid.ipfsd.demo.DemoNavGraph
 import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
-import danbroid.ipfsd.demo.ipfsClient
+import danbroid.ipfsd.demo.model.ipfsClient
+import danbroid.ipfsd.demo.openBrowser
 import danbroid.util.menu.MenuActionContext
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
@@ -50,12 +52,24 @@ val rootContent: MenuItemBuilder by lazy {
 
     menu {
       title = "Add string"
-      onClick = {
+      onClick = { callback ->
         val msg = "Hello from the ipfs demo at ${Date()}.\n"
+        log.trace("adding message: $msg")
         api.add(msg, fileName = "ipfs_test_message.txt").exec { result ->
           log.debug("added $msg -> $result")
           withContext(Dispatchers.Main) {
             fragment?.activityInterface?.showSnackbar("Added: $msg")
+            callback.invoke(true)
+          }
+        }
+      }
+
+      menu {
+        title = "Sub Menu"
+        onClick = {
+          fragment?.findNavController()?.also {
+            log.debug("navigating to test fragment")
+            it.navigate(DemoNavGraph.dest.test_id)
           }
         }
       }
@@ -76,7 +90,6 @@ val rootContent: MenuItemBuilder by lazy {
       onClick = {
         api.pubSub.publish("poiqwe098123", "Hello from the IPFS app at ${Date()}\n ").exec {
           log.debug("RESULT: $it")
-          false
         }
       }
     }
@@ -85,7 +98,7 @@ val rootContent: MenuItemBuilder by lazy {
       title = "Pubsub Test Subscribe"
       onClick = {
 
-        api.pubSub.subscribe("poiqwe098123").asFlow().collect {
+        api.pubSub.subscribe("poiqwe098123", discover = true).exec {
           log.debug("message: from:${it?.fromID} seqNo:${it?.sequenceID} msg:${it?.dataString}")
         }
 
@@ -109,24 +122,32 @@ val rootContent: MenuItemBuilder by lazy {
     menu {
       title = "List XCCD"
       onClick = {
-        api.ls(DIR_XCCD, stream = false).exec {
+        api.ls(DIR_XCCD).exec {
           log.info("result: $it")
-          true
         }
       }
     }
 
+    val url_webui = "http://localhost:5001/webui/"
+
     menu {
       title = "WebUI"
-      id = "http://localhost:5001/webui/"
-      onClick = {
-        context.startActivity(Intent(Intent.ACTION_VIEW).also {
-          it.data = Uri.parse(id)
-        })
-        /*(fragment?.requireActivity() as MainActivity).findNavController(R.id.nav_host_fragment)
-          .also {
-            it.navigate(BrowserFragmentDirections.actionGlobalNavigationBrowser(id!!))
-          }*/
+
+      menu {
+        title = "WebUI external browser"
+
+        onClick = {
+          context.startActivity(Intent(Intent.ACTION_VIEW).also {
+            it.data = Uri.parse(url_webui)
+          })
+        }
+      }
+
+      menu {
+        title = "WebUI embedded browser"
+        onClick = {
+          navController?.openBrowser(url_webui)
+        }
       }
     }
 
