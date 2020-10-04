@@ -52,11 +52,14 @@ val rootContent: MenuItemBuilder by lazy {
 
     menu {
       title = "Add string"
+      var hashID: String? = null
+
       onClick = { callback ->
         val msg = "Hello from the ipfs demo at ${Date()}.\n"
         log.trace("adding message: $msg")
         api.add(msg, fileName = "ipfs_test_message.txt").exec { result ->
           log.debug("added $msg -> $result")
+          hashID = result!!.hash
           withContext(Dispatchers.Main) {
             fragment?.activityInterface?.showSnackbar("Added: $msg")
             callback.invoke(true)
@@ -65,14 +68,15 @@ val rootContent: MenuItemBuilder by lazy {
       }
 
       menu {
-        title = "Sub Menu"
+        title = "Publish: $hashID"
         onClick = {
-          fragment?.findNavController()?.also {
-            log.debug("navigating to test fragment")
-            it.navigate(DemoNavGraph.dest.test_id)
+          api.name.publish(hashID!!).exec {
+            fragment?.activityInterface?.showSnackbar("Published: $hashID to ${it?.value}")
+            log.debug("result: $it")
           }
         }
       }
+
     }
 
     menu {
