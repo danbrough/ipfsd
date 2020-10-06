@@ -1,6 +1,7 @@
 package danbroid.ipfsd.demo.content
 
 import androidx.appcompat.app.AppCompatActivity
+import danbroid.ipfs.api.API
 import danbroid.ipfsd.demo.model.IPFSClientModel
 import danbroid.ipfsd.demo.model.ipfsClient
 import danbroid.util.menu.MenuDSL
@@ -38,7 +39,7 @@ fun MenuItemBuilder.ipfsDir(
         ipfsClient = (context as AppCompatActivity).ipfsClient
 
         log.debug("calling ls on $path")
-        ipfsClient.api.ls(path).exec { result ->
+        ipfsClient.executor.exec(API.ls(path)) { result ->
           log.debug("result: $result")
           result?.objects?.forEach { file ->
             file.links.forEach { link ->

@@ -2,7 +2,6 @@ package danbroid.ipfsd.demo.activities
 
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
-import danbroid.ipfsd.demo.R
 import danbroid.util.menu.ui.menulist.MenuListAdapter
 
 
@@ -22,10 +21,9 @@ interface ActivityInterface {
   )
 
 
-
   fun openBrowser(url: String)
 }
 
 
-val Fragment.activityInterface: ActivityInterface?
-  get() = (activity as? ActivityInterface)
+val Fragment?.activityInterface: ActivityInterface?
+  get() = (this!!.activity as ActivityInterface)

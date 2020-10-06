@@ -52,6 +52,7 @@ open class OkHttpCallExecutor(
           }
         }.build()
 
+
   protected fun addFile(builder: MultipartBody.Builder, file: File, rootLength: Int? = null) {
     log.trace("addFile() $file isDir:${file.isDirectory} isFile:${file.isFile}")
 
@@ -106,7 +107,6 @@ open class OkHttpCallExecutor(
         httpClient.newCall(it)
       }
 
-
   override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) {
     runCatching {
       log.trace("exec() url: ${call.path}")
@@ -136,5 +136,6 @@ open class OkHttpCallExecutor(
 
     }
   }
+
 }
 

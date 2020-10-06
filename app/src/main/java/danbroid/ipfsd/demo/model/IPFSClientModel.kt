@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import danbroid.ipfs.api.API
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.OkHttpCallExecutor
 import danbroid.ipfs.api.ResultHandler
@@ -19,8 +18,8 @@ class IPFSClientModel(context: Application) : AndroidViewModel(context) {
     log.error("CREATED IPFS CLIENT MODEL ")
   }
 
-  val ipfsClient = IPFSClient.getClient(context).also {
-    it.connect()
+  val ipfsClient = IPFSClient(context).apply {
+    connect()
   }
 
   val executor = object : OkHttpCallExecutor() {
@@ -30,10 +29,10 @@ class IPFSClientModel(context: Application) : AndroidViewModel(context) {
       }
     }
   }
-  val api = API(executor)
 
   override fun onCleared() {
     log.error("onCleared()")
+    ipfsClient.disconnect()
   }
 
   companion object {

@@ -1,5 +1,6 @@
 package danbroid.ipfs.api
 
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import danbroid.ipfs.api.utils.Base58
 import okio.ByteString.Companion.decodeBase64
@@ -122,6 +123,15 @@ object Types {
     @SerializedName("Value")
     val value: String
   )
+
+  class Config {
+    data class ConfigChange(
+      @SerializedName("NewCfg")
+      val newConfig: JsonObject,
+      @SerializedName("OldCfg")
+      val oldConfig: JsonObject
+    )
+  }
 
 }
 

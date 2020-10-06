@@ -4,6 +4,7 @@ package danbroid.ipfsd.demo.content
 import android.content.Intent
 import android.net.Uri
 import danbroid.ipfs.api.API
+import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.model.ipfsClient
@@ -14,7 +15,6 @@ import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -25,9 +25,15 @@ const val dir_kitty = "/ipfs/QmaknW7EzautwWKE1q4rpR4tPnP1XuxMKGr8KiyRZKqC5T"
 
 val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 
-private val MenuActionContext.api: API
-  get() = fragment!!.ipfsClient.api
+private val MenuActionContext.executor: CallExecutor
+  get() = fragment!!.ipfsClient.executor
 
+private inline suspend fun MenuActionContext.debug(msg: String) {
+  withContext(Dispatchers.Main) {
+    log.debug(msg)
+    fragment.activityInterface?.showSnackbar(msg)
+  }
+}
 
 val rootContent: MenuItemBuilder by lazy {
 
@@ -38,27 +44,31 @@ val rootContent: MenuItemBuilder by lazy {
     menu {
       title = "Get ID"
       onClick = {
-
-        /*   api.version().asFlow().first()?.also {
-             log.debug("version: $it")
-           }*/
-
-        api.id().asFlow().first().also {
-          log.debug("id: $it")
+        executor.exec(API.id()) {
+          debug("id: $it")
         }
-
       }
     }
 
     menu {
       title = "Stop"
       onClick = {
-        context.startService(
-          Intent(
-            context,
-            IPFSService::class.java
-          ).setAction(IPFSService.ACTION_STOP)
-        )
+        /*     context.startService(
+               Intent(
+                 context,
+                 IPFSService::class.java
+               ).setAction(IPFSService.ACTION_STOP)
+             )*/
+        context.stopService(Intent(context, IPFSService::class.java))
+      }
+    }
+
+    menu {
+      title = "Profile Apply"
+      onClick = {
+        executor.exec(API.Config.Profile.apply("lowpower")) {
+          debug("result: $it")
+        }
       }
     }
 
@@ -71,7 +81,7 @@ val rootContent: MenuItemBuilder by lazy {
         val msg = "Hello from the ipfs demo at ${Date()}.\n"
         log.trace("adding message: $msg")
         val parentID = this@menu.id
-        api.add(msg, fileName = "ipfs_test_message.txt").exec { result ->
+        executor.exec(API.add(msg, fileName = "ipfs_test_message.txt")) { result ->
           log.debug("added $msg -> $result")
           hashID = result!!.hash
           withContext(Dispatchers.Main) {
@@ -83,7 +93,7 @@ val rootContent: MenuItemBuilder by lazy {
               subtitle = hashID!!
               onClick = {
                 log.error("publishing: $hashID")
-                api.name.publish(hashID!!).exec {
+                executor.exec(API.Name.publish(hashID!!)) {
                   fragment?.activityInterface?.showSnackbar("Published: $hashID to ${it?.value}")
                   log.debug("result: $it")
                 }
@@ -96,11 +106,10 @@ val rootContent: MenuItemBuilder by lazy {
     }
 
     menu {
-      title = "GC"
+      title = "Bandwidth"
       onClick = {
-        System.gc()
-        api.stats.bw().exec {
-          log.debug("bandwidth: $it")
+        executor.exec(API.Stats.bw()) {
+          debug("bandwidth: $it")
         }
       }
     }
@@ -108,8 +117,13 @@ val rootContent: MenuItemBuilder by lazy {
     menu {
       title = "PubSub Publish"
       onClick = {
-        api.pubSub.publish("poiqwe098123", "Hello from the IPFS app at ${Date()}\n ").exec {
-          log.debug("RESULT: $it")
+        executor.exec(
+          API.PubSub.publish(
+            "poiqwe098123",
+            "Hello from the IPFS app at ${Date()}\n "
+          )
+        ) {
+          debug("RESULT: $it")
         }
       }
     }
@@ -118,8 +132,9 @@ val rootContent: MenuItemBuilder by lazy {
       title = "Pubsub Test Subscribe"
       onClick = {
 
-        api.pubSub.subscribe("poiqwe098123", discover = true).exec {
-          log.debug("message: from:${it?.fromID} seqNo:${it?.sequenceID} msg:${it?.dataString}")
+        executor.exec(API.PubSub.subscribe("poiqwe098123", discover = true)) {
+          val msg = it?.dataString ?: "null"
+          debug(msg)
         }
 
       }
@@ -128,8 +143,8 @@ val rootContent: MenuItemBuilder by lazy {
     menu {
       title = "List kitty"
       onClick = {
-        api.ls(dir_kitty).exec {
-          log.debug("GOT KITTY: $it")
+        executor.exec(API.ls(dir_kitty)) {
+          debug("GOT KITTY: $it")
         }
       }
     }
@@ -137,7 +152,9 @@ val rootContent: MenuItemBuilder by lazy {
     menu {
       title = "List kitty.danbrough.org"
       onClick = {
-        api.ls("/ipns/kitty.danbrough.org").exec()
+        executor.exec(API.ls("/ipns/kitty.danbrough.org")) {
+          debug("result: $it")
+        }
       }
     }
 
@@ -172,5 +189,3 @@ val rootContent: MenuItemBuilder by lazy {
   }
 
 }
-
-
