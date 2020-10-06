@@ -19,6 +19,10 @@ sealed class IPFSMessage : Parcelable {
   @Parcelize
   object SERVICE_STARTED : IPFSMessage()
 
+
+  @Parcelize
+  object SERVICE_STOPPING : IPFSMessage()
+
   @Parcelize
   data class SET_CONFIGURATION(
     val inactivityTimeout: Long,

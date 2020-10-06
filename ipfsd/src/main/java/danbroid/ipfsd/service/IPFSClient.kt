@@ -16,18 +16,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import java.lang.ref.WeakReference
 
 /**
  *
  */
-open class IPFSClient protected constructor(val context: Context) {
+open class IPFSClient(val context: Context, var timeout: Long = 60000L) {
 
   enum class ConnectionState {
-    CLOSED, DISCONNECTED, CONNECTING, CONNECTED, STARTED;
+    DISCONNECTED, CONNECTING, CONNECTED, STARTED;
   }
 
-  var timeout: Long = 60000L
+  init {
+    log.error("CREATED IPFS CLIENT")
+  }
 
   private val _connectionState: MutableLiveData<ConnectionState> =
     MutableLiveData(ConnectionState.DISCONNECTED)
@@ -49,6 +50,10 @@ open class IPFSClient protected constructor(val context: Context) {
           IPFSMessage.SERVICE_STARTED -> {
             _connectionState.value = ConnectionState.STARTED
             setTimeout()
+          }
+          IPFSMessage.SERVICE_STOPPING -> {
+            log.warn("SERVICE STOPPING")
+            disconnect()
           }
           else -> log.error("unhandled message: $msg")
         }
@@ -78,18 +83,21 @@ open class IPFSClient protected constructor(val context: Context) {
 
   @MainThread
   fun connect() {
-    if (_connectionState.value.let {
-        it != ConnectionState.STARTED && it != ConnectionState.CONNECTING
-      }) {
+    log.debug("connect() state: ${_connectionState.value}")
+    if (_connectionState.value == ConnectionState.DISCONNECTED) {
       log.debug("connecting ..")
       _connectionState.value = ConnectionState.CONNECTING
 
+      log.warn("starting service")
+      val intent = Intent(context, IPFSService::class.java)
+
       log.warn("binding to service ..")
       context.bindService(
-        Intent(context, IPFSService::class.java),
+        intent,
         serviceConnection,
         Context.BIND_AUTO_CREATE
       )
+
     }
   }
 
@@ -98,16 +106,16 @@ open class IPFSClient protected constructor(val context: Context) {
     log.info("disconnect() connectionState: ${_connectionState.value}")
     messageHandler.removeCallbacksAndMessages(null)
 
-    if (_connectionState.value != ConnectionState.CLOSED) {
+    if (_connectionState.value != ConnectionState.DISCONNECTED) {
       outMessenger?.send(IPFSMessage.CLIENT_DISCONNECT.toMessage())
     }
 
-    if (_connectionState.value != ConnectionState.CLOSED && _connectionState.value != ConnectionState.DISCONNECTED) {
+    if (_connectionState.value != ConnectionState.DISCONNECTED && _connectionState.value != ConnectionState.DISCONNECTED) {
       // sendMessage(RegisterEvent.UNREGISTER)
       log.trace("unbinding service ..")
       context.unbindService(serviceConnection)
     }
-    _connectionState.value = ConnectionState.CLOSED
+    _connectionState.value = ConnectionState.DISCONNECTED
 
   }
 
@@ -118,19 +126,7 @@ open class IPFSClient protected constructor(val context: Context) {
 
 
   companion object {
-
     const val MSG_TIMEOUT = 12301
-
-    private var client: WeakReference<IPFSClient>? = null
-
-    fun getClient(context: Context, timeout: Long = 60000): IPFSClient =
-      client?.get() ?: synchronized(IPFSClient::class.java) {
-        client?.get() ?: IPFSClient(context).also {
-          client = WeakReference(it)
-          it.timeout = timeout
-        }
-      }
-
   }
 
   private var callCount = 0

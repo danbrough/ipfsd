@@ -3,12 +3,11 @@ package danbroid.ipfs.api
 import danbroid.ipfs.api.utils.addUrlArgs
 import java.io.File
 
-class API(val executor: CallExecutor) {
+object API {
 
 
   @JvmOverloads
   fun ls(path: String, stream: Boolean = false) = ApiCall(
-    executor,
     "ls".addUrlArgs("arg" to path, "stream" to stream),
     Types.Objects::class.java
   )
@@ -33,7 +32,6 @@ class API(val executor: CallExecutor) {
     onlyHash: Boolean? = null
   ) =
     ApiCall(
-      executor,
       "add".addUrlArgs(
         "wrap-with-directory" to wrapWithDirectory,
         "pin" to pin,
@@ -51,38 +49,33 @@ class API(val executor: CallExecutor) {
       }
     }
 
-  fun id() = ApiCall(executor, "id", Types.ID::class.java)
-  fun version() = ApiCall(executor, "version", Types.Version::class.java)
+  fun id() = ApiCall("id", Types.ID::class.java)
+  fun version() = ApiCall("version", Types.Version::class.java)
 
 
-  class PubSub(private val api: API) {
+  object PubSub {
     @JvmOverloads
     fun subscribe(topic: String, discover: Boolean = true) = ApiCall(
-      api.executor,
       "pubsub/sub".addUrlArgs("arg" to topic, "discover" to discover),
       Types.PubSub.Message::class.java
     )
 
+    @JvmOverloads
+
     fun publish(topic: String, data: String) = ApiCall<Boolean>(
-      api.executor,
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
     ) { _, handler ->
       handler.invoke(true)
     }
   }
 
-  @JvmField
-  val pubSub = PubSub(this)
 
-  class Stats(private val api: API) {
-    fun bw() = ApiCall(api.executor, "stats/bw", Types.Stats.Bandwidth::class.java)
+  object Stats {
+    fun bw() = ApiCall("stats/bw", Types.Stats.Bandwidth::class.java)
   }
 
-  @JvmField
-  val stats = Stats(this)
 
-
-  class Name(private val api: API) {
+  object Name {
 
     /**
      *  Publish IPNS names
@@ -105,7 +98,6 @@ class API(val executor: CallExecutor) {
       key: String? = null
     ) =
       ApiCall(
-        api.executor,
         "name/publish".addUrlArgs(
           "arg" to path,
           "resolve" to resolve,
@@ -116,10 +108,8 @@ class API(val executor: CallExecutor) {
       )
   }
 
-  @JvmField
-  val name = Name(this)
 
-  class Key(private val api: API) {
+  object Key {
     /**
      * List all local keypairs
      *
@@ -129,15 +119,27 @@ class API(val executor: CallExecutor) {
     fun ls(
       ipnsBase: String? = null
     ) =
-      ApiCall(api.executor, "key/list".addUrlArgs("ipns-base" to ipnsBase), Types.Keys::class.java)
+      ApiCall("key/list".addUrlArgs("ipns-base" to ipnsBase), Types.Keys::class.java)
   }
 
-  @JvmField
-  val key = Key(this)
 
-  companion object {
-    private val log = org.slf4j.LoggerFactory.getLogger(API::class.java)
+  object Config {
+    object Profile {
+      /**
+       * @param profile The profile to apply to the config.
+       * @param dryRun Print difference between the current config and the config that would be generated.
+       */
+      @JvmOverloads
+      fun apply(profile: String, dryRun: Boolean? = null) =
+        ApiCall(
+          "config/profile/apply".addUrlArgs("arg" to profile, "dry-run" to dryRun),
+          Types.Config.ConfigChange::class.java
+        )
+    }
   }
+
+  //private val log = org.slf4j.LoggerFactory.getLogger(API::class.java)
+
 }
 
 

@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.os.Messenger
 import danbroid.ipfsd.R
+import danbroid.util.format.FormatUtils
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import kotlin.system.measureTimeMillis
@@ -26,9 +27,23 @@ class IPFSService : Service() {
       context,
       IPFSService::class.java
     ).setAction(ACTION_STOP)
+
+    @Volatile
+    private var ipfs: IPFS? = null
+
+    fun getIPFS(context: Context) = ipfs ?: synchronized(IPFSService::class.java) {
+      ipfs ?: IPFS(context.applicationContext).also {
+        it.enableNamesysPubsub()
+        it.enablePubsubExperiment()
+        ipfs = it
+      }
+    }
   }
 
-  var ipfs: IPFS? = null
+
+  private val ipfs: IPFS
+    get() = getIPFS(this)
+
   private var coroutineScope = CoroutineScope(Dispatchers.IO)
 
   val clients = mutableSetOf<Messenger>()
@@ -46,7 +61,7 @@ class IPFSService : Service() {
         when (msg) {
           IPFSMessage.CLIENT_CONNECT -> {
             clients.add(it.replyTo)
-            if (ipfs?.isStarted == true)
+            if (ipfs.isStarted == true)
               it.replyTo.send(IPFSMessage.SERVICE_STARTED.toMessage())
           }
           IPFSMessage.CLIENT_DISCONNECT -> {
@@ -73,22 +88,17 @@ class IPFSService : Service() {
 
     coroutineScope.launch {
       measureTimeMillis {
-        ipfs = IPFS(this@IPFSService).apply {
-          enableNamesysPubsub()
-          enablePubsubExperiment()
-          start()
-          log.debug("started: ${isStarted}")
-        }
+        if (!ipfs.isStarted)
+          ipfs.start()
       }.also {
         log.debug("created ipfs in $it")
-        withContext(Dispatchers.Main) {
-          showNotification(getString(R.string.lbl_service_running))
-        }
       }
-
+      withContext(Dispatchers.Main) {
+        showNotification(getString(R.string.lbl_service_running))
+      }
       readStats()
       withContext(Dispatchers.Main) {
-        if (ipfs?.isStarted == true) {
+        if (ipfs.isStarted == true) {
           val msg = IPFSMessage.SERVICE_STARTED.toMessage()
           clients.forEach {
             it.send(msg)
@@ -101,7 +111,7 @@ class IPFSService : Service() {
 
   private fun readStats() {
     coroutineScope.launch {
-      ipfs?.newRequest("stats/bw")?.send()?.also {
+      ipfs.newRequest("stats/bw")?.send()?.also {
         messengerHandler.sendEmptyMessageDelayed(MSG_POLL_STATS, 10000)
         val stats = JSONObject(it.decodeToString())
         withContext(Dispatchers.Main) {
@@ -110,7 +120,9 @@ class IPFSService : Service() {
             val totalOut = stats.getLong("TotalOut")
             val rateIn = stats.getDouble("RateIn")
             val rateOut = stats.getDouble("RateOut")
-            val msg = "In: %02d Out:%02d (%.0f,%.0f)".format(totalIn, totalOut, rateIn, rateOut)
+
+            //val msg = "In: %02d Out:%02d (%.0f,%.0f)".format(totalIn, totalOut, rateIn, rateOut)
+            val msg = "Network usage: ${FormatUtils.humanReadableByteCountBin(totalIn)} in ${FormatUtils.humanReadableByteCountBin(totalOut)} out. Total: ${FormatUtils.humanReadableByteCountBin(totalIn + totalOut)}"
             setContentText(msg)
           }
         }
@@ -128,8 +140,24 @@ class IPFSService : Service() {
     log.warn("onStartCommand() $intent flags:$flags startId: $startId")
     if (intent?.action == ACTION_STOP) {
       log.error("NEED TO STOP!!!")
-      stopSelf()
+
+      cancelNotification()
+      clients.forEach {
+        val msg = IPFSMessage.SERVICE_STOPPING.toMessage()
+        try {
+          it.send(msg)
+        } catch (err: Exception) {
+          log.error(err.message, err)
+        }
+      }
+      clients.clear()
+      coroutineScope.cancel("Stopping")
+      stopSelf(startId)
+
+      return START_STICKY_COMPATIBILITY
     }
+
+
 /*    if (intent?.getBooleanExtra(EXTRA_DELETE, false) == true) {
       log.error("NEED TO STOP!!!")
       stopSelf()
@@ -142,17 +170,17 @@ class IPFSService : Service() {
     log.warn("onDestroy()")
     super.onDestroy()
     cancelNotification()
-    ipfs?.also {
-      ipfs = null
-      runBlocking(Dispatchers.IO) {
-        measureTimeMillis {
-          it.stop()
-        }.also {
-          log.debug("stopped in $it")
-        }
-        coroutineScope.cancel("Service stopped")
+    coroutineScope.cancel("Service stopped")
+
+    runBlocking(Dispatchers.IO) {
+      measureTimeMillis {
+        if (ipfs.isStarted)
+          ipfs.stop()
+      }.also {
+        log.debug("stopped in $it")
       }
     }
+
     messengerHandler.removeCallbacksAndMessages(null)
     clients.clear()
   }

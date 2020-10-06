@@ -2,11 +2,13 @@ package danbroid.ipfs.api
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonStreamParser
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.Reader
-import kotlin.coroutines.coroutineContext
 
 
 /**
@@ -18,13 +20,11 @@ typealias ResultHandler<T> = (suspend (T?) -> Unit)
 typealias  ResponseProcessor<T> = suspend (reader: Reader, handler: ResultHandler<T>) -> Unit
 
 open class ApiCall<T>(
-  val executor: CallExecutor,
   val path: String,
   val responseProcessor: ResponseProcessor<T>
 ) {
 
-  constructor(executor: CallExecutor, path: String, type: Class<T>) : this(
-    executor,
+  constructor(path: String, type: Class<T>) : this(
     path,
     jsonParser(type)
   )
@@ -83,7 +83,7 @@ open class ApiCall<T>(
   }
 
 
-  suspend fun exec(handler: ResultHandler<T>? = null) {
+/*  suspend fun exec(handler: ResultHandler<T>? = null) {
     if (handler != null) resultHandler = handler
     withContext(Dispatchers.IO) {
       executor.exec(this@ApiCall, resultHandler)
@@ -115,7 +115,7 @@ open class ApiCall<T>(
     executor.exec(this@ApiCall) {
       emit(it)
     }
-  }.flowOn(Dispatchers.IO)
+  }.flowOn(Dispatchers.IO)*/
 
 
 }
