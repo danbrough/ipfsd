@@ -10,8 +10,8 @@ buildscript {
   }
 
   dependencies {
-     classpath("com.android.tools.build:gradle:4.1.0-rc03")
-   // classpath("com.android.tools.build:gradle:4.2.0-alpha13")
+   //classpath("com.android.tools.build:gradle:4.1.0-rc03")
+     classpath("com.android.tools.build:gradle:4.2.0-alpha13")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
   }
 
@@ -27,7 +27,6 @@ allprojects {
     jcenter()
     //maven("https://jitpack.io")
     maven("https://h1.danbrough.org/maven")
-   //s maven("https://jitpack.io")
   }
 
   tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
@@ -40,9 +39,11 @@ allprojects {
 
 }
 
+
 tasks.dokkaGfmMultiModule {
   outputDirectory.set(file("docs"))
 }
+
 
 
 

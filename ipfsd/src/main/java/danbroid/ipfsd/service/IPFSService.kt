@@ -1,18 +1,31 @@
 package danbroid.ipfsd.service
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.Messenger
+import danbroid.ipfsd.R
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import kotlin.system.measureTimeMillis
 
 
 class IPFSService : Service() {
+
   companion object {
     const val MSG_POLL_STATS = 10241
+    const val CHANNEL_ID = "ipfs_channel"
+    const val CHANNEL_NAME = "IPFS Channel"
+    const val CHANNEL_DESCRIPTION = "IPFS Service notification channel"
+    const val ACTION_STOP = "danbroid.ipfsd.service.ACTION_STOP"
+
+    fun createStopIntent(context: Context) = Intent(
+      context,
+      IPFSService::class.java
+    ).setAction(ACTION_STOP)
   }
 
   var ipfs: IPFS? = null
@@ -51,8 +64,12 @@ class IPFSService : Service() {
     log.warn("onCreate()")
     super.onCreate()
 
+    log.trace("creating notification channel")
+    createNotificationChannel(CHANNEL_ID, CHANNEL_NAME, CHANNEL_DESCRIPTION)
+
     messengerHandler = Handler(Looper.myLooper()!!, messengerCallback)
     messenger = Messenger(messengerHandler)
+    showNotification(getString(R.string.lbl_service_starting))
 
     coroutineScope.launch {
       measureTimeMillis {
@@ -64,6 +81,9 @@ class IPFSService : Service() {
         }
       }.also {
         log.debug("created ipfs in $it")
+        withContext(Dispatchers.Main) {
+          showNotification(getString(R.string.lbl_service_running))
+        }
       }
 
       readStats()
@@ -78,19 +98,42 @@ class IPFSService : Service() {
     }
   }
 
+
   private fun readStats() {
     coroutineScope.launch {
       ipfs?.newRequest("stats/bw")?.send()?.also {
-        it.decodeToString().also {
-          log.trace(it)
-        }
         messengerHandler.sendEmptyMessageDelayed(MSG_POLL_STATS, 10000)
+        val stats = JSONObject(it.decodeToString())
+        withContext(Dispatchers.Main) {
+          showNotification {
+            val totalIn = stats.getLong("TotalIn")
+            val totalOut = stats.getLong("TotalOut")
+            val rateIn = stats.getDouble("RateIn")
+            val rateOut = stats.getDouble("RateOut")
+            val msg = "In: %02d Out:%02d (%.0f,%.0f)".format(totalIn, totalOut, rateIn, rateOut)
+            setContentText(msg)
+          }
+        }
       }
     }
   }
 
+  override fun onRebind(intent: Intent?) {
+    log.warn("onRebind() $intent")
+    super.onRebind(intent)
+  }
+
+
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     log.warn("onStartCommand() $intent flags:$flags startId: $startId")
+    if (intent?.action == ACTION_STOP) {
+      log.error("NEED TO STOP!!!")
+      stopSelf()
+    }
+/*    if (intent?.getBooleanExtra(EXTRA_DELETE, false) == true) {
+      log.error("NEED TO STOP!!!")
+      stopSelf()
+    }*/
     return super.onStartCommand(intent, flags, startId)
   }
 
@@ -98,6 +141,7 @@ class IPFSService : Service() {
   override fun onDestroy() {
     log.warn("onDestroy()")
     super.onDestroy()
+    cancelNotification()
     ipfs?.also {
       ipfs = null
       runBlocking(Dispatchers.IO) {

@@ -5,9 +5,6 @@ import java.io.File
 
 class API(val executor: CallExecutor) {
 
-  interface CallExecutor {
-    suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>)
-  }
 
   @JvmOverloads
   fun ls(path: String, stream: Boolean = false) = ApiCall(
@@ -69,7 +66,7 @@ class API(val executor: CallExecutor) {
     fun publish(topic: String, data: String) = ApiCall<Boolean>(
       api.executor,
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
-    ) { reader, handler ->
+    ) { _, handler ->
       handler.invoke(true)
     }
   }

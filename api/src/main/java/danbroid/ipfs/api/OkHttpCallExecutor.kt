@@ -15,7 +15,7 @@ open class OkHttpCallExecutor(
   port: Int = 5001,
   val urlBase: String = "http://localhost:$port/api/v0"
 ) :
-  API.CallExecutor {
+  CallExecutor {
 
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpCallExecutor::class.java)

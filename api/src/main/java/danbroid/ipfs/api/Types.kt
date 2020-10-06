@@ -44,7 +44,10 @@ object Types {
     val target: String,
     @SerializedName("Type")
     val type: Int
-  )
+  ) {
+    val isDirectory = type == 1
+    val isFile = type == 2
+  }
 
   data class Object(
     @SerializedName("Hash")
