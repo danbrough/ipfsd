@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import danbroid.ipfsd.demo.DemoNavGraph
 import danbroid.ipfsd.demo.R
+import danbroid.ipfsd.demo.model.ipfsClient
 import kotlinx.android.synthetic.main.fragment_browser.*
 
 
@@ -31,6 +32,17 @@ class BrowserFragment : Fragment() {
     super.onCreate(savedInstanceState)
     setHasOptionsMenu(true)
   }
+
+  override fun onStart() {
+    super.onStart()
+    ipfsClient.ipfsClient.incrementCallCount()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    ipfsClient.ipfsClient.decrementCallCount()
+  }
+
 
   val onBackPressedCallback = object : OnBackPressedCallback(false) {
     override fun handleOnBackPressed() {
@@ -63,7 +75,7 @@ class BrowserFragment : Fragment() {
 
 
     override fun onPageStarted(view: WebView?, url: String, favicon: Bitmap?) {
-      //log.info("onPageStarted() $url")
+      log.info("onPageStarted() $url")
       //TODO  activityInterface?.setToolbarTitle(getString(R.string.msg_loading))
       loading.postValue(true)
     }
@@ -91,6 +103,12 @@ class BrowserFragment : Fragment() {
       loading.postValue(false)
     }
 
+
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+      log.trace("showOverrideUrlLoading() ${request.url}")
+      view.loadUrl(request.url.toString())
+      return true
+    }
 
   }
 

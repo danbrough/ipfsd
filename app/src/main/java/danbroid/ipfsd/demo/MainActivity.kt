@@ -26,7 +26,6 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
 
   val model: IPFSClientModel by viewModels()
 
-
   protected val navHostFragment: NavHostFragment
     get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
 
@@ -62,6 +61,9 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
     log.warn("data:${intent?.data}")
     log.warn("extras:${intent?.extras}")
 
+    if (intent?.action == Intent.ACTION_VIEW) {
+      if (navHostFragment.navController.handleDeepLink(intent)) return
+    }
     super.onNewIntent(intent)
   }
 
@@ -81,7 +83,11 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     return when (item.itemId) {
-      R.id.action_settings -> true
+      R.id.action_settings -> {
+        log.debug("navingating to settings")
+        navHostFragment.navController.navigate(DemoNavGraph.dest.settings_id)
+        true
+      }
       else -> super.onOptionsItemSelected(item)
     }
   }

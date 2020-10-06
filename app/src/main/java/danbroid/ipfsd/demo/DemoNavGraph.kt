@@ -4,15 +4,20 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.fragment.fragment
 import danbroid.ipfsd.demo.ui.TestFragment
+import danbroid.ipfsd.demo.ui.settings.SettingsFragment
 import danbroid.ipfsd.demo.ui.www.BrowserFragment
 import danbroid.util.menu.navigation.UniqueIDS
 import danbroid.util.menu.navigation.createMenuGraph
+
+private const val pkg = "danbroid.ipfsd.demo"
+const val ACTION_SETTINGS = "$pkg.ACTION_SETTINGS"
 
 object DemoNavGraph : UniqueIDS {
 
   object dest {
     val browser_id = nextID()
     val test_id = nextID()
+    val settings_id = nextID()
   }
 
   object deep_link {
@@ -21,6 +26,7 @@ object DemoNavGraph : UniqueIDS {
 
   object action {
     val toBrowser = nextID()
+    val toSettings = nextID()
   }
 
   object args {
@@ -36,9 +42,9 @@ fun NavController.createDemoNavGraph() =
   createMenuGraph(deeplinkPrefix = URL_CONTENT_BASE) {
 
     fragment<BrowserFragment>(DemoNavGraph.dest.browser_id) {
-      label = "Loading.."
+      label = "WebUI"
       argument(DemoNavGraph.args.url) {
-        defaultValue = "https://www.rnz.co.nz/news"
+        defaultValue = "https://localhost:5001/webui/"
       }
     }
 
@@ -46,12 +52,21 @@ fun NavController.createDemoNavGraph() =
       label = "Test Fragment"
     }
 
+    fragment<SettingsFragment>(DemoNavGraph.dest.settings_id) {
+      label = "Settings"
+      deepLink {
+        action = ACTION_SETTINGS
+        uriPattern = "$URL_BASE/settings"
+      }
+    }
+
     action(DemoNavGraph.action.toBrowser) {
       destinationId = DemoNavGraph.dest.browser_id
     }
 
+
     deepLink {
-      uriPattern = "$URL_BASE//.*"
+      uriPattern = "ipfsd://.*"
     }
   }
 

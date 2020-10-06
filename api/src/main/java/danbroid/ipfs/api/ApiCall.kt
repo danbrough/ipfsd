@@ -18,12 +18,12 @@ typealias ResultHandler<T> = (suspend (T?) -> Unit)
 typealias  ResponseProcessor<T> = suspend (reader: Reader, handler: ResultHandler<T>) -> Unit
 
 open class ApiCall<T>(
-  val executor: API.CallExecutor,
+  val executor: CallExecutor,
   val path: String,
   val responseProcessor: ResponseProcessor<T>
 ) {
 
-  constructor(executor: API.CallExecutor, path: String, type: Class<T>) : this(
+  constructor(executor: CallExecutor, path: String, type: Class<T>) : this(
     executor,
     path,
     jsonParser(type)

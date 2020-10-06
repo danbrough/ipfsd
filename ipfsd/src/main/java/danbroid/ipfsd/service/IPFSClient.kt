@@ -21,11 +21,13 @@ import java.lang.ref.WeakReference
 /**
  *
  */
-open class IPFSClient protected constructor(val context: Context, var timeout: Long = 60000L) {
+open class IPFSClient protected constructor(val context: Context) {
 
   enum class ConnectionState {
     CLOSED, DISCONNECTED, CONNECTING, CONNECTED, STARTED;
   }
+
+  var timeout: Long = 60000L
 
   private val _connectionState: MutableLiveData<ConnectionState> =
     MutableLiveData(ConnectionState.DISCONNECTED)
@@ -63,6 +65,7 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
 
   @MainThread
   fun setTimeout() {
+    log.trace("setTimeout() $timeout")
     clearTimeout()
     messageHandler.sendEmptyMessageDelayed(MSG_TIMEOUT, timeout)
   }
@@ -74,7 +77,7 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
   private val serviceConnection = IPFSServiceConnection()
 
   @MainThread
-  private fun connect() {
+  fun connect() {
     if (_connectionState.value.let {
         it != ConnectionState.STARTED && it != ConnectionState.CONNECTING
       }) {
@@ -120,10 +123,11 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
 
     private var client: WeakReference<IPFSClient>? = null
 
-    fun getClient(context: Context): IPFSClient =
+    fun getClient(context: Context, timeout: Long = 60000): IPFSClient =
       client?.get() ?: synchronized(IPFSClient::class.java) {
         client?.get() ?: IPFSClient(context).also {
           client = WeakReference(it)
+          it.timeout = timeout
         }
       }
 
@@ -131,14 +135,27 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
 
   private var callCount = 0
 
+  @MainThread
+  fun incrementCallCount() {
+    if (callCount == 0)
+      clearTimeout()
+    callCount++
+    log.trace("callCount: $callCount")
+    connect()
+  }
+
+  @MainThread
+  fun decrementCallCount() {
+    callCount--
+    log.trace("call complete: $callCount")
+    if (callCount == 0)
+      setTimeout()
+  }
+
   suspend fun runWhenConnected(job: suspend () -> Unit) {
     withContext(Dispatchers.Main) {
       runCatching {
-        if (callCount == 0)
-          clearTimeout()
-        callCount++
-        log.trace("callCount: $callCount")
-        connect()
+        incrementCallCount()
 
         if (connectionState.value != ConnectionState.STARTED) {
           log.trace("waiting to be connected ..")
@@ -150,12 +167,7 @@ open class IPFSClient protected constructor(val context: Context, var timeout: L
         else throw IllegalStateException("Failed to connect")
 
       }.also {
-        callCount--
-        log.trace("call complete: $callCount RESULT: $it")
-        if (callCount == 0)
-          setTimeout().also {
-            log.trace("set timeout")
-          }
+        decrementCallCount()
       }
     }
   }

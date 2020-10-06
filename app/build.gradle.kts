@@ -103,7 +103,8 @@ dependencies {
   //implementation(Libs.slf4j_android)
   implementation("org.slf4j:slf4j-api:_")
   //implementation(Libs.slf4j)
-  implementation(Danbroid.utils.menu)
+ // implementation(Danbroid.utils.menu)
+  implementation(project(":menu"))
   implementation(Danbroid.utils.slf4j)
   implementation(Danbroid.utils.misc)
 
