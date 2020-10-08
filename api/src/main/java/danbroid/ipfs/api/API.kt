@@ -50,6 +50,7 @@ object API {
     }
 
   fun id() = ApiCall("id", Types.ID::class.java)
+
   fun version() = ApiCall("version", Types.Version::class.java)
 
 
@@ -61,7 +62,6 @@ object API {
     )
 
     @JvmOverloads
-
     fun publish(topic: String, data: String) = ApiCall<Boolean>(
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
     ) { _, handler ->

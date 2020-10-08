@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 /**
  *
  */
-open class IPFSClient(val context: Context, var timeout: Long = 60000L) {
+open class IPFSClient(val context: Context) {
 
   enum class ConnectionState {
     DISCONNECTED, CONNECTING, CONNECTED, STARTED;
@@ -35,45 +35,29 @@ open class IPFSClient(val context: Context, var timeout: Long = 60000L) {
 
   val connectionState: LiveData<ConnectionState> = _connectionState
 
-
   private val messageCallback = Handler.Callback {
-    when (it.what) {
-      MSG_TIMEOUT -> {
-        log.warn("MSG_TIMEOUT")
+
+    val msg = it.toIPFSMessage()
+    log.debug("inMessage: $msg")
+
+    when (msg) {
+      IPFSMessage.SERVICE_STARTED -> {
+        _connectionState.value = ConnectionState.STARTED
+      }
+      IPFSMessage.SERVICE_STOPPING -> {
+        log.warn("SERVICE STOPPING")
         disconnect()
       }
-      else -> {
-        val msg = it.toIPFSMessage()
-        log.debug("inMessage: $msg")
+      is IPFSMessage.BANDWIDTH -> {
 
-        when (msg) {
-          IPFSMessage.SERVICE_STARTED -> {
-            _connectionState.value = ConnectionState.STARTED
-            setTimeout()
-          }
-          IPFSMessage.SERVICE_STOPPING -> {
-            log.warn("SERVICE STOPPING")
-            disconnect()
-          }
-          else -> log.error("unhandled message: $msg")
-        }
       }
+      else -> log.error("unhandled message: $msg")
     }
 
     true
   }
 
   private val messageHandler = Handler(Looper.getMainLooper(), messageCallback)
-
-  @MainThread
-  fun clearTimeout() = messageHandler.removeMessages(MSG_TIMEOUT)
-
-  @MainThread
-  fun setTimeout() {
-    log.trace("setTimeout() $timeout")
-    clearTimeout()
-    messageHandler.sendEmptyMessageDelayed(MSG_TIMEOUT, timeout)
-  }
 
   private val inMessenger = Messenger(messageHandler)
 
@@ -133,8 +117,6 @@ open class IPFSClient(val context: Context, var timeout: Long = 60000L) {
 
   @MainThread
   fun incrementCallCount() {
-    if (callCount == 0)
-      clearTimeout()
     callCount++
     log.trace("callCount: $callCount")
     connect()
@@ -144,13 +126,14 @@ open class IPFSClient(val context: Context, var timeout: Long = 60000L) {
   fun decrementCallCount() {
     callCount--
     log.trace("call complete: $callCount")
-    if (callCount == 0)
-      setTimeout()
   }
 
   suspend fun runWhenConnected(job: suspend () -> Unit) {
     withContext(Dispatchers.Main) {
       runCatching {
+        var sendTimeoutReset = false
+        if (callCount == 0)
+          sendTimeoutReset = true
         incrementCallCount()
 
         if (connectionState.value != ConnectionState.STARTED) {
@@ -159,8 +142,11 @@ open class IPFSClient(val context: Context, var timeout: Long = 60000L) {
           log.trace("connection state: ${connectionState.value}")
         }
 
-        if (connectionState.value == ConnectionState.STARTED) job.invoke()
-        else throw IllegalStateException("Failed to connect")
+        if (connectionState.value == ConnectionState.STARTED) {
+          if (sendTimeoutReset)
+            sendMessage(IPFSMessage.TIMEOUT_RESET)
+          job.invoke()
+        } else throw IllegalStateException("Failed to connect")
 
       }.also {
         decrementCallCount()
@@ -184,6 +170,7 @@ open class IPFSClient(val context: Context, var timeout: Long = 60000L) {
       outMessenger = Messenger(service)
       _connectionState.value = ConnectionState.CONNECTED
 
+      log.debug("sending CLIENT_CONNECT")
       outMessenger?.send(IPFSMessage.CLIENT_CONNECT.toMessage(inMessenger))
     }
 

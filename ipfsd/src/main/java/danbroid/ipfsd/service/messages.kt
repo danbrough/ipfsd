@@ -19,9 +19,19 @@ sealed class IPFSMessage : Parcelable {
   @Parcelize
   object SERVICE_STARTED : IPFSMessage()
 
-
   @Parcelize
   object SERVICE_STOPPING : IPFSMessage()
+
+  @Parcelize
+  object TIMEOUT_RESET : IPFSMessage()
+
+  @Parcelize
+  data class BANDWIDTH(
+    val totalIn: Long,
+    val totalOut: Long,
+    val rateIn: Double,
+    val rateOut: Double
+  ) : IPFSMessage()
 
   @Parcelize
   data class SET_CONFIGURATION(

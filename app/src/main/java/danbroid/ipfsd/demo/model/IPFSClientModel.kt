@@ -12,19 +12,22 @@ import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.OkHttpCallExecutor
 import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfsd.service.IPFSClient
+import java.lang.ref.WeakReference
 
-class IPFSClientModel(context: Application) : AndroidViewModel(context) {
+class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   init {
     log.error("CREATED IPFS CLIENT MODEL ")
   }
 
-  val ipfsClient = IPFSClient(context).apply {
-    connect()
-  }
+  val ipfsClient: IPFSClient
+    get() = getIPFSClient(context)
+
 
   val executor = object : OkHttpCallExecutor() {
     override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) {
+      log.trace("run")
       ipfsClient.runWhenConnected {
+        log.trace("connected")
         super.exec(call, handler)
       }
     }
@@ -32,10 +35,23 @@ class IPFSClientModel(context: Application) : AndroidViewModel(context) {
 
   override fun onCleared() {
     log.error("onCleared()")
-    ipfsClient.disconnect()
+   // ipfsClient.disconnect()
+    ref = null
   }
 
   companion object {
+
+    @Volatile
+    private var ref: WeakReference<IPFSClient>? = null
+
+    @JvmStatic
+    fun getIPFSClient(context: Context) = ref?.get() ?: synchronized(IPFSClientModel::class.java) {
+      ref?.get() ?: IPFSClient(context).also {
+        ref = WeakReference(it)
+        it.connect()
+      }
+    }
+
     class ModelFactory(val context: Context) : ViewModelProvider.NewInstanceFactory() {
       @Suppress("UNCHECKED_CAST")
       override fun <T : ViewModel?> create(modelClass: Class<T>): T {

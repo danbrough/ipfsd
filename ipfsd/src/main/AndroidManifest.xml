@@ -15,13 +15,6 @@
             android:name=".service.IPFSService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE">
-            <intent-filter>
-                <action android:name="danbroid.ipfsd.service.ACTION_STOP" />
-            </intent-filter>
         </service>
-
-        <receiver
-            android:name=".service.NotificationReceiver"
-            android:exported="false"></receiver>
     </application>
 </manifest>
