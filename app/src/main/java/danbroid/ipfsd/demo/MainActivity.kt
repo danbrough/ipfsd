@@ -3,14 +3,12 @@ package danbroid.ipfsd.demo
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import danbroid.ipfsd.demo.activities.ActivityInterface
 import danbroid.ipfsd.demo.content.rootContent
-import danbroid.ipfsd.demo.model.IPFSClientModel
 import danbroid.util.menu.ui.MenuImplementation
 import danbroid.util.menu.ui.menulist.MenuListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
@@ -23,8 +21,6 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
       rootContent
     }
   }
-
-  val model: IPFSClientModel by viewModels()
 
   protected val navHostFragment: NavHostFragment
     get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -85,7 +81,7 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
     return when (item.itemId) {
       R.id.action_settings -> {
         log.debug("navingating to settings")
-        navHostFragment.navController.navigate(DemoNavGraph.dest.settings_id)
+        navHostFragment.navController.navigate(DemoNavGraph.action.toSettings)
         true
       }
       else -> super.onOptionsItemSelected(item)

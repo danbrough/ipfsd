@@ -2,7 +2,9 @@ package danbroid.ipfsd.demo
 
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.fragment.fragment
+import danbroid.ipfsd.demo.ui.QRCodeFragment
 import danbroid.ipfsd.demo.ui.TestFragment
 import danbroid.ipfsd.demo.ui.settings.SettingsFragment
 import danbroid.ipfsd.demo.ui.www.BrowserFragment
@@ -11,6 +13,8 @@ import danbroid.util.menu.navigation.createMenuGraph
 
 private const val pkg = "danbroid.ipfsd.demo"
 const val ACTION_SETTINGS = "$pkg.ACTION_SETTINGS"
+const val ACTION_QR_CODE = "$pkg.ACTION_QR_CODE"
+
 
 object DemoNavGraph : UniqueIDS {
 
@@ -18,6 +22,7 @@ object DemoNavGraph : UniqueIDS {
     val browser_id = nextID()
     val test_id = nextID()
     val settings_id = nextID()
+    val qrcode_id = nextID()
   }
 
   object deep_link {
@@ -31,6 +36,7 @@ object DemoNavGraph : UniqueIDS {
 
   object args {
     val url = "url"
+    val data = "data"
   }
 }
 
@@ -52,6 +58,17 @@ fun NavController.createDemoNavGraph() =
       label = "Test Fragment"
     }
 
+    fragment<QRCodeFragment>(DemoNavGraph.dest.qrcode_id) {
+      label = "QRCode"
+      deepLink {
+        action = ACTION_QR_CODE
+        uriPattern = "$URL_BASE/qrcode/{data}"
+      }
+      argument(DemoNavGraph.args.data) {
+        type = NavType.StringType
+      }
+    }
+
     fragment<SettingsFragment>(DemoNavGraph.dest.settings_id) {
       label = "Settings"
       deepLink {
@@ -64,9 +81,12 @@ fun NavController.createDemoNavGraph() =
       destinationId = DemoNavGraph.dest.browser_id
     }
 
+    action(DemoNavGraph.action.toSettings) {
+      destinationId = DemoNavGraph.dest.settings_id
+    }
 
     deepLink {
-      uriPattern = "ipfsd://.*"
+      uriPattern = "$URL_BASE/.*"
     }
   }
 

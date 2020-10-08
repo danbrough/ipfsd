@@ -10,8 +10,8 @@ buildscript {
   }
 
   dependencies {
-   //classpath("com.android.tools.build:gradle:4.1.0-rc03")
-     classpath("com.android.tools.build:gradle:4.2.0-alpha13")
+   classpath("com.android.tools.build:gradle:4.1.0-rc03")
+     //classpath("com.android.tools.build:gradle:4.2.0-alpha13")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
   }
 
@@ -23,6 +23,7 @@ apply("project.gradle.kts")
 allprojects {
 
   repositories {
+    mavenLocal()
     google()
     jcenter()
     //maven("https://jitpack.io")

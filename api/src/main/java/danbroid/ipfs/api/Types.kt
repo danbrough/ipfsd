@@ -105,6 +105,7 @@ object Types {
   data class Keys(@SerializedName("Keys") val keys: Array<Key>)
 
   class Stats {
+
     data class Bandwidth(
       @SerializedName("TotalIn")
       val totalIn: Long,
