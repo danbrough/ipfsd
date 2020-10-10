@@ -1,5 +1,6 @@
 package danbroid.ipfs.api.test
 
+import danbroid.ipfs.api.API
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -13,12 +14,11 @@ class PublishTest : CallTest() {
       return
     }
 
-    runBlocking {
-      api.name.publish(cid,key = "test").exec {
-        log.warn("published $it")
-      }
+    callTest(API.Name.publish(cid, key = "test")) {
+      log.warn("published $it")
     }
   }
+
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(PublishTest::class.java)

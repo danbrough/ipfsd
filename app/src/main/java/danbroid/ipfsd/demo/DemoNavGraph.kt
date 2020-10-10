@@ -18,6 +18,7 @@ const val ACTION_QR_CODE = "$pkg.ACTION_QR_CODE"
 
 object DemoNavGraph : UniqueIDS {
 
+
   object dest {
     val browser_id = nextID()
     val test_id = nextID()
@@ -40,8 +41,8 @@ object DemoNavGraph : UniqueIDS {
   }
 }
 
-const val URL_BASE = "ipfsdemo:/"
-const val URL_CONTENT_BASE = "$URL_BASE/content"
+const val URL_PREFIX_DEMO = "ipfsdemo:/"
+const val URL_CONTENT_BASE = "$URL_PREFIX_DEMO/content"
 
 fun NavController.createDemoNavGraph() =
 
@@ -62,7 +63,7 @@ fun NavController.createDemoNavGraph() =
       label = "QRCode"
       deepLink {
         action = ACTION_QR_CODE
-        uriPattern = "$URL_BASE/qrcode/{data}"
+        uriPattern = "$URL_PREFIX_DEMO/qrcode/{data}"
       }
       argument(DemoNavGraph.args.data) {
         type = NavType.StringType
@@ -73,7 +74,7 @@ fun NavController.createDemoNavGraph() =
       label = "Settings"
       deepLink {
         action = ACTION_SETTINGS
-        uriPattern = "$URL_BASE/settings"
+        uriPattern = "$URL_PREFIX_DEMO/settings"
       }
     }
 
@@ -86,7 +87,7 @@ fun NavController.createDemoNavGraph() =
     }
 
     deepLink {
-      uriPattern = "$URL_BASE/.*"
+      uriPattern = "$URL_PREFIX_DEMO/.*"
     }
   }
 

@@ -3,6 +3,7 @@ package danbroid.ipfsd.demo.content
 
 import android.content.Intent
 import android.net.Uri
+import androidx.core.net.toUri
 import danbroid.ipfs.api.API
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.demo.R
@@ -10,6 +11,7 @@ import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.model.ipfsClient
 import danbroid.ipfsd.demo.openBrowser
 import danbroid.ipfsd.service.IPFSService
+import danbroid.ipfsd.service.SettingsActivity
 import danbroid.util.menu.MenuActionContext
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
@@ -26,7 +28,7 @@ const val dir_kitty = "/ipfs/QmaknW7EzautwWKE1q4rpR4tPnP1XuxMKGr8KiyRZKqC5T"
 val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 
 private val MenuActionContext.executor: CallExecutor
-  get() = fragment!!.ipfsClient.executor
+  get() = fragment!!.ipfsClient.callExecutor
 
 private inline suspend fun MenuActionContext.debug(msg: String) {
   withContext(Dispatchers.Main) {
@@ -59,7 +61,13 @@ val rootContent: MenuItemBuilder by lazy {
                  IPFSService::class.java
                ).setAction(IPFSService.ACTION_STOP)
              )*/
-        context.stopService(Intent(context, IPFSService::class.java))
+        IPFSService.stopServiceIntent(context)
+      }
+    }
+    menu {
+      title = "Reset Stats"
+      onClick = {
+        context.startActivity(Intent(Intent.ACTION_VIEW).setData(SettingsActivity.URI_COMMAND_RESET_STATS.toUri()))
       }
     }
 

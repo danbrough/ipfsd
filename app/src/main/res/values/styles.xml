@@ -16,6 +16,19 @@
     <item name="windowNoTitle">true</item>
   </style>
 
+  <style name="AppTheme.Dialog" parent="@style/Theme.AppCompat.Light.Dialog">
+    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <item name="colorAccent">@color/colorAccent</item>
+    <item name="colorControlActivated">@color/colorWarning</item>
+    <item name="colorControlHighlight">@color/colorAccent</item>
+    <!--
+            <item name="android:windowFrame">@null</item>
+    -->
+
+    <item name="windowNoTitle">false</item>
+    <item name="background">@color/colorPrimary</item>
+  </style>
   <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
   <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

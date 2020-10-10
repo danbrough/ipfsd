@@ -13,7 +13,7 @@ public class JavaTests extends CallTest {
   @Test
   public void test1() {
     log.info("running test1()");
-    api.key.ls().exec(new ApiCall.FlowCallback<Types.Keys>() {
+/*    api.key.ls().exec(new ApiCall.FlowCallback<Types.Keys>() {
 
       @Override
       public void onCompletion(Throwable thr) {
@@ -25,7 +25,7 @@ public class JavaTests extends CallTest {
       public void onResult(Types.Keys result) {
         log.info("RESULT: {}", result);
       }
-    });
+    });*/
 
   }
 }
