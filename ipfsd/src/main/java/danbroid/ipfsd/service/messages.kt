@@ -25,6 +25,17 @@ sealed class IPFSMessage : Parcelable {
   @Parcelize
   object TIMEOUT_RESET : IPFSMessage()
 
+
+  @Parcelize
+  object STATS_RESET : IPFSMessage()
+
+
+  @Parcelize
+  object TIMEOUT_INCREMENT_LOCK : IPFSMessage()
+
+  @Parcelize
+  object TIMEOUT_DECREMENT_LOCK : IPFSMessage()
+
   @Parcelize
   data class BANDWIDTH(
     val totalIn: Long,

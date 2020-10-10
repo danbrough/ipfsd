@@ -1,7 +1,8 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.API
-import danbroid.ipfs.api.OkHttpCallExecutor
+import danbroid.ipfs.api.*
+import kotlinx.coroutines.runBlocking
+import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
 
@@ -13,16 +14,25 @@ abstract class CallTest {
 
   companion object {
 
-    lateinit var api: API
+    var executor: CallExecutor? = null
 
     @BeforeClass
     @JvmStatic
     fun beforeClass() {
-      log.error("before class")
-      api = API(executor = OkHttpCallExecutor())
+      executor = OkHttpCallExecutor()
     }
 
+    @AfterClass
+    @JvmStatic
+    fun afterClass() {
+      executor = null
+    }
   }
+
+  open fun <T> callTest(call: ApiCall<T>, handler: ResultHandler<T>) = runBlocking {
+    executor!!.exec(call, handler)
+  }
+
 
   @Before
   open fun setup() {

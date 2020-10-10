@@ -15,7 +15,10 @@ import androidx.lifecycle.asFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import java.lang.ref.WeakReference
+import kotlin.system.measureTimeMillis
 
 /**
  *
@@ -28,6 +31,18 @@ open class IPFSClient(val context: Context) {
 
   init {
     log.error("CREATED IPFS CLIENT")
+  }
+
+  companion object {
+    @Volatile
+    private var instance: WeakReference<IPFSClient>? = null
+
+    @JvmStatic
+    fun getInstance(context: Context) = instance?.get() ?: synchronized(IPFSClient::class.java) {
+      instance?.get() ?: IPFSClient(context).also {
+        instance = WeakReference(it)
+      }
+    }
   }
 
   private val _connectionState: MutableLiveData<ConnectionState> =
@@ -72,8 +87,11 @@ open class IPFSClient(val context: Context) {
       log.debug("connecting ..")
       _connectionState.value = ConnectionState.CONNECTING
 
-      log.warn("starting service")
+
       val intent = Intent(context, IPFSService::class.java)
+
+      log.warn("starting service")
+      context.startService(intent)
 
       log.warn("binding to service ..")
       context.bindService(
@@ -85,7 +103,6 @@ open class IPFSClient(val context: Context) {
     }
   }
 
-  @MainThread
   fun disconnect() {
     log.info("disconnect() connectionState: ${_connectionState.value}")
     messageHandler.removeCallbacksAndMessages(null)
@@ -99,7 +116,7 @@ open class IPFSClient(val context: Context) {
       log.trace("unbinding service ..")
       context.unbindService(serviceConnection)
     }
-    _connectionState.value = ConnectionState.DISCONNECTED
+    _connectionState.postValue(ConnectionState.DISCONNECTED)
 
   }
 
@@ -108,10 +125,6 @@ open class IPFSClient(val context: Context) {
     disconnect()
   }
 
-
-  companion object {
-    const val MSG_TIMEOUT = 12301
-  }
 
   private var callCount = 0
 
@@ -129,16 +142,17 @@ open class IPFSClient(val context: Context) {
   }
 
   suspend fun runWhenConnected(job: suspend () -> Unit) {
+
     withContext(Dispatchers.Main) {
+      log.trace("runWhenConnected()")
       runCatching {
-        var sendTimeoutReset = false
-        if (callCount == 0)
-          sendTimeoutReset = true
+        val sendTimeoutReset = callCount == 0
         incrementCallCount()
 
         if (connectionState.value != ConnectionState.STARTED) {
           log.trace("waiting to be connected ..")
-          connectionState.asFlow().filter { it == ConnectionState.STARTED }.first()
+          connectionState.asFlow().flowOn(Dispatchers.IO).filter { it == ConnectionState.STARTED }
+            .first()
           log.trace("connection state: ${connectionState.value}")
         }
 
@@ -150,6 +164,9 @@ open class IPFSClient(val context: Context) {
 
       }.also {
         decrementCallCount()
+        it.exceptionOrNull()?.also {
+          log.error(it.message, it)
+        }
       }
     }
   }

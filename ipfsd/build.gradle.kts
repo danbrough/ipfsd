@@ -73,7 +73,11 @@ android {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true
   }
-
+  buildTypes {
+    forEach {
+      it.buildConfigField("String", "URL_PREFIX", "\"ipfsd:/\"")
+    }
+  }
 
 }
 
@@ -116,6 +120,7 @@ dependencies {
   implementation(project(":api"))
 
   implementation(Danbroid.utils.misc)
+
 //  implementation(project(":misc"))
 
   implementation("commons-io:commons-io:_")

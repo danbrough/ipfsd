@@ -35,12 +35,12 @@ class BrowserFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    ipfsClient.ipfsClient.incrementCallCount()
+
   }
 
   override fun onStop() {
     super.onStop()
-    ipfsClient.ipfsClient.decrementCallCount()
+
   }
 
 

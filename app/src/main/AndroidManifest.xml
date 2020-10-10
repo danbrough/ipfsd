@@ -48,6 +48,7 @@
 
         </activity>
 
+
         <provider
             android:name="danbroid.ipfsd.demo.sync.DBContentProvider"
             android:authorities="danbroid.ipfsd.demo.datasync.provider"

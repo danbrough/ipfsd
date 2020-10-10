@@ -1,5 +1,6 @@
 package danbroid.ipfsd.service
 
+
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -7,11 +8,15 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.Messenger
+import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.core.net.toUri
 import danbroid.ipfsd.R
 import danbroid.util.format.humanReadableByteCount
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import org.json.JSONObject
 import kotlin.system.measureTimeMillis
 
@@ -27,10 +32,10 @@ class IPFSService : Service() {
     const val CHANNEL_DESCRIPTION = "IPFS Service notification channel"
 
     private const val pkg = "danbroid.ipfsd.service"
-    const val ACTION_SETTINGS = "$pkg.ACTION_SETTINGS"
+
+    //const val ACTION_SETTINGS = "$pkg.ACTION_SETTINGS"
     const val ACTION_STOP = "$pkg.ACTION_STOP"
     const val ACTION_CLEAR_NET_STATS = "$pkg.ACTION_CLEAR_NET_STATS"
-
 
     @Volatile
     private var _ipfs: IPFS? = null
@@ -42,6 +47,22 @@ class IPFSService : Service() {
         _ipfs = it
       }
     }
+
+    fun resetStatsIntent(context: Context) = context.startService(
+      Intent(
+        context,
+        IPFSService::class.java
+      ).setAction(ACTION_CLEAR_NET_STATS)
+    )
+
+    fun stopServiceIntent(context: Context) = context.startService(
+      Intent(
+        context,
+        IPFSService::class.java
+      ).setAction(ACTION_STOP)
+    )
+
+
   }
 
 
@@ -76,12 +97,13 @@ class IPFSService : Service() {
             if (ipfs.isStarted == true)
               it.replyTo.send(IPFSMessage.SERVICE_STARTED.toMessage())
           }
-          IPFSMessage.CLIENT_DISCONNECT -> {
+          IPFSMessage.CLIENT_DISCONNECT ->
             clients.remove(it.replyTo)
-          }
-          IPFSMessage.TIMEOUT_RESET -> {
+
+          IPFSMessage.TIMEOUT_RESET ->
             resetTimeout()
-          }
+
+          IPFSMessage.STATS_RESET -> readStats(true)
         }
       }
     }
@@ -95,67 +117,89 @@ class IPFSService : Service() {
       removeMessages(MSG_TIMEOUT)
       sendEmptyMessageDelayed(MSG_TIMEOUT, 60000)
     }
-
   }
 
-  private val actionHandler: (Intent) -> Unit = {
-    when (it.action) {
-      ACTION_SETTINGS -> {
-        log.debug("showing settings")
-        startActivity(Intent(Intent.ACTION_VIEW).setData("ipfsdemo://settings".toUri()))
+  private val notificationListener = object : NotificationManager.NotificationListener {
+    override fun onAction(intent: Intent) {
+      log.trace("action: $intent")
+
+      when (intent.action) {
+        /*   ACTION_SETTINGS -> {
+             startActivity(Intent(Intent.ACTION_VIEW).setData("ipfsdemo://settings".toUri()))
+           }*/
+        ACTION_CLEAR_NET_STATS -> readStats(true)
       }
     }
-    log.error("action: $it")
   }
+
+  protected fun startFlow() = flow {
+    log.warn("START FLOW")
+
+    if (ipfs.isStarted) {
+      emit(true)
+      return@flow
+    }
+
+    withContext(Dispatchers.Main) {
+      notificationManager.showNotification(getString(R.string.lbl_service_starting))
+    }
+
+    measureTimeMillis {
+      log.warn("starting ipfs")
+      ipfs.start()
+    }.also {
+      log.warn("created ipfs in $it")
+    }
+
+    if (!ipfs.isStarted) {
+      emit(false)
+      return@flow
+    }
+
+    log.warn("SHOWING NOTIFICATION")
+    withContext(Dispatchers.Main) {
+      notificationManager.showNotification(getString(R.string.lbl_service_running))
+
+      readStats()
+
+      clients.forEach {
+        it.send(IPFSMessage.SERVICE_STARTED.toMessage())
+      }
+    }
+
+  }.flowOn(Dispatchers.IO)
+
 
   override fun onCreate() {
     log.warn("onCreate()")
     super.onCreate()
 
-    NetworkStats.startDataIn = prefs.dataIn
-    NetworkStats.startDataOut = prefs.dataOut
-
     notificationManager = NotificationManager(
       this, CHANNEL_ID,
       CHANNEL_NAME, CHANNEL_DESCRIPTION,
-      actionHandler = actionHandler
+      listener = notificationListener
     )
 
     messengerHandler = Handler(Looper.myLooper()!!, messengerCallback)
     messenger = Messenger(messengerHandler)
-    notificationManager.showNotification(getString(R.string.lbl_service_starting))
 
     coroutineScope.launch {
-      measureTimeMillis {
-        if (!ipfs.isStarted)
-          ipfs.start()
-      }.also {
-        log.debug("created ipfs in $it")
+      startFlow().firstOrNull {
+        log.warn("STARTED: $it")
+        true
       }
-      withContext(Dispatchers.Main) {
-        notificationManager.showNotification(getString(R.string.lbl_service_running))
-      }
-      readStats()
-      withContext(Dispatchers.Main) {
-        if (ipfs.isStarted == true) {
-          val msg = IPFSMessage.SERVICE_STARTED.toMessage()
-          clients.forEach {
-            it.send(msg)
-          }
-        }
-      }
+      log.warn("LAUNCH FINISHED")
     }
   }
 
 
   private object NetworkStats {
-    var totalDataIn: Long = 0
-    var startDataIn: Long = 0
-    var startDataOut: Long = 0
-    var totalDataOut: Long = 0
+    var dataIn: Long = 0
+    var dataOut: Long = 0
   }
 
-  private fun readStats() {
+
+  private fun readStats(resetStats: Boolean = false) {
     coroutineScope.launch {
       ipfs.newRequest("stats/bw")?.send()?.also {
         messengerHandler.sendEmptyMessageDelayed(MSG_POLL_STATS, 10000)
@@ -166,16 +210,36 @@ class IPFSService : Service() {
             val rateIn = stats.getDouble("RateIn")
             val rateOut = stats.getDouble("RateOut")
 
-            NetworkStats.totalDataIn = stats.getLong("TotalIn")
-            NetworkStats.totalDataOut = stats.getLong("TotalOut")
 
-            val currentDataIn = NetworkStats.totalDataIn + NetworkStats.startDataIn
-            val currentDataOut = NetworkStats.totalDataOut + NetworkStats.startDataOut
+            val totalDataIn = stats.getLong("TotalIn")
+            val totalDataOut = stats.getLong("TotalOut")
+            var newDataIn = totalDataIn - NetworkStats.dataIn
+            var newDataOut = totalDataOut - NetworkStats.dataOut
+            NetworkStats.dataIn = totalDataIn
+            NetworkStats.dataOut = totalDataOut
+
+            if (resetStats) {
+              newDataIn = 0
+              newDataOut = 0
+              Toast.makeText(
+                this@IPFSService,
+                R.string.msg_stats_reset,
+                Toast.LENGTH_SHORT
+              ).show()
+            } else {
+              newDataIn = prefs.dataIn + newDataIn
+              newDataOut = prefs.dataOut + newDataOut
+            }
+
+            prefs.dataIn = newDataIn
+            prefs.dataOut = newDataOut
+
+
 
             sendMessage(
               IPFSMessage.BANDWIDTH(
-                currentDataIn,
-                currentDataOut,
+                newDataIn,
+                newDataOut,
                 rateIn,
                 rateOut
               )
@@ -183,7 +247,7 @@ class IPFSService : Service() {
 
             //val msg = "In: %02d Out:%02d (%.0f,%.0f)".format(totalIn, totalOut, rateIn, rateOut)
             val msg =
-              "${currentDataIn.humanReadableByteCount()} in ${currentDataOut.humanReadableByteCount()} out. Total: ${(currentDataIn + currentDataOut).humanReadableByteCount()}"
+              "${newDataIn.humanReadableByteCount()} in ${newDataOut.humanReadableByteCount()} out. Total: ${(newDataIn + newDataOut).humanReadableByteCount()}"
             setContentText(msg)
           }
         }
@@ -219,6 +283,11 @@ class IPFSService : Service() {
       return START_STICKY_COMPATIBILITY
     }
 
+    if (intent?.action == ACTION_CLEAR_NET_STATS) {
+      readStats(true)
+      return START_STICKY_COMPATIBILITY
+    }
+
 
 /*    if (intent?.getBooleanExtra(EXTRA_DELETE, false) == true) {
       log.error("NEED TO STOP!!!")
@@ -227,6 +296,7 @@ class IPFSService : Service() {
     return super.onStartCommand(intent, flags, startId)
   }
 
+  @MainThread
   private fun stopService(startId: Int = -1) {
     log.warn("stopService()")
     notificationManager.cancelNotification()
@@ -245,23 +315,22 @@ class IPFSService : Service() {
 
   override fun onDestroy() {
     log.warn("onDestroy()")
-    prefs.dataIn = NetworkStats.startDataIn + NetworkStats.totalDataIn
-    prefs.dataOut = NetworkStats.startDataOut + NetworkStats.totalDataOut
+    messengerHandler.removeCallbacksAndMessages(null)
     notificationManager.cancelNotification()
     coroutineScope.cancel("Service stopped")
 
     runBlocking(Dispatchers.IO) {
       measureTimeMillis {
-        if (_ipfs?.isStarted == true)
+        if (_ipfs?.isStarted == true) {
           _ipfs?.stop()
+        }
+        _ipfs = null
       }.also {
         log.debug("stopped in $it")
       }
     }
 
-    _ipfs = null
 
-    messengerHandler.removeCallbacksAndMessages(null)
     clients.clear()
     super.onDestroy()
 
@@ -274,5 +343,6 @@ class IPFSService : Service() {
 
 
 }
+
 
 private val log = org.slf4j.LoggerFactory.getLogger(IPFSService::class.java)

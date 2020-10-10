@@ -39,7 +39,7 @@ fun MenuItemBuilder.ipfsDir(
         ipfsClient = (context as AppCompatActivity).ipfsClient
 
         log.debug("calling ls on $path")
-        ipfsClient.executor.exec(API.ls(path)) { result ->
+        ipfsClient.callExecutor.exec(API.ls(path)) { result ->
           log.debug("result: $result")
           result?.objects?.forEach { file ->
             file.links.forEach { link ->

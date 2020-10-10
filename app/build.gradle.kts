@@ -53,6 +53,12 @@ android {
       languageSettings.useExperimentalAnnotation(it)
     }
   }
+
+/*  buildTypes {
+    forEach {
+      it.buildConfigField("String", "URL_DEMO_PREFIX", "\"ipfsdemo:/\"")
+    }
+  }*/
 }
 
 
