@@ -20,7 +20,7 @@ jvm
 Content  
 @[JvmOverloads](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-overloads/index.html)()  
   
-fun [apply](apply.md)(profile: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), dryRun: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)?): [ApiCall](../../../-api-call/index.md)<[Types.Config.ConfigChange](../../../-types/-config/-config-change/index.md)>  
+fun [apply](apply.md)(profile: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), dryRun: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)?): [ApiCall](../../../-api-call/index.md)<[API.Config.Profile.ApplyResponse](-apply-response/index.md)>  
 
 
 
