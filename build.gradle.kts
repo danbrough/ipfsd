@@ -13,6 +13,8 @@ buildscript {
     classpath("com.android.tools.build:gradle:4.1.0-rc03")
     //classpath("com.android.tools.build:gradle:4.2.0-alpha13")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
+    classpath("org.jetbrains.dokka:dokka-gradle-plugin:_")
+
   }
 
 }

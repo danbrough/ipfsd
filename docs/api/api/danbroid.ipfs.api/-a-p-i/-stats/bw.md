@@ -5,7 +5,7 @@
 # bw  
 [jvm]  
 Content  
-fun [bw](bw.md)(): [ApiCall](../../-api-call/index.md)<[Types.Stats.Bandwidth](../../-types/-stats/-bandwidth/index.md)>  
+fun [bw](bw.md)(): [ApiCall](../../-api-call/index.md)<[API.Stats.BandwidthResponse](-bandwidth-response/index.md)>  
 
 
 

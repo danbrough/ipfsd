@@ -3,52 +3,6 @@
 
 
 # app  
- [common] 
-
-
-
-##  Stuff  
-
-
-information about the demo
-
-
-
-   
- [androidJvm] 
-
-
-
-##  Stuff  
-
-
-information about the demo
-
-
-
-
-
-
-
-##  Stuff  
-
-
-information about the demo
-
-
-
-
-
-
-
-##  Stuff  
-
-
-information about the demo
-
-
-
-   
 
 
 ## Packages  

@@ -5,7 +5,7 @@
 # version  
 [jvm]  
 Content  
-fun [version](version.md)(): [ApiCall](../-api-call/index.md)<[Types.Version](../-types/-version/index.md)>  
+fun [version](version.md)(): [ApiCall](../-api-call/index.md)<[API.VersionResponse](-version-response/index.md)>  
 
 
 

@@ -1,6 +1,6 @@
-# Module app
+# Module :app
 
-## Stuff
+## Demo App
 
 information about the demo
 

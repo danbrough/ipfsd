@@ -1,4 +1,8 @@
 # Module api
 
-This is an implementation of the IPFS http api written in kotlin but supporting java.
+## IPFS API
+
+This is an implementation of the IPFS api written in kotlin but supporting java.
+
+
 
