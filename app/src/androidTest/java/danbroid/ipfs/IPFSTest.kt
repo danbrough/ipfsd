@@ -55,6 +55,11 @@ class IPFSTest {
       executor.exec(API.PubSub.publish("poiqwe098123", "Hello World")) {
         log.debug("GOT RESULT: $it")
       }
+      log.debug("calling repo/stat")
+      executor.exec(API.Repo.stat()) {
+        log.debug("GOT RESULT: $it")
+      }
+
     }
   }
 

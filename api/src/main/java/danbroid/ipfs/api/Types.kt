@@ -95,6 +95,10 @@ object Types {
     }
   }
 
+  class Repo {
+
+  }
+
   data class Key(
     @SerializedName("Name")
     val name: String,
@@ -116,16 +120,6 @@ object Types {
 
   class Stats {
 
-    data class Bandwidth(
-      @SerializedName("TotalIn")
-      val totalIn: Long,
-      @SerializedName("TotalOut")
-      val totalOut: Long,
-      @SerializedName("RateIn")
-      val rateIn: Double,
-      @SerializedName("RateOut")
-      val rateOut: Double
-    )
   }
 
   data class NameValue(
