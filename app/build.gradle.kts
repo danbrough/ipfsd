@@ -109,10 +109,17 @@ dependencies {
   //implementation(Libs.slf4j_android)
   implementation("org.slf4j:slf4j-api:_")
   //implementation(Libs.slf4j)
-  implementation(Danbroid.utils.menu)
-//  implementation(project(":menu"))
-  implementation(Danbroid.utils.slf4j)
-  //implementation(project(":misc"))
+
+
+  val localUtils = false
+  if (localUtils) {
+    implementation(project(":menu"))
+    implementation(project(":misc"))
+  } else {
+    implementation(Danbroid.utils.menu)
+    implementation(Danbroid.utils.slf4j)
+  }
+
   implementation(Danbroid.utils.misc)
   implementation("com.google.zxing:android-core:_")
 

@@ -37,7 +37,7 @@ class SettingsActivity : AppCompatActivity() {
       .setTitle(R.string.lbl_reset_stats)
       .setNegativeButton(android.R.string.cancel, null)
       .setPositiveButton(android.R.string.ok) { _, _ ->
-        IPFSService.resetStatsIntent(this)
+        IPFSService.resetStats(this)
       }.setOnDismissListener {
         finish()
       }.show()

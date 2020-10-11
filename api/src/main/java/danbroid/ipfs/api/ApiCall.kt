@@ -15,7 +15,7 @@ import java.io.Reader
  * Receives the result of an API call
  * @returns true to continue processing
  */
-typealias ResultHandler<T> = (suspend (T?) -> Unit)
+typealias ResultHandler<T> = (suspend (T) -> Unit)
 
 typealias  ResponseProcessor<T> = suspend (reader: Reader, handler: ResultHandler<T>) -> Unit
 
