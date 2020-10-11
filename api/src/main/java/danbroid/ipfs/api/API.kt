@@ -3,14 +3,16 @@ package danbroid.ipfs.api
 import danbroid.ipfs.api.utils.addUrlArgs
 import java.io.File
 
+/**
+ * API for calls to an IPFS node
+ */
 object API {
-
+  private inline fun <reified T> apiCall(path: String, vararg args: Pair<String, Any?>) =
+    ApiCall(path.addUrlArgs(*args), T::class.java)
 
   @JvmOverloads
-  fun ls(path: String, stream: Boolean = false) = ApiCall(
-    "ls".addUrlArgs("arg" to path, "stream" to stream),
-    Types.Objects::class.java
-  )
+  fun ls(path: String, stream: Boolean = false) =
+    apiCall<Types.Objects>("ls", "arg" to path, "stream" to stream)
 
   /**
    * Add data to ipfs.
@@ -31,14 +33,12 @@ object API {
     pin: Boolean = true,
     onlyHash: Boolean? = null
   ) =
-    ApiCall(
-      "add".addUrlArgs(
-        "wrap-with-directory" to wrapWithDirectory,
-        "pin" to pin,
-        "only-hash" to onlyHash,
-        "chunker" to chunker
-      ),
-      Types.File::class.java
+    apiCall<Types.File>(
+      "add",
+      "wrap-with-directory" to wrapWithDirectory,
+      "pin" to pin,
+      "only-hash" to onlyHash,
+      "chunker" to chunker
     ).also { call ->
       if (data != null)
         call.addData(data, fileName)
@@ -49,19 +49,19 @@ object API {
       }
     }
 
-  fun id() = ApiCall("id", Types.ID::class.java)
+  fun id() = apiCall<Types.ID>("id")
 
-  fun version() = ApiCall("version", Types.Version::class.java)
+  fun version() = apiCall<Types.Version>("version")
 
 
   object PubSub {
+    
     @JvmOverloads
-    fun subscribe(topic: String, discover: Boolean = true) = ApiCall(
-      "pubsub/sub".addUrlArgs("arg" to topic, "discover" to discover),
-      Types.PubSub.Message::class.java
+    fun subscribe(topic: String, discover: Boolean? = true) = apiCall<Types.PubSub.Message>(
+      "pubsub/sub", "arg" to topic, "discover" to discover
     )
 
-    @JvmOverloads
+
     fun publish(topic: String, data: String) = ApiCall<Boolean>(
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
     ) { _, handler ->
@@ -69,9 +69,21 @@ object API {
     }
   }
 
+  object Repo {
+    /**
+     * @param stream-error Stream errors
+     * @param quiet Write minimal output
+
+     */
+    @JvmOverloads
+    fun gc(streamErrors: Boolean? = null, quiet: Boolean? = null) =
+      apiCall<Types.KeyError>("repo/gc", "stream-errors" to streamErrors, "quiet" to quiet)
+
+  }
+
 
   object Stats {
-    fun bw() = ApiCall("stats/bw", Types.Stats.Bandwidth::class.java)
+    fun bw() = apiCall<Types.Stats.Bandwidth>("stats/bw")
   }
 
 
@@ -96,16 +108,13 @@ object API {
       resolve: Boolean = true,
       lifetime: String? = null,
       key: String? = null
-    ) =
-      ApiCall(
-        "name/publish".addUrlArgs(
-          "arg" to path,
-          "resolve" to resolve,
-          "lifetime" to lifetime,
-          "key" to key
-        ),
-        Types.NameValue::class.java
-      )
+    ) = apiCall<Types.NameValue>(
+      "name/publish",
+      "arg" to path,
+      "resolve" to resolve,
+      "lifetime" to lifetime,
+      "key" to key
+    )
   }
 
 
@@ -116,10 +125,7 @@ object API {
      * @param ipnsBase Encoding used for keys: Can either be a multibase encoded CID or a base58btc encoded multihash. Takes {b58mh|base36|k|base32|b...}. Default: base36. Required: no.
      */
     @JvmOverloads
-    fun ls(
-      ipnsBase: String? = null
-    ) =
-      ApiCall("key/list".addUrlArgs("ipns-base" to ipnsBase), Types.Keys::class.java)
+    fun ls(ipnsBase: String? = null) = apiCall<Types.Keys>("key/list", "ipns-base" to ipnsBase)
   }
 
 
@@ -130,11 +136,11 @@ object API {
        * @param dryRun Print difference between the current config and the config that would be generated.
        */
       @JvmOverloads
-      fun apply(profile: String, dryRun: Boolean? = null) =
-        ApiCall(
-          "config/profile/apply".addUrlArgs("arg" to profile, "dry-run" to dryRun),
-          Types.Config.ConfigChange::class.java
-        )
+      fun apply(profile: String, dryRun: Boolean? = null) = apiCall<Types.Config.ConfigChange>(
+        "config/profile/apply",
+        "arg" to profile,
+        "dry-run" to dryRun
+      )
     }
   }
 

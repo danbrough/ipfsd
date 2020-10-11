@@ -102,6 +102,16 @@ object Types {
     val id: String
   )
 
+  data class KeyError(
+    @SerializedName("Key")
+    val key: GcError
+  ) {
+    data class GcError(
+      @SerializedName("/")
+      val cid: String
+    )
+  }
+
   data class Keys(@SerializedName("Keys") val keys: Array<Key>)
 
   class Stats {

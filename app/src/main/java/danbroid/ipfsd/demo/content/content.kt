@@ -7,6 +7,7 @@ import androidx.core.net.toUri
 import danbroid.ipfs.api.API
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.demo.R
+import danbroid.ipfsd.demo.URL_CONTENT_BASE
 import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.model.ipfsClient
 import danbroid.ipfsd.demo.openBrowser
@@ -30,10 +31,11 @@ val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 private val MenuActionContext.executor: CallExecutor
   get() = fragment!!.ipfsClient.callExecutor
 
-private inline suspend fun MenuActionContext.debug(msg: String) {
+private inline suspend fun MenuActionContext.debug(msg: String?) {
+  val message = msg ?: "null"
   withContext(Dispatchers.Main) {
-    log.debug(msg)
-    fragment.activityInterface?.showSnackbar(msg)
+    log.debug(message)
+    fragment.activityInterface?.showSnackbar(message)
   }
 }
 
@@ -52,6 +54,8 @@ val rootContent: MenuItemBuilder by lazy {
       }
     }
 
+    repoMenu()
+
     menu {
       title = "Stop"
       onClick = {
@@ -61,7 +65,7 @@ val rootContent: MenuItemBuilder by lazy {
                  IPFSService::class.java
                ).setAction(IPFSService.ACTION_STOP)
              )*/
-        IPFSService.stopServiceIntent(context)
+        IPFSService.stopService(context)
       }
     }
     menu {
@@ -82,7 +86,7 @@ val rootContent: MenuItemBuilder by lazy {
 
     menu {
       title = "Add string"
-      var hashID: String? = null
+      var hashID: String?
       isBrowsable = true
 
       onClick = { callback ->
@@ -90,8 +94,8 @@ val rootContent: MenuItemBuilder by lazy {
         log.trace("adding message: $msg")
         val parentID = this@menu.id
         executor.exec(API.add(msg, fileName = "ipfs_test_message.txt")) { result ->
-          log.debug("added $msg -> $result")
-          hashID = result!!.hash
+          debug("added $msg -> $result")
+          hashID = result.hash
           withContext(Dispatchers.Main) {
             fragment?.activityInterface?.showSnackbar("Added: $msg")
 
@@ -197,3 +201,17 @@ val rootContent: MenuItemBuilder by lazy {
   }
 
 }
+
+fun MenuItemBuilder.repoMenu() =
+  menu {
+    id = "$URL_CONTENT_BASE/repo"
+    title = "Repo"
+
+    menu {
+      onClick = {
+        executor.exec(API.Repo.gc(streamErrors = true, quiet = false)) {
+          log.debug("err: $it")
+        }
+      }
+    }
+  }

@@ -86,9 +86,9 @@ fun NavController.createDemoNavGraph() =
       destinationId = DemoNavGraph.dest.settings_id
     }
 
-    deepLink {
+ /*   deepLink {
       uriPattern = "$URL_PREFIX_DEMO/.*"
-    }
+    }*/
   }
 
 

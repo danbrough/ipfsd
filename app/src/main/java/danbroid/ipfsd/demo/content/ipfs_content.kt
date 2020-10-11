@@ -22,14 +22,14 @@ fun MenuItemBuilder.ipfsDir(
 
     log.error("CREATED BUILDER: $id")
 
-    provides = {
+/*    provides = {
       log.trace("provides: $it")
       if (it.startsWith("ipfsd:/"))
         ipfsDir(it.substring(6)).also {
           log.error("RETURNING $it")
         }
       else null
-    }
+    }*/
 
     liveChildren = { context, id, oldItem ->
       val items = mutableListOf<MenuItem>()

@@ -48,14 +48,14 @@ class IPFSService : Service() {
       }
     }
 
-    fun resetStatsIntent(context: Context) = context.startService(
+    fun resetStats(context: Context) = context.startService(
       Intent(
         context,
         IPFSService::class.java
       ).setAction(ACTION_CLEAR_NET_STATS)
     )
 
-    fun stopServiceIntent(context: Context) = context.startService(
+    fun stopService(context: Context) = context.startService(
       Intent(
         context,
         IPFSService::class.java
@@ -82,12 +82,12 @@ class IPFSService : Service() {
 
   private val messengerCallback = Handler.Callback {
     when (it.what) {
-      MSG_POLL_STATS -> {
+      MSG_POLL_STATS ->
         readStats()
-      }
-      MSG_TIMEOUT -> {
-        stopService()
-      }
+
+      MSG_TIMEOUT ->
+        onTimeout()
+
       else -> {
         val msg = it.toIPFSMessage()
         log.debug("SERVICE MESSAGE: $msg")
@@ -130,6 +130,11 @@ class IPFSService : Service() {
         ACTION_CLEAR_NET_STATS -> readStats(true)
       }
     }
+  }
+
+  private fun onTimeout() {
+    log.warn("onTimeout()")
+    stopService()
   }
 
   protected fun startFlow() = flow {
