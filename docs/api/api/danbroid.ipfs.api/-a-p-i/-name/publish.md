@@ -23,6 +23,8 @@ jvm
   
   
 Content  
+@[JvmOverloads](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-overloads/index.html)()  
+  
 fun [publish](publish.md)(path: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html), resolve: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html), lifetime: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?, key: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?): [ApiCall](../../-api-call/index.md)<[Types.NameValue](../../-types/-name-value/index.md)>  
 
 

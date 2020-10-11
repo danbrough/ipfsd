@@ -39,7 +39,7 @@ androidJvm
   
   
 Content  
-open fun [withOption](with-option.md)(option: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html), value: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)): [RequestBuilder](index.md)  
+open fun [withOption](with-option.md)(option: [String](https://developer.android.com/reference/kotlin/java/lang/String.html), value: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html)): [RequestBuilder](index.md)  
 
 
 [androidJvm]  
@@ -78,7 +78,7 @@ androidJvm
   
   
 Content  
-open fun [withOption](with-option.md)(option: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html), value: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html)): [RequestBuilder](index.md)  
+open fun [withOption](with-option.md)(option: [String](https://developer.android.com/reference/kotlin/java/lang/String.html), value: [String](https://developer.android.com/reference/kotlin/java/lang/String.html)): [RequestBuilder](index.md)  
 
 
 [androidJvm]  
@@ -117,7 +117,7 @@ androidJvm
   
   
 Content  
-open fun [withOption](with-option.md)(option: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html), value: [Array](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html)<[Byte](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte/index.html)>): [RequestBuilder](index.md)  
+open fun [withOption](with-option.md)(option: [String](https://developer.android.com/reference/kotlin/java/lang/String.html), value: [Array](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-array/index.html)<[Byte](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-byte/index.html)>): [RequestBuilder](index.md)  
 
 
 

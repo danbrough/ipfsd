@@ -28,7 +28,7 @@ androidJvm
   
   
 Content  
-open fun [sendToJSONList](send-to-j-s-o-n-list.md)(): [ArrayList](https://docs.oracle.com/javase/8/docs/api/java/util/ArrayList.html)<[JSONObject](https://developer.android.com/reference/kotlin/org/json/JSONObject.html)>  
+open fun [sendToJSONList](send-to-j-s-o-n-list.md)(): [ArrayList](https://developer.android.com/reference/kotlin/java/util/ArrayList.html)<[JSONObject](https://developer.android.com/reference/kotlin/org/json/JSONObject.html)>  
 
 
 
