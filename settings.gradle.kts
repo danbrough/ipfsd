@@ -7,13 +7,26 @@ buildscript {
   }
 
   dependencies.classpath("de.fayard:dependencies:+")
+
+  // println("Danbroid: ${Danbroid.local_utils}")
 }
 
 
 bootstrapRefreshVersionsAndDependencies()
 include(":app", ":ipfsd", ":api")
 
-val localUtils = false
+rootProject.name = "ipfs_daemon"
+
+
+
+//println("initProps()")
+val fis = java.io.FileInputStream(file("project.properties"))
+val props = java.util.Properties()
+props.load(fis)
+fis.close()
+val localUtils: Boolean = props.get("localUtils") == "true"
+
+
 if (localUtils) {
   include(":menu", ":slf4j", ":misc")
   project(":menu").projectDir = file("../androidutils/menu")
@@ -23,6 +36,5 @@ if (localUtils) {
 
 
 
-rootProject.name = "ipfs_daemon"
 
 

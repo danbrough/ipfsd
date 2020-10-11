@@ -111,14 +111,14 @@ dependencies {
   //implementation(Libs.slf4j)
 
 
-  val localUtils = false
-  if (localUtils) {
+  if (rootProject.extra["localUtils"] == "true") {
     implementation(project(":menu"))
     implementation(project(":misc"))
   } else {
     implementation(Danbroid.utils.menu)
-    implementation(Danbroid.utils.slf4j)
+    implementation(Danbroid.utils.misc)
   }
+  implementation(Danbroid.utils.slf4j)
 
   implementation(Danbroid.utils.misc)
   implementation("com.google.zxing:android-core:_")

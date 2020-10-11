@@ -21,7 +21,7 @@
         <activity
             android:name=".service.SettingsActivity"
             android:excludeFromRecents="true"
-            android:label="SettingS"
+            android:label="Setting"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
 
@@ -31,7 +31,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="ipfsd_settings" />
+                <data
+                    android:host="settings"
+                    android:scheme="ipfsd" />
             </intent-filter>
         </activity>
 

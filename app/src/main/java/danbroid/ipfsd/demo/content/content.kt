@@ -68,11 +68,10 @@ val rootContent: MenuItemBuilder by lazy {
         IPFSService.stopService(context)
       }
     }
+
     menu {
+      id = SettingsActivity.URI_COMMAND_RESET_STATS
       title = "Reset Stats"
-      onClick = {
-        context.startActivity(Intent(Intent.ACTION_VIEW).setData(SettingsActivity.URI_COMMAND_RESET_STATS.toUri()))
-      }
     }
 
     menu {
@@ -208,6 +207,7 @@ fun MenuItemBuilder.repoMenu() =
     title = "Repo"
 
     menu {
+      title = "Garbage Collect"
       onClick = {
         executor.exec(API.Repo.gc(streamErrors = true, quiet = false)) {
           log.debug("err: $it")
