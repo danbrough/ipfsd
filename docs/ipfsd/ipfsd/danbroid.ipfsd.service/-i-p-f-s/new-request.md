@@ -38,7 +38,7 @@ androidJvm
   
   
 Content  
-open fun [newRequest](new-request.md)(command: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html)): [RequestBuilder](../-request-builder/index.md)  
+open fun [newRequest](new-request.md)(command: [String](https://developer.android.com/reference/kotlin/java/lang/String.html)): [RequestBuilder](../-request-builder/index.md)  
 
 
 

@@ -39,7 +39,7 @@ androidJvm
   
   
 Content  
-open fun [withHeader](with-header.md)(key: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html), value: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html)): [RequestBuilder](index.md)  
+open fun [withHeader](with-header.md)(key: [String](https://developer.android.com/reference/kotlin/java/lang/String.html), value: [String](https://developer.android.com/reference/kotlin/java/lang/String.html)): [RequestBuilder](index.md)  
 
 
 

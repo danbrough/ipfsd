@@ -19,3 +19,10 @@
 | [showSnackbar](show-snackbar.md)| [androidJvm]  <br>Content  <br>abstract fun [showSnackbar](show-snackbar.md)(msg: [CharSequence](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-char-sequence/index.html), length: [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html), actionLabel: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?, action: () -> [Unit](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-unit/index.html)?)  <br><br><br>
 | [toString](../../danbroid.ipfsd.demo.ui.www/-browser-fragment/-web-client/index.md#kotlin/Any/toString/#/PointingToDeclaration/)| [androidJvm]  <br>Content  <br>open override fun [toString](../../danbroid.ipfsd.demo.ui.www/-browser-fragment/-web-client/index.md#kotlin/Any/toString/#/PointingToDeclaration/)(): [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)  <br><br><br>
 
+
+## Inheritors  
+  
+|  Name| 
+|---|
+| [MainActivity](../../danbroid.ipfsd.demo/-main-activity/index.md)
+

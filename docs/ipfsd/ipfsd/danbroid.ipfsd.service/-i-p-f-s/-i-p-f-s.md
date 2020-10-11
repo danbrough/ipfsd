@@ -43,7 +43,7 @@ androidJvm
   
   
 Content  
-open fun [IPFS](-i-p-f-s.md)(context: [Context](https://developer.android.com/reference/kotlin/android/content/Context.html), repoPath: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html))  
+open fun [IPFS](-i-p-f-s.md)(context: [Context](https://developer.android.com/reference/kotlin/android/content/Context.html), repoPath: [String](https://developer.android.com/reference/kotlin/java/lang/String.html))  
 
 
 [androidJvm]  
@@ -66,7 +66,7 @@ androidJvm
   
   
 Content  
-open fun [IPFS](-i-p-f-s.md)(context: [Context](https://developer.android.com/reference/kotlin/android/content/Context.html), repoPath: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html), internalStorage: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html))  
+open fun [IPFS](-i-p-f-s.md)(context: [Context](https://developer.android.com/reference/kotlin/android/content/Context.html), repoPath: [String](https://developer.android.com/reference/kotlin/java/lang/String.html), internalStorage: [Boolean](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-boolean/index.html))  
 
 
 

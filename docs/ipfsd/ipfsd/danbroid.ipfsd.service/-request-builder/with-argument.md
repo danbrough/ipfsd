@@ -38,7 +38,7 @@ androidJvm
   
   
 Content  
-open fun [withArgument](with-argument.md)(argument: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html)): [RequestBuilder](index.md)  
+open fun [withArgument](with-argument.md)(argument: [String](https://developer.android.com/reference/kotlin/java/lang/String.html)): [RequestBuilder](index.md)  
 
 
 

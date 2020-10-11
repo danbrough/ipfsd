@@ -4,6 +4,9 @@ $dokka.linkExtension:md
 danbroid.ipfsd.demo
 danbroid.ipfsd.demo.activities
 danbroid.ipfsd.demo.content
+danbroid.ipfsd.demo.model
 danbroid.ipfsd.demo.sync
+danbroid.ipfsd.demo.ui
+danbroid.ipfsd.demo.ui.settings
 danbroid.ipfsd.demo.ui.www
 
