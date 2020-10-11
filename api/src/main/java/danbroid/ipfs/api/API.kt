@@ -1,5 +1,6 @@
 package danbroid.ipfs.api
 
+import com.google.gson.annotations.SerializedName
 import danbroid.ipfs.api.utils.addUrlArgs
 import java.io.File
 
@@ -79,11 +80,81 @@ object API {
     fun gc(streamErrors: Boolean? = null, quiet: Boolean? = null) =
       apiCall<Types.KeyError>("repo/gc", "stream-errors" to streamErrors, "quiet" to quiet)
 
+
+    data class StatResponse(
+      @SerializedName("NumObjects")
+      val numObjects: Long,
+      @SerializedName("RepoPath")
+      val repoPath: String,
+      @SerializedName("Version")
+      val version: String,
+      @SerializedName("RepoSize")
+      val repoSize: Long,
+      @SerializedName("StorageMax")
+      val storageMax: Long
+    )
+
+    /**
+     * Get stats for the currently used repo.
+     * @param sizeOnly Only report RepoSize and StorageMax. Required: no.
+     * @param human Print sizes in human readable format (e.g., 1K 234M 2G). Required: no.
+     */
+    @JvmOverloads
+    fun stat(sizeOnly: Boolean? = null, human: Boolean? = null) = apiCall<StatResponse>(
+      "repo/stat",
+      "size-only" to sizeOnly, "human" to human
+    )
+
+    data class VerifyResponse(
+      @SerializedName("Msg")
+      val msg: String,
+      @SerializedName("Progress")
+      val progress: Int
+    )
+
+    /**
+     * Verify all blocks in repo are not corrupted.
+     */
+    fun verify() = apiCall<VerifyResponse>("repo/verify")
+
+    data class VersionResponse(@SerializedName("Version") val version: String)
+
+    /**
+     * Show the repo version.
+     * curl -X POST "http://127.0.0.1:5001/api/v0/repo/version?quiet=<value>"
+     * @param quiet Write minimal output. Required: no.
+     **/
+
+    fun version(quiet: Boolean? = null) = apiCall<VersionResponse>(
+      "repo/version", "quiet" to quiet
+    )
+
+    /**
+     * /api/v0/repo/fsck
+     * Remove repo lockfiles.
+     * cURL Example
+     * curl -X POST "http://127.0.0.1:5001/api/v0/repo/fsck"
+     */
+    data class FsckResponse(@SerializedName("Message") val message: String)
+
+    fun fsck() = apiCall<FsckResponse>("repo/fsck")
   }
 
 
   object Stats {
-    fun bw() = apiCall<Types.Stats.Bandwidth>("stats/bw")
+
+    data class BandwidthResponse(
+      @SerializedName("TotalIn")
+      val totalIn: Long,
+      @SerializedName("TotalOut")
+      val totalOut: Long,
+      @SerializedName("RateIn")
+      val rateIn: Double,
+      @SerializedName("RateOut")
+      val rateOut: Double
+    )
+
+    fun bw() = apiCall<BandwidthResponse>("stats/bw")
   }
 
 
@@ -144,7 +215,7 @@ object API {
     }
   }
 
-  //private val log = org.slf4j.LoggerFactory.getLogger(API::class.java)
+//private val log = org.slf4j.LoggerFactory.getLogger(API::class.java)
 
 }
 

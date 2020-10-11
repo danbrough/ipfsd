@@ -209,7 +209,43 @@ fun MenuItemBuilder.repoMenu() =
     menu {
       title = "Garbage Collect"
       onClick = {
-        executor.exec(API.Repo.gc(streamErrors = true, quiet = false)) {
+        executor.exec(API.Repo.gc()) {
+          log.debug("err: $it")
+        }
+      }
+    }
+
+    menu {
+      title = "Stat"
+      onClick = {
+        executor.exec(API.Repo.stat(human = true)) {
+          log.debug("err: $it")
+        }
+      }
+    }
+
+    menu {
+      title = "Version"
+      onClick = {
+        executor.exec(API.Repo.version(quiet = false)) {
+          log.debug("err: $it")
+        }
+      }
+    }
+
+    menu {
+      title = "Verify"
+      onClick = {
+        executor.exec(API.Repo.verify()) {
+          log.debug("err: $it")
+        }
+      }
+    }
+
+    menu {
+      title = "Fsck"
+      onClick = {
+        executor.exec(API.Repo.fsck()) {
           log.debug("err: $it")
         }
       }
