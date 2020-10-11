@@ -55,7 +55,7 @@ object API {
 
 
   object PubSub {
-    
+
     @JvmOverloads
     fun subscribe(topic: String, discover: Boolean? = true) = apiCall<Types.PubSub.Message>(
       "pubsub/sub", "arg" to topic, "discover" to discover

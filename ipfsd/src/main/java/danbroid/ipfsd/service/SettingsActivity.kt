@@ -12,7 +12,7 @@ import danbroid.ipfsd.R
 class SettingsActivity : AppCompatActivity() {
 
   companion object {
-    const val URI_PREFIX = "ipfsd_settings:/"
+    const val URI_PREFIX = "ipfsd://settings"
     const val URI_COMMAND_RESET_STATS = "$URI_PREFIX/reset_stats"
 
     val INTENT_RESET_STATS = Intent(Intent.ACTION_VIEW).setData(URI_COMMAND_RESET_STATS.toUri())

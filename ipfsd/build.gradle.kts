@@ -6,12 +6,6 @@ plugins {
   `maven-publish`
 }
 
-
-repositories {
-  maven("https://h1.danbrough.org/maven")
-  //maven("https://maven.pkg.jetbrains.space/kotlin/p/dokka/dev")
-}
-
 android {
   ndkVersion = ProjectVersions.NDK_VERSION
 
