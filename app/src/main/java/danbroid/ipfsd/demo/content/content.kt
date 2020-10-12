@@ -98,7 +98,7 @@ val rootContent: MenuItemBuilder by lazy {
         onClick = {
           log.error("publishing: $id")
           executor.exec(API.Name.publish(hashID!!)) { response ->
-            debug("Published: $id to ${response?.value}")
+            debug("Published: $id to ${response.getOrNull()}")
           }
         }
       }
@@ -110,7 +110,7 @@ val rootContent: MenuItemBuilder by lazy {
         executor.exec(API.add(msg, fileName = "ipfs_test_message.txt")) { result ->
           debug("added $msg -> $result")
           menuPublish.title = "Publish $hashID"
-          hashID = result?.hash
+          hashID = result.getOrThrow().hash
           fragment?.lifecycleScope?.launch(Dispatchers.Main) {
             callback.invoke(true)
           }
@@ -147,8 +147,7 @@ val rootContent: MenuItemBuilder by lazy {
       onClick = {
 
         executor.exec(API.PubSub.subscribe("poiqwe098123", discover = true)) {
-          val msg = it?.dataString
-          debug(msg)
+          debug("result: ${it.getOrNull()}")
         }
 
       }
@@ -212,17 +211,8 @@ fun MenuItemBuilder.repoMenu() =
     menu {
       title = "Garbage Collect"
       onClick = {
-        API.Repo.gc().onResult {
-          log.debug("msg: $it")
-        }.onError {
-          log.warn("GOT ERROR: ${it.javaClass}")
-          if (it is EOFException || it.cause is EOFException) {
-            log.debug("no response")
-          } else {
-            log.error(it.message, it)
-          }
-        }.also {
-          executor.exec(it)
+        executor.exec(API.Repo.gc()) {
+          log.info("result: $it")
         }
       }
     }

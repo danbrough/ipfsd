@@ -8,9 +8,10 @@ import java.io.Reader
 /**
  * Receives the result of an API call
  */
-typealias ResultHandler<T> = (suspend (T) -> Unit)
+typealias ResultHandler<T> = (suspend (Result<T>) -> Unit)
 
 typealias  ResponseProcessor<T> = suspend (input: ApiCall.InputSource, handler: ResultHandler<T>) -> Unit
+
 
 open class ApiCall<T>(
   val path: String,
@@ -50,18 +51,7 @@ open class ApiCall<T>(
     parts.add(FilePart(file))
   }
 
-  var resultHandler: ResultHandler<T>? = null
+  lateinit var resultHandler: ResultHandler<T>
 
-  var errorHandler: (Throwable) -> Unit = {
-    log.error(it.message, it)
-  }
-
-  fun onResult(handler: ResultHandler<T>) = apply {
-    resultHandler = handler
-  }
-
-  fun onError(handler: (Throwable) -> Unit) = apply {
-    errorHandler = handler
-  }
 
 }

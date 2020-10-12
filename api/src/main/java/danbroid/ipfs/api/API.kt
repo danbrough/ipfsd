@@ -402,7 +402,7 @@ object API {
     fun publish(topic: String, data: String) = ApiCall<Boolean>(
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
     ) { _, handler ->
-      handler.invoke(true)
+      handler.invoke(Result.success(true))
     }
 
 
