@@ -2,4 +2,5 @@ $dokka.format:gfm-v1
 $dokka.linkExtension:md
 
 danbroid.ipfsd.service
+danbroid.ipfsd.service.settings
 

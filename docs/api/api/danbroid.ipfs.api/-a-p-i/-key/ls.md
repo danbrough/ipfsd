@@ -21,6 +21,7 @@ jvm
   
   
 Content  
+@[JvmStatic](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-static/index.html)()  
 @[JvmOverloads](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-jvm-overloads/index.html)()  
   
 fun [ls](ls.md)(ipnsBase: [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html)?): [ApiCall](../../-api-call/index.md)<[API.Key.LsResponse](-ls-response/index.md)>  

@@ -38,7 +38,7 @@ androidJvm
   
   
 Content  
-open fun [getConfigKey](get-config-key.md)(key: [String](https://developer.android.com/reference/kotlin/java/lang/String.html)): [JSONObject](https://developer.android.com/reference/kotlin/org/json/JSONObject.html)  
+open fun [getConfigKey](get-config-key.md)(key: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html)): [JSONObject](https://developer.android.com/reference/kotlin/org/json/JSONObject.html)  
 
 
 

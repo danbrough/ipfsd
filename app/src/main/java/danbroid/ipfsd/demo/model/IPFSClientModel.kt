@@ -8,14 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import danbroid.ipfs.api.ApiCall
-import danbroid.ipfs.api.CallExecutor
-import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfsd.service.ApiClient
-import danbroid.ipfsd.service.IPFSMessage
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   init {

@@ -1,5 +1,8 @@
-package danbroid.ipfs.api
+package danbroid.ipfs.api.okhttp
 
+import danbroid.ipfs.api.ApiCall
+import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfs.api.utils.uriEncode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -11,11 +14,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-open class OkHttpCallExecutor(
+open class OkHttpCallExecutor @JvmOverloads constructor(
   port: Int = 5001,
   val urlBase: String = "http://localhost:$port/api/v0"
-) :
-  CallExecutor {
+) : CallExecutor {
 
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpCallExecutor::class.java)
@@ -56,7 +58,6 @@ open class OkHttpCallExecutor(
   protected fun addFile(builder: MultipartBody.Builder, file: File, rootLength: Int? = null) {
     log.trace("addFile() $file isDir:${file.isDirectory} isFile:${file.isFile}")
 
-
     val fileName: String =
       rootLength?.let { file.absolutePath.substring(rootLength).uriEncode() } ?: file.name
 
@@ -69,6 +70,7 @@ open class OkHttpCallExecutor(
           builder.addPart(it)
         }
       }
+
 
       file.isDirectory -> {
         val rootDirLength = rootLength ?: file.parentFile.absolutePath.let {
@@ -107,20 +109,24 @@ open class OkHttpCallExecutor(
         httpClient.newCall(it)
       }
 
+  private fun ResponseBody.toInputSource() = object : ApiCall.InputSource {
+    override fun getStream() = this@toInputSource.byteStream()
+    override fun getReader() = this@toInputSource.charStream()
+  }
+
   override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) {
     runCatching {
       log.trace("exec() url: ${call.path}")
       withContext(Dispatchers.IO) {
         val httpCall = createRequest(call)
         httpCall.execute().use { response ->
+
           if (!response.isSuccessful) {
             call.errorHandler.invoke(Exception("Request failed: ${response.message} code:${response.code}"))
             return@use
           }
 
-          response.body!!.charStream().use { reader ->
-            call.responseProcessor.invoke(reader, handler)
-          }
+          call.responseProcessor.invoke(response.body!!.toInputSource(), handler)
         }
       }
     }.exceptionOrNull().also {
@@ -136,6 +142,8 @@ open class OkHttpCallExecutor(
 
     }
   }
+
+
 
 }
 

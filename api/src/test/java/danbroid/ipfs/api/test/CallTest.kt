@@ -1,6 +1,7 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.*
+import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Before

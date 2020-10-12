@@ -22,7 +22,7 @@ androidJvm
   
   
 Content  
-open fun [setDNSPair](set-d-n-s-pair.md)(primary: [String](https://developer.android.com/reference/kotlin/java/lang/String.html), secondary: [String](https://developer.android.com/reference/kotlin/java/lang/String.html))  
+open fun [setDNSPair](set-d-n-s-pair.md)(primary: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html), secondary: [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html))  
 
 
 

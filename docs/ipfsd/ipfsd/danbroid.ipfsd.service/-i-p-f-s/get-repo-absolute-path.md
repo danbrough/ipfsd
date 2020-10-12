@@ -18,7 +18,7 @@ The repo absolute path
 
   
 Content  
-open fun [getRepoAbsolutePath](get-repo-absolute-path.md)(): [String](https://developer.android.com/reference/kotlin/java/lang/String.html)  
+open fun [getRepoAbsolutePath](get-repo-absolute-path.md)(): [String](https://docs.oracle.com/javase/8/docs/api/java/lang/String.html)  
 
 
 

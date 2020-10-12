@@ -146,8 +146,8 @@ open class IPFSClient(val context: Context) {
     withContext(Dispatchers.Main) {
       log.trace("runWhenConnected()")
       runCatching {
-        val sendTimeoutReset = callCount == 0
         incrementCallCount()
+
 
         if (connectionState.value != ConnectionState.STARTED) {
           log.trace("waiting to be connected ..")
@@ -156,9 +156,10 @@ open class IPFSClient(val context: Context) {
           log.trace("connection state: ${connectionState.value}")
         }
 
+
+
         if (connectionState.value == ConnectionState.STARTED) {
-          if (sendTimeoutReset)
-            sendMessage(IPFSMessage.TIMEOUT_RESET)
+         // sendMessage(IPFSMessage.TIMEOUT_RESET)
           job.invoke()
         } else throw IllegalStateException("Failed to connect")
 

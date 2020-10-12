@@ -3,7 +3,7 @@ package danbroid.ipfsd.demo.content
 
 import android.content.Intent
 import android.net.Uri
-import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import danbroid.ipfs.api.API
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.demo.R
@@ -12,12 +12,13 @@ import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.model.ipfsClient
 import danbroid.ipfsd.demo.openBrowser
 import danbroid.ipfsd.service.IPFSService
-import danbroid.ipfsd.service.SettingsActivity
+import danbroid.ipfsd.service.settings.SettingsActivity
 import danbroid.util.menu.MenuActionContext
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -31,10 +32,10 @@ val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 private val MenuActionContext.executor: CallExecutor
   get() = fragment!!.ipfsClient.callExecutor
 
-private inline suspend fun MenuActionContext.debug(msg: String?) {
+private inline fun MenuActionContext.debug(msg: String?) {
   val message = msg ?: "null"
-  withContext(Dispatchers.Main) {
-    log.debug(message)
+  log.debug(message)
+  fragment?.lifecycleScope?.launch(Dispatchers.Main) {
     fragment.activityInterface?.showSnackbar(message)
   }
 }
@@ -48,8 +49,9 @@ val rootContent: MenuItemBuilder by lazy {
     menu {
       title = "Get ID"
       onClick = {
-        executor.exec(API.id()) {
+        executor.exec(API.Network.id()) {
           debug("id: $it")
+
         }
       }
     }
@@ -70,8 +72,10 @@ val rootContent: MenuItemBuilder by lazy {
     }
 
     menu {
-      id = SettingsActivity.URI_COMMAND_RESET_STATS
       title = "Reset Stats"
+      onClick = {
+        SettingsActivity.resetStatsPrompt(context)
+      }
     }
 
     menu {
@@ -85,36 +89,34 @@ val rootContent: MenuItemBuilder by lazy {
 
     menu {
       title = "Add string"
-      var hashID: String?
+      var hashID: String? = null
       isBrowsable = true
+
+      val menuPublish = menu {
+        title = "Publish:"
+        onClick = {
+          log.error("publishing: $id")
+          executor.exec(API.Name.publish(hashID!!)) { response ->
+            debug("Published: $id to ${response.value}")
+          }
+        }
+      }
 
       onClick = { callback ->
         val msg = "Hello from the ipfs demo at ${Date()}.\n"
         log.trace("adding message: $msg")
-        val parentID = this@menu.id
+
         executor.exec(API.add(msg, fileName = "ipfs_test_message.txt")) { result ->
           debug("added $msg -> $result")
+          menuPublish.title = "Publish $hashID"
           hashID = result.hash
-          withContext(Dispatchers.Main) {
-            fragment?.activityInterface?.showSnackbar("Added: $msg")
-
-            menu {
-              id = "${parentID}/publish"
-              title = "Publish:"
-              subtitle = hashID!!
-              onClick = {
-                log.error("publishing: $hashID")
-                executor.exec(API.Name.publish(hashID!!)) {
-                  fragment?.activityInterface?.showSnackbar("Published: $hashID to ${it?.value}")
-                  log.debug("result: $it")
-                }
-              }
-            }
+          fragment?.lifecycleScope?.launch(Dispatchers.Main) {
             callback.invoke(true)
           }
         }
       }
     }
+
 
     menu {
       title = "Bandwidth"
@@ -144,7 +146,7 @@ val rootContent: MenuItemBuilder by lazy {
       onClick = {
 
         executor.exec(API.PubSub.subscribe("poiqwe098123", discover = true)) {
-          val msg = it?.dataString ?: "null"
+          val msg = it.dataString
           debug(msg)
         }
 
@@ -210,7 +212,7 @@ fun MenuItemBuilder.repoMenu() =
       title = "Garbage Collect"
       onClick = {
         executor.exec(API.Repo.gc()) {
-          log.debug("err: $it")
+          debug("err: $it")
         }
       }
     }
@@ -219,7 +221,7 @@ fun MenuItemBuilder.repoMenu() =
       title = "Stat"
       onClick = {
         executor.exec(API.Repo.stat(human = true)) {
-          log.debug("err: $it")
+          debug("err: $it")
         }
       }
     }
@@ -228,7 +230,7 @@ fun MenuItemBuilder.repoMenu() =
       title = "Version"
       onClick = {
         executor.exec(API.Repo.version(quiet = false)) {
-          log.debug("err: $it")
+          debug("err: $it")
         }
       }
     }
@@ -237,17 +239,10 @@ fun MenuItemBuilder.repoMenu() =
       title = "Verify"
       onClick = {
         executor.exec(API.Repo.verify()) {
-          log.debug("err: $it")
+          debug("err: $it")
         }
       }
     }
 
-    menu {
-      title = "Fsck"
-      onClick = {
-        executor.exec(API.Repo.fsck()) {
-          log.debug("err: $it")
-        }
-      }
-    }
+
   }
