@@ -12,7 +12,7 @@ class ApiClient(
 
   var ipfsClient: IPFSClient? = IPFSClient.getInstance(context)
 
-  override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) =
+  override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>?) =
     ipfsClient!!.runWhenConnected {
       super.exec(call, handler)
     }

@@ -2,6 +2,7 @@ package danbroid.ipfs.api
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonStreamParser
+import java.io.EOFException
 
 class ResponseProcessors {
   companion object {
@@ -14,7 +15,6 @@ class ResponseProcessors {
           handler.invoke(json)
         }
       }
-
     }
   }
 }
