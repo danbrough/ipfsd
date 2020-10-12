@@ -1,5 +1,6 @@
 package danbroid.ipfsd.demo
 
+import android.content.Intent
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.NavType
@@ -8,6 +9,7 @@ import danbroid.ipfsd.demo.ui.QRCodeFragment
 import danbroid.ipfsd.demo.ui.TestFragment
 import danbroid.ipfsd.demo.ui.settings.SettingsFragment
 import danbroid.ipfsd.demo.ui.www.BrowserFragment
+import danbroid.ipfsd.service.settings.SettingsActivity
 import danbroid.util.menu.navigation.UniqueIDS
 import danbroid.util.menu.navigation.createMenuGraph
 
@@ -33,6 +35,7 @@ object DemoNavGraph : UniqueIDS {
   object action {
     val toBrowser = nextID()
     val toSettings = nextID()
+    val toResetStatsPrompt = nextID()
   }
 
   object args {
@@ -86,9 +89,18 @@ fun NavController.createDemoNavGraph() =
       destinationId = DemoNavGraph.dest.settings_id
     }
 
- /*   deepLink {
-      uriPattern = "$URL_PREFIX_DEMO/.*"
-    }*/
+    action(DemoNavGraph.action.toResetStatsPrompt) {
+
+    }
+
+    deepLink {
+      action = Intent.ACTION_VIEW
+      uriPattern = SettingsActivity.URI_RESET_STATS_PROMPT
+    }
+
+    /*   deepLink {
+         uriPattern = "$URL_PREFIX_DEMO/.*"
+       }*/
   }
 
 

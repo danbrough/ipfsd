@@ -13,7 +13,7 @@ class AddTest : CallTest() {
   fun idTest() {
     log.debug("test1()")
     runBlocking {
-      callTest(API.id()) {
+      callTest(API.Network.id()) {
         log.info("id: $it")
       }
     }

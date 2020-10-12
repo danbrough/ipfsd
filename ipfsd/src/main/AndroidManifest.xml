@@ -19,7 +19,7 @@
             android:permission="android.permission.BIND_JOB_SERVICE"></service>
 
         <activity
-            android:name=".service.SettingsActivity"
+            android:name=".service.settings.SettingsActivity"
             android:excludeFromRecents="true"
             android:label="Setting"
             android:noHistory="true"

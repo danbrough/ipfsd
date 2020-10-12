@@ -2,7 +2,7 @@ package danbroid.ipfs.api.test
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonStreamParser
-import danbroid.ipfs.api.Types
+import danbroid.ipfs.api.API
 import danbroid.ipfs.api.utils.addUrlArgs
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -41,7 +41,7 @@ class OkHttpTests {
           message.toRequestBody(MEDIA_TYPE_APPLICATION)
         ).let {
           val headers = it.headers!!.newBuilder()
-            .add("Abspath","/stuff/message.txt")
+            .add("Abspath", "/stuff/message.txt")
             .build()
           MultipartBody.Part.Companion.create(headers, it.body)
         }
@@ -63,7 +63,7 @@ class OkHttpTests {
     while (parser.hasNext()) {
       val e = parser.next()
       println("e: ${gson.toJson(e)}")
-      val data = gson.fromJson(e, Types.File::class.java)
+      val data = gson.fromJson(e, API.Files::class.java)
       log.debug("data: $data")
     }
 

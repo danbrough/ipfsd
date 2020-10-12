@@ -15,6 +15,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import danbroid.ipfsd.BuildConfig
 import danbroid.ipfsd.R
+import danbroid.ipfsd.service.settings.SettingsActivity
 
 class NotificationManager(
   val context: Context,

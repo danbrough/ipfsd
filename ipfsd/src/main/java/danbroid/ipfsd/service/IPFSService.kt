@@ -10,8 +10,8 @@ import android.os.Looper
 import android.os.Messenger
 import android.widget.Toast
 import androidx.annotation.MainThread
-import androidx.core.net.toUri
 import danbroid.ipfsd.R
+import danbroid.ipfsd.service.settings.IPFSServicePrefs
 import danbroid.util.format.humanReadableByteCount
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
@@ -115,7 +115,7 @@ class IPFSService : Service() {
     log.trace("resetTimeout()")
     messengerHandler.apply {
       removeMessages(MSG_TIMEOUT)
-      sendEmptyMessageDelayed(MSG_TIMEOUT, 60000)
+      sendEmptyMessageDelayed(MSG_TIMEOUT, prefs.timeout)
     }
   }
 

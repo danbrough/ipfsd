@@ -1,11 +1,9 @@
 package danbroid.ipfs
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.internal.runner.junit4.AndroidJUnit4Builder
-import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import danbroid.ipfs.api.API
-import danbroid.ipfs.api.OkHttpCallExecutor
+import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfsd.service.IPFS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

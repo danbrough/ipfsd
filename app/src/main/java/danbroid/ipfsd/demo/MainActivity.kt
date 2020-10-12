@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.snackbar.Snackbar
 import danbroid.ipfsd.demo.activities.ActivityInterface
 import danbroid.ipfsd.demo.content.rootContent
@@ -35,13 +35,9 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
 
     navHostFragment.navController.also { controller ->
       controller.createDemoNavGraph()
-      setupActionBarWithNavController(this@MainActivity, controller)
+      setupActionBarWithNavController(controller)
     }
-/*
-    navController.graph.addAll(navController.navInflater.inflate(R.navigation.ipfsd_navigation))
 
-
-    setupActionBarWithNavController(navController)*/
     log.warn("intent $intent")
     log.warn("data:${intent?.data}")
     intent?.extras?.also {

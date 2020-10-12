@@ -2,7 +2,7 @@ package danbroid.ipfsd.service
 
 import android.content.Context
 import danbroid.ipfs.api.ApiCall
-import danbroid.ipfs.api.OkHttpCallExecutor
+import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfs.api.ResultHandler
 
 class ApiClient(

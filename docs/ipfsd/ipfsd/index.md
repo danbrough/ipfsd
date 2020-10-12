@@ -56,4 +56,5 @@ This package contains the IPFSService android service that runs the ipfs node an
 |  Name|  Summary| 
 |---|---|
 | [danbroid.ipfsd.service](danbroid.ipfsd.service/index.md) | 
+| [danbroid.ipfsd.service.settings](danbroid.ipfsd.service.settings/index.md) | 
 

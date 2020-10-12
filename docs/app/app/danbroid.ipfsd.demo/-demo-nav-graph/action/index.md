@@ -20,5 +20,6 @@
 |  Name|  Summary| 
 |---|---|
 | [toBrowser](index.md#danbroid.ipfsd.demo/DemoNavGraph.action/toBrowser/#/PointingToDeclaration/)|  [androidJvm] val [toBrowser](index.md#danbroid.ipfsd.demo/DemoNavGraph.action/toBrowser/#/PointingToDeclaration/): [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)   <br>
+| [toResetStatsPrompt](index.md#danbroid.ipfsd.demo/DemoNavGraph.action/toResetStatsPrompt/#/PointingToDeclaration/)|  [androidJvm] val [toResetStatsPrompt](index.md#danbroid.ipfsd.demo/DemoNavGraph.action/toResetStatsPrompt/#/PointingToDeclaration/): [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)   <br>
 | [toSettings](index.md#danbroid.ipfsd.demo/DemoNavGraph.action/toSettings/#/PointingToDeclaration/)|  [androidJvm] val [toSettings](index.md#danbroid.ipfsd.demo/DemoNavGraph.action/toSettings/#/PointingToDeclaration/): [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)   <br>
 
