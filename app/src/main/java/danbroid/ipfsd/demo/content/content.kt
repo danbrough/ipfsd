@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
+import java.io.EOFException
 import java.util.*
 
 const val URI_CONTENT_ROOT = "ipfsdemo://content"
@@ -97,7 +98,7 @@ val rootContent: MenuItemBuilder by lazy {
         onClick = {
           log.error("publishing: $id")
           executor.exec(API.Name.publish(hashID!!)) { response ->
-            debug("Published: $id to ${response.value}")
+            debug("Published: $id to ${response?.value}")
           }
         }
       }
@@ -109,7 +110,7 @@ val rootContent: MenuItemBuilder by lazy {
         executor.exec(API.add(msg, fileName = "ipfs_test_message.txt")) { result ->
           debug("added $msg -> $result")
           menuPublish.title = "Publish $hashID"
-          hashID = result.hash
+          hashID = result?.hash
           fragment?.lifecycleScope?.launch(Dispatchers.Main) {
             callback.invoke(true)
           }
@@ -146,7 +147,7 @@ val rootContent: MenuItemBuilder by lazy {
       onClick = {
 
         executor.exec(API.PubSub.subscribe("poiqwe098123", discover = true)) {
-          val msg = it.dataString
+          val msg = it?.dataString
           debug(msg)
         }
 
@@ -211,8 +212,17 @@ fun MenuItemBuilder.repoMenu() =
     menu {
       title = "Garbage Collect"
       onClick = {
-        executor.exec(API.Repo.gc()) {
-          debug("err: $it")
+        API.Repo.gc().onResult {
+          log.debug("msg: $it")
+        }.onError {
+          log.warn("GOT ERROR: ${it.javaClass}")
+          if (it is EOFException || it.cause is EOFException) {
+            log.debug("no response")
+          } else {
+            log.error(it.message, it)
+          }
+        }.also {
+          executor.exec(it)
         }
       }
     }

@@ -114,7 +114,8 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
     override fun getReader() = this@toInputSource.charStream()
   }
 
-  override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>) {
+  override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>?) {
+    if (handler != null) call.resultHandler = handler
     runCatching {
       log.trace("exec() url: ${call.path}")
       withContext(Dispatchers.IO) {
@@ -126,7 +127,7 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
             return@use
           }
 
-          call.responseProcessor.invoke(response.body!!.toInputSource(), handler)
+          call.responseProcessor.invoke(response.body!!.toInputSource(), call.resultHandler!!)
         }
       }
     }.exceptionOrNull().also {
@@ -137,12 +138,13 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
         is CancellationException -> {
           //log.trace("CancellationException: ${it.message}")
         }
-        else -> call.errorHandler.invoke(it)
+        else -> {
+          call.errorHandler.invoke(it)
+        }
       }
 
     }
   }
-
 
 
 }
