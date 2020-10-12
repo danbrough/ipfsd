@@ -11,8 +11,8 @@ class ResponseProcessors {
       input.getReader().use {
         val parser = JsonStreamParser(it)
         while (parser.hasNext()) {
-          val json = GsonBuilder().create().fromJson(parser.next(), jsonType)
-          handler.invoke(json)
+          val result = GsonBuilder().create().fromJson(parser.next(), jsonType)
+          handler.invoke(Result.success(result))
         }
       }
     }

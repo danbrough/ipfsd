@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 interface CallExecutor {
 
   interface JavaResultHandler<T> {
-    fun onResult(t: T?)
+    fun onResult(t: Result<T>?)
   }
 
   suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>? = null)

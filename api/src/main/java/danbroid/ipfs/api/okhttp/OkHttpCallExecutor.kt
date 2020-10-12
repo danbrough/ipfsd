@@ -123,7 +123,7 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
         httpCall.execute().use { response ->
 
           if (!response.isSuccessful) {
-            call.errorHandler.invoke(Exception("Request failed: ${response.message} code:${response.code}"))
+            call.resultHandler?.invoke(Result.failure(Exception("Request failed: ${response.message} code:${response.code}")))
             return@use
           }
 
@@ -139,7 +139,7 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
           //log.trace("CancellationException: ${it.message}")
         }
         else -> {
-          call.errorHandler.invoke(it)
+          call.resultHandler?.invoke(Result.failure(it))
         }
       }
 

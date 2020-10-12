@@ -41,7 +41,7 @@ fun MenuItemBuilder.ipfsDir(
         log.debug("calling ls on $path")
         ipfsClient.callExecutor.exec(API.ls(path)) { result ->
           log.debug("result: $result")
-          result?.objects?.forEach { file ->
+          result.getOrNull()?.objects?.forEach { file ->
             file.links.forEach { link ->
               items.add(
                 MenuItem(
