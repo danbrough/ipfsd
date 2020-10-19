@@ -13,7 +13,7 @@ buildscript {
 
 
 bootstrapRefreshVersionsAndDependencies()
-include(":demo_api", ":ipfsd", ":api")
+include(":demo_api", ":demo_shopping_list", ":ipfsd", ":api")
 
 rootProject.name = "ipfs_daemon"
 

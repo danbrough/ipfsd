@@ -53,6 +53,10 @@ android {
       languageSettings.useExperimentalAnnotation(it)
     }
   }
+
+  buildTypes.all {
+    buildConfigField("String", "URI_SCHEME", "\"shopping\"")
+  }
 }
 
 
@@ -69,22 +73,6 @@ tasks.withType<Test> {
   }
 }
 
-/*
-configurations.all {
-  resolutionStrategy.force "com.squareup.okhttp3:okhttp:$okhttp_version"
-}
-
-project.afterEvaluate {
-  android.applicationVariants.all { variant ->
-    task "installRun${variant.name.capitalize()}"(type: Exec, dependsOn: "install${variant.name.capitalize()}", group: "run") {
-      commandLine = ["adb", "shell", "monkey", "-p", variant.applicationId + " 1"]
-      doLast {
-        println "Launching ${variant.applicationId}"
-      }
-    }
-  }
-}
-*/
 
 dependencies {
   implementation(project(":ipfsd"))
@@ -105,15 +93,21 @@ dependencies {
   //implementation(Libs.slf4j)
 
 
+  implementation("com.mikepenz:fontawesome-typeface:_")
+  implementation("com.mikepenz:google-material-typeface:_")
+  implementation("com.mikepenz:iconics-core:_")
+
+
+
   if (Danbroid.useLocalUtils) {
     implementation(project(":menu"))
     implementation(project(":misc"))
   } else {
-    implementation("com.github.danbrough.androidutils:menu:_")
-    implementation("com.github.danbrough.androidutils:misc:_")
+    implementation(Danbroid.menu)
+    implementation(Danbroid.misc)
   }
 
-  implementation("com.github.danbrough.androidutils:slf4j:_")
+  implementation(Danbroid.slf4j)
 
   implementation("com.google.zxing:android-core:_")
 
