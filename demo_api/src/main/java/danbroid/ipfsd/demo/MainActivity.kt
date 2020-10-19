@@ -13,6 +13,10 @@ import danbroid.util.menu.ui.MenuListAdapter
 
 class MainActivity : MenuActivity(), ActivityInterface {
 
+  val rootContent by lazy {
+    rootContent(this)
+  }
+
   override fun createNavGraph(navController: NavController) = navController.createDemoNavGraph(this)
 
   override fun getRootMenu(menuID: String) = rootContent
@@ -21,7 +25,6 @@ class MainActivity : MenuActivity(), ActivityInterface {
   override fun onCreate(savedInstanceState: Bundle?) {
     log.info("onCreate()")
     super.onCreate(savedInstanceState)
-
 
     log.warn("intent $intent")
     log.warn("data:${intent?.data}")

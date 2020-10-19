@@ -1,13 +1,13 @@
 package danbroid.ipfsd.demo.content
 
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.API
-import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
@@ -16,7 +16,7 @@ import danbroid.ipfsd.demo.openBrowser
 import danbroid.ipfsd.service.IPFSService
 import danbroid.ipfsd.service.settings.SettingsActivity
 import danbroid.util.menu.MenuItemBuilder
-import danbroid.util.menu.getRootMenu
+import danbroid.util.menu.rootMenu
 import danbroid.util.menu.menu
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,8 +40,8 @@ inline fun Fragment.debug(msg: String?) {
   }
 }
 
-val rootContent: MenuItemBuilder by lazy {
-  getRootMenu {
+fun rootContent(context: Context): MenuItemBuilder =
+  rootMenu(context) {
     id = URI_CONTENT_ROOT
     titleID = R.string.app_name
 
@@ -122,7 +122,6 @@ val rootContent: MenuItemBuilder by lazy {
     }
   }
 
-}
 
 fun MenuItemBuilder.commands() = menu {
   title = "Commands"
