@@ -3,40 +3,25 @@ package danbroid.ipfsd.demo
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.NavController
 import com.google.android.material.snackbar.Snackbar
 import danbroid.ipfsd.demo.activities.ActivityInterface
 import danbroid.ipfsd.demo.content.rootContent
-import danbroid.util.menu.ui.MenuImplementation
-import danbroid.util.menu.ui.menulist.MenuListAdapter
-import kotlinx.android.synthetic.main.activity_main.*
+import danbroid.util.menu.MenuActivity
+import danbroid.util.menu.ui.MenuListAdapter
 
 
-class MainActivity : AppCompatActivity(), ActivityInterface {
+class MainActivity : MenuActivity(), ActivityInterface {
 
-  init {
-    MenuImplementation.rootContent = {
-      rootContent
-    }
-  }
+  override fun createNavGraph(navController: NavController) = navController.createDemoNavGraph(this)
 
-  protected val navHostFragment: NavHostFragment
-    get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+  override fun getRootMenu(menuID: String) = rootContent
+
 
   override fun onCreate(savedInstanceState: Bundle?) {
     log.info("onCreate()")
     super.onCreate(savedInstanceState)
 
-
-    setContentView(R.layout.activity_main)
-    setSupportActionBar(toolbar)
-
-    navHostFragment.navController.also { controller ->
-      controller.createDemoNavGraph()
-      setupActionBarWithNavController(controller)
-    }
 
     log.warn("intent $intent")
     log.warn("data:${intent?.data}")
@@ -58,9 +43,6 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
     }
     super.onNewIntent(intent)
   }
-
-  override fun onSupportNavigateUp() =
-    navHostFragment.navController.navigateUp() || super.onSupportNavigateUp()
 
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -85,16 +67,13 @@ class MainActivity : AppCompatActivity(), ActivityInterface {
   }
 
   override fun onItemClicked(holder: MenuListAdapter.MenuViewHolder) {
-    log.info("onItemCLicked not implemented")
+    TODO("Not yet implemented")
   }
 
   override fun open(uri: String) {
     log.info("open() $uri  NOT IMPLEMENTED")
   }
 
-  override fun setToolbarTitle(title: CharSequence) {
-    supportActionBar?.setTitle(title)
-  }
 
   override fun showSnackbar(
     msg: CharSequence,

@@ -8,6 +8,7 @@ import danbroid.util.menu.MenuDSL
 import danbroid.util.menu.MenuItem
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
+import danbroid.util.menu.model.menuViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -17,50 +18,32 @@ fun MenuItemBuilder.ipfsDir(
   block: (MenuItemBuilder.() -> Unit)? = null
 ): MenuItemBuilder =
   menu {
-    isBrowsable = true
     id = "ipfsd:/$path"
 
-    log.error("CREATED BUILDER: $id")
-
-/*    provides = {
-      log.trace("provides: $it")
-      if (it.startsWith("ipfsd:/"))
-        ipfsDir(it.substring(6)).also {
-          log.error("RETURNING $it")
-        }
-      else null
-    }*/
-
-    liveChildren = { context, id, oldItem ->
-      val items = mutableListOf<MenuItem>()
-      val ipfsClient: IPFSClientModel
-      log.warn("LIVE CHILDREN")
-      runBlocking(Dispatchers.Main) {
-        ipfsClient = (context as AppCompatActivity).ipfsClient
-
-        log.debug("calling ls on $path")
-        ipfsClient.callExecutor.exec(API.ls(path)) { result ->
-          log.debug("result: $result")
-          result.getOrNull()?.objects?.forEach { file ->
-            file.links.forEach { link ->
-              items.add(
-                MenuItem(
-                  "ipfsd://ipfs/${link.hash}",
-                  link.name,
-                  "${link.hash} size:${link.size}"
-                )
+    onClick = { callback ->
+      ipfsClient.callExecutor.exec(API.Basic.ls(path)) {
+        val items = mutableListOf<MenuItem>()
+        it.getOrNull()?.objects?.forEach { file ->
+          file.links.forEach { link ->
+            items.add(
+              MenuItem(
+                "ipfsd://ipfs/${link.hash}",
+                link.name,
+                "${link.hash} size:${link.size}"
               )
-            }
+            )
           }
         }
-
-        log.warn("returning ${items.size} items")
-        items
+        log.warn("updaing children with $items")
+        menuViewModel().also {
+          it.updateChildren(items)
+        }
+        callback.invoke(true)
       }
     }
+
     block?.invoke(this)
   }
-
 
 
 

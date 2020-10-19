@@ -53,12 +53,6 @@ android {
       languageSettings.useExperimentalAnnotation(it)
     }
   }
-
-/*  buildTypes {
-    forEach {
-      it.buildConfigField("String", "URL_DEMO_PREFIX", "\"ipfsdemo:/\"")
-    }
-  }*/
 }
 
 
@@ -111,16 +105,16 @@ dependencies {
   //implementation(Libs.slf4j)
 
 
-  if (rootProject.extra["localUtils"] == "true") {
+  if (false) {
     implementation(project(":menu"))
     implementation(project(":misc"))
   } else {
-    implementation(Danbroid.utils.menu)
-    implementation(Danbroid.utils.misc)
+    implementation("com.github.danbrough.androidutils:menu:_")
+    implementation("com.github.danbrough.androidutils:misc:_")
   }
-  implementation(Danbroid.utils.slf4j)
 
-  implementation(Danbroid.utils.misc)
+  implementation("com.github.danbrough.androidutils:slf4j:_")
+
   implementation("com.google.zxing:android-core:_")
 
   implementation("com.google.zxing:core:_")
@@ -137,7 +131,7 @@ dependencies {
   androidTestImplementation(AndroidX.test.rules)
   androidTestImplementation(AndroidX.test.ext.junitKtx)
   androidTestImplementation("com.google.truth:truth:_")
-  androidTestImplementation(Danbroid.utils.slf4j)
+  androidTestImplementation("com.github.danbrough.androidutils:slf4j:_")
 
 
   testImplementation("ch.qos.logback:logback-classic:_")

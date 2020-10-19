@@ -89,9 +89,9 @@ open class IPFSClient(val context: Context) {
 
 
       val intent = Intent(context, IPFSService::class.java)
-
+/*
       log.warn("starting service")
-      context.startService(intent)
+      context.startService(intent)*/
 
       log.warn("binding to service ..")
       context.bindService(

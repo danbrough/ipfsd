@@ -42,17 +42,14 @@ dependencies {
   testImplementation("ch.qos.logback:logback-classic:_")
 
   implementation("org.slf4j:slf4j-api:_")
-//api(Libs.slf4j_api)
-//implementation(Libs.kotlin_stdlib_jdk8)
   implementation(Kotlin.stdlib.jdk8)
   implementation(KotlinX.coroutines.jdk8)
-//api(Libs.kotlinx_coroutines_android)
+  implementation("org.jetbrains.kotlin:kotlin-reflect:_")
+
   implementation("com.google.code.gson:gson:_")
-//api(Libs.gson)
   implementation(Square.okHttp3.okHttp)
 
 
-//testImplementation(Libs.robolectric)
 
 }
 
@@ -79,16 +76,3 @@ publishing {
   }
 }
 
-/*
-publishing {
-  publications {
-    val release by registering(MavenPublication::class) {
-      from(components["release"])
-      artifact(sourcesJar.get())
-      artifactId = "ipfsd"
-      groupId = ProjectVersions.GROUP_ID
-      version = ProjectVersions.VERSION_NAME
-    }
-  }
-
-}*/

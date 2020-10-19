@@ -2,7 +2,7 @@ package danbroid.ipfsd.demo.activities
 
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
-import danbroid.util.menu.ui.menulist.MenuListAdapter
+import danbroid.util.menu.ui.MenuListAdapter
 
 
 interface ActivityInterface {
@@ -11,7 +11,6 @@ interface ActivityInterface {
 
   fun open(uri: String)
 
-  fun setToolbarTitle(title: CharSequence)
 
   fun showSnackbar(
     msg: CharSequence,
@@ -26,4 +25,4 @@ interface ActivityInterface {
 
 
 val Fragment?.activityInterface: ActivityInterface?
-  get() = (this!!.activity as ActivityInterface)
+  get() = (this?.activity as? ActivityInterface)
