@@ -3,25 +3,24 @@ package danbroid.ipfsd.demo.content
 
 import android.content.Intent
 import android.net.Uri
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.API
+import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.demo.R
-import danbroid.ipfsd.demo.URL_CONTENT_BASE
 import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.model.ipfsClient
 import danbroid.ipfsd.demo.openBrowser
 import danbroid.ipfsd.service.IPFSService
 import danbroid.ipfsd.service.settings.SettingsActivity
-import danbroid.util.menu.MenuActionContext
 import danbroid.util.menu.MenuItemBuilder
+import danbroid.util.menu.getRootMenu
 import danbroid.util.menu.menu
-import danbroid.util.menu.rootMenu
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
-import java.io.EOFException
 import java.util.*
 
 const val URI_CONTENT_ROOT = "ipfsdemo://content"
@@ -30,172 +29,94 @@ const val dir_kitty = "/ipfs/QmaknW7EzautwWKE1q4rpR4tPnP1XuxMKGr8KiyRZKqC5T"
 
 val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 
-private val MenuActionContext.executor: CallExecutor
-  get() = fragment!!.ipfsClient.callExecutor
+val Fragment.executor: CallExecutor
+  get() = ipfsClient.callExecutor
 
-private inline fun MenuActionContext.debug(msg: String?) {
+inline fun Fragment.debug(msg: String?) {
   val message = msg ?: "null"
   log.debug(message)
-  fragment?.lifecycleScope?.launch(Dispatchers.Main) {
-    fragment.activityInterface?.showSnackbar(message)
+  lifecycleScope.launch(Dispatchers.Main) {
+    activityInterface?.showSnackbar(message)
   }
 }
 
 val rootContent: MenuItemBuilder by lazy {
-
-  rootMenu<MenuItemBuilder> {
+  getRootMenu {
     id = URI_CONTENT_ROOT
     titleID = R.string.app_name
 
-    menu {
-      title = "Get ID"
-      onClick = {
-        executor.exec(API.Network.id()) {
-          debug("id: $it")
-
-        }
-      }
+    onCreate = { item, model ->
+      //auto connect to the IPFS service
+      ipfsClient.connect()
     }
 
-    repoMenu()
+    commands()
+
 
     menu {
-      title = "Stop"
+      title = "Stop Service"
       onClick = {
-        /*     context.startService(
-               Intent(
-                 context,
-                 IPFSService::class.java
-               ).setAction(IPFSService.ACTION_STOP)
-             )*/
-        IPFSService.stopService(context)
+        IPFSService.stopService(requireContext())
       }
     }
 
     menu {
       title = "Reset Stats"
       onClick = {
-        SettingsActivity.resetStatsPrompt(context)
+        SettingsActivity.resetStatsPrompt(requireContext())
       }
     }
 
-    menu {
-      title = "Profile Apply"
-      onClick = {
-        executor.exec(API.Config.Profile.apply("lowpower")) {
-          debug("result: $it")
-        }
-      }
-    }
 
     menu {
-      title = "Add string"
-      var hashID: String? = null
-      isBrowsable = true
-
-      val menuPublish = menu {
-        title = "Publish:"
+      title = "Misc"
+      menu {
+        title = "List kitty"
         onClick = {
-          log.error("publishing: $id")
-          executor.exec(API.Name.publish(hashID!!)) { response ->
-            debug("Published: $id to ${response.getOrNull()}")
+          executor.exec(API.Basic.ls(dir_kitty)) {
+            debug("GOT KITTY: $it")
           }
         }
       }
 
-      onClick = { callback ->
-        val msg = "Hello from the ipfs demo at ${Date()}.\n"
-        log.trace("adding message: $msg")
-
-        executor.exec(API.add(msg, fileName = "ipfs_test_message.txt")) { result ->
-          debug("added $msg -> $result")
-          menuPublish.title = "Publish $hashID"
-          hashID = result.getOrThrow().hash
-          fragment?.lifecycleScope?.launch(Dispatchers.Main) {
-            callback.invoke(true)
+      menu {
+        title = "List kitty.danbrough.org"
+        onClick = {
+          executor.exec(API.Basic.ls("/ipns/kitty.danbrough.org")) {
+            debug("result: $it")
           }
         }
       }
-    }
 
-
-    menu {
-      title = "Bandwidth"
-      onClick = {
-        executor.exec(API.Stats.bw()) {
-          debug("bandwidth: $it")
-        }
+      ipfsDir(DIR_XCCD) {
+        title = "DIR XCCD"
       }
     }
 
     menu {
-      title = "PubSub Publish"
-      onClick = {
-        executor.exec(
-          API.PubSub.publish(
-            "poiqwe098123",
-            "Hello from the IPFS app at ${Date()}\n "
-          )
-        ) {
-          debug("RESULT: $it")
-        }
-      }
-    }
 
-    menu {
-      title = "Pubsub Test Subscribe"
-      onClick = {
-
-        executor.exec(API.PubSub.subscribe("poiqwe098123", discover = true)) {
-          debug("result: ${it.getOrNull()}")
-        }
-
-      }
-    }
-
-    menu {
-      title = "List kitty"
-      onClick = {
-        executor.exec(API.ls(dir_kitty)) {
-          debug("GOT KITTY: $it")
-        }
-      }
-    }
-
-    menu {
-      title = "List kitty.danbrough.org"
-      onClick = {
-        executor.exec(API.ls("/ipns/kitty.danbrough.org")) {
-          debug("result: $it")
-        }
-      }
-    }
-
-    ipfsDir(DIR_XCCD) {
-      title = "DIR XCCD"
-      isBrowsable = true
-    }
-
-
-    val url_webui = "http://localhost:5001/webui/"
-
-    menu {
       title = "WebUI"
 
-      menu {
-        title = "WebUI external browser"
+      val url_webui = "http://localhost:5001/webui/"
 
-        onClick = {
-          context.startActivity(Intent(Intent.ACTION_VIEW).also {
-            it.data = Uri.parse(url_webui)
-          })
+      menu {
+        title = "WebUI"
+
+        menu {
+          title = "WebUI external browser"
+
+          onClick = {
+            requireContext().startActivity(Intent(Intent.ACTION_VIEW).also {
+              it.data = Uri.parse(url_webui)
+            })
+          }
         }
-      }
 
-      menu {
-        title = "WebUI embedded browser"
-        onClick = {
-          navController?.openBrowser(url_webui)
+        menu {
+          title = "WebUI embedded browser"
+          onClick = {
+            findNavController().openBrowser(url_webui)
+          }
         }
       }
     }
@@ -203,46 +124,68 @@ val rootContent: MenuItemBuilder by lazy {
 
 }
 
-fun MenuItemBuilder.repoMenu() =
+fun MenuItemBuilder.commands() = menu {
+  title = "Commands"
+
+
   menu {
-    id = "$URL_CONTENT_BASE/repo"
-    title = "Repo"
-
-    menu {
-      title = "Garbage Collect"
-      onClick = {
-        executor.exec(API.Repo.gc()) {
-          log.info("result: $it")
-        }
+    title = "Get ID"
+    onClick = {
+      executor.exec(API.Network.id()) {
+        debug("id: $it")
       }
     }
-
-    menu {
-      title = "Stat"
-      onClick = {
-        executor.exec(API.Repo.stat(human = true)) {
-          debug("err: $it")
-        }
-      }
-    }
-
-    menu {
-      title = "Version"
-      onClick = {
-        executor.exec(API.Repo.version(quiet = false)) {
-          debug("err: $it")
-        }
-      }
-    }
-
-    menu {
-      title = "Verify"
-      onClick = {
-        executor.exec(API.Repo.verify()) {
-          debug("err: $it")
-        }
-      }
-    }
-
-
   }
+
+
+
+  menu {
+    title = "Profile Apply"
+    onClick = {
+      executor.exec(API.Config.Profile.apply("lowpower")) {
+        debug("result: $it")
+      }
+    }
+  }
+
+  menu {
+    id = "$URI_CONTENT_ROOT/add_string"
+    title = "Add string"
+    val parent = this
+
+    onClick = { callback ->
+      val msg = "Hello from the ipfs demo at ${Date()}.\n"
+      log.trace("adding message: $msg")
+      executor.exec(API.Basic.add(msg, fileName = "ipfs_test_message.txt")) { result ->
+        debug("added $msg -> $result")
+        val hashID = result.getOrThrow().hash
+        log.debug("hashID: $hashID")
+        lifecycleScope.launch(Dispatchers.Main) {
+          callback.invoke(true)
+        }
+      }
+    }
+  }
+
+
+  menu {
+    title = "Bandwidth"
+    onClick = {
+      executor.exec(API.Stats.bw()) {
+        debug("bandwidth: $it")
+      }
+    }
+  }
+
+  menu {
+    title = "Repo Stat Test"
+    onClick = {
+      //TODO fragment.ipfsClient?.sendMessage(IPFSMessage.REPO_STAT)
+    }
+  }
+
+
+
+  pubSubCommands()
+  repoCommands()
+}

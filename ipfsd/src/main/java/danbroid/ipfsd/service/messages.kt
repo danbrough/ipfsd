@@ -29,6 +29,8 @@ sealed class IPFSMessage : Parcelable {
   @Parcelize
   object STATS_RESET : IPFSMessage()
 
+  @Parcelize
+  object REPO_STAT : IPFSMessage()
 
   @Parcelize
   object TIMEOUT_INCREMENT_LOCK : IPFSMessage()

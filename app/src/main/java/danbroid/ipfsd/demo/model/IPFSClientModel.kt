@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.service.ApiClient
+import danbroid.ipfsd.service.IPFSMessage
 
 class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   init {
@@ -17,12 +19,18 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
 
   private var apiClient = ApiClient(context)
 
-  val callExecutor = apiClient
+  val callExecutor: CallExecutor = apiClient
+
+  suspend fun sendMessage(msg: IPFSMessage) {
+    apiClient.ipfsClient.sendMessage(msg)
+  }
 
   override fun onCleared() {
     log.error("onCleared()")
     apiClient.close()
   }
+
+  fun connect() = apiClient.ipfsClient.connect()
 
   companion object {
     class ModelFactory(val context: Context) : ViewModelProvider.NewInstanceFactory() {

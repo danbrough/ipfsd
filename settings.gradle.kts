@@ -19,15 +19,8 @@ rootProject.name = "ipfs_daemon"
 
 
 
-//println("initProps()")
-val fis = java.io.FileInputStream(file("project.properties"))
-val props = java.util.Properties()
-props.load(fis)
-fis.close()
-val localUtils: Boolean = props.get("localUtils") == "true"
 
-
-if (localUtils) {
+if (false) {
   include(":menu", ":slf4j", ":misc")
   project(":menu").projectDir = file("../androidutils/menu")
   project(":slf4j").projectDir = file("../androidutils/slf4j")

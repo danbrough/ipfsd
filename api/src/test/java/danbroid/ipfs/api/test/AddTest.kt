@@ -23,8 +23,8 @@ class AddTest : CallTest() {
   fun addMessage() {
     log.info("addTest()")
     val msg = "${javaClass.simpleName} addMessage at ${Date()}\n"
-    callTest(API.add(msg, fileName = "test_message.txt")) {
-      SharedData.cid = it?.hash
+    callTest(API.Basic.add(msg, fileName = "test_message.txt")) {
+      SharedData.cid = it.getOrNull()?.hash
     }
   }
 
@@ -33,7 +33,7 @@ class AddTest : CallTest() {
   fun addDirectory() {
     log.info("addDirectory()")
     callTest(
-      API.add(file = File("/tmp/test_dir"), recurseDirectory = true)
+      API.Basic.add(file = File("/tmp/test_dir"), recurseDirectory = true)
     ) {
       log.debug("result: $it")
     }

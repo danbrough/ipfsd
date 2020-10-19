@@ -6,7 +6,6 @@ import danbroid.ipfs.api.utils.Base58
 import danbroid.ipfs.api.utils.addUrlArgs
 import okio.ByteString.Companion.decodeBase64
 import java.io.File
-import java.io.InputStream
 
 /**
  * API for calls to an IPFS node
@@ -15,120 +14,124 @@ object API {
   private inline fun <reified T> apiCall(path: String, vararg args: Pair<String, Any?>) =
     ApiCall(path.addUrlArgs(*args), T::class.java)
 
-  data class Object(
-    @SerializedName("Hash")
-    val hash: String,
-    @SerializedName("Links")
-    val links: Array<Link>
-  ) {
+  object Basic {
+    data class Object(
+      @SerializedName("Hash")
+      val hash: String,
+      @SerializedName("Links")
+      val links: Array<Link>
+    ) {
 
-    data class Link(
+      data class Link(
+        @SerializedName("Hash")
+        val hash: String,
+        @SerializedName("Name")
+        val name: String,
+        @SerializedName("Size")
+        val size: Long,
+        @SerializedName("Target")
+        val target: String,
+        @SerializedName("Type")
+        val type: Int
+      ) {
+        val isDirectory = type == 1
+        val isFile = type == 2
+      }
+    }
+
+    data class LsResponse(
+      @SerializedName("Objects")
+      val objects: Array<Object>
+    )
+
+
+    @JvmOverloads
+    @JvmStatic
+    fun ls(path: String, stream: Boolean = false) =
+      apiCall<LsResponse>("ls", "arg" to path, "stream" to stream)
+
+    data class FileResponse(
+      @SerializedName("Bytes")
+      val bytes: Long,
       @SerializedName("Hash")
       val hash: String,
       @SerializedName("Name")
       val name: String,
       @SerializedName("Size")
-      val size: Long,
-      @SerializedName("Target")
-      val target: String,
-      @SerializedName("Type")
-      val type: Int
-    ) {
-      val isDirectory = type == 1
-      val isFile = type == 2
-    }
-  }
+      val size: Long
+    )
 
-  data class LsResponse(
-    @SerializedName("Objects")
-    val objects: Array<Object>
-  )
-
-
-  @JvmOverloads
-  fun ls(path: String, stream: Boolean = false) =
-    apiCall<LsResponse>("ls", "arg" to path, "stream" to stream)
-
-  data class FileResponse(
-    @SerializedName("Bytes")
-    val bytes: Long,
-    @SerializedName("Hash")
-    val hash: String,
-    @SerializedName("Name")
-    val name: String,
-    @SerializedName("Size")
-    val size: Long
-  )
-
-  /**
-   * Add data to ipfs.
-   * @param data String data to add
-   * @param pin Whether to pin the content
-   * @param wrapWithDirectory Wrap files with a directory object
-   * @param onlyHash Only chunk and hash - do not write to disk
-   * @param chunker Chunking algorithm, size-<bytes>, rabin-<min>-<avg>-<max> or buzhash. Default: size-262144
-   * @param trickle  Use trickle-dag format for dag generation. Required: no.
-   * @param rawLeaves Use raw blocks for leaf nodes. (experimental). Required: no.
-   * @param inline Inline small blocks into CIDs. (experimental). Required: no.
-   * @param inlineLimit Maximum block size to inline. (experimental). Default: 32. Required: no.
-   * @param fsCache: Check the filestore for pre-existing blocks. (experimental). Required: no.
-   * @param noCopy Add the file using filestore. Implies raw-leaves. (experimental). Required: no.
-   */
-  @JvmOverloads
-  fun add(
-    data: String? = null,
-    file: File? = null,
-    recurseDirectory: Boolean? = null,
-    fileName: String? = null,
-    wrapWithDirectory: Boolean? = null,
-    chunker: String? = null,
-    pin: Boolean = true,
-    onlyHash: Boolean? = null,
-    trickle: Boolean? = null,
-    rawLeaves: Boolean? = null,
-    inline: Boolean? = null,
-    inlineLimit: Int? = null,
-    fsCache: Boolean? = null,
-    noCopy: Boolean? = null
-  ) =
-    apiCall<FileResponse>(
-      "add",
-      "wrap-with-directory" to wrapWithDirectory,
-      "pin" to pin,
-      "only-hash" to onlyHash,
-      "chunker" to chunker,
-      "trickle" to trickle,
-      "raw-leaves" to rawLeaves,
-      "inline" to inline,
-      "inline-limit" to inlineLimit,
-      "fscache" to fsCache,
-      "nocopy" to noCopy
-    ).also { call ->
-      if (data != null)
-        call.addData(data, fileName)
-      else if (file != null) {
-        if (file.isDirectory && recurseDirectory != true)
-          throw IllegalArgumentException("${file.path} is a directory. You must set recurseDirectory = true")
-        call.addFile(file)
+    /**
+     * Add data to ipfs.
+     * @param data String data to add
+     * @param pin Whether to pin the content
+     * @param wrapWithDirectory Wrap files with a directory object
+     * @param onlyHash Only chunk and hash - do not write to disk
+     * @param chunker Chunking algorithm, size-<bytes>, rabin-<min>-<avg>-<max> or buzhash. Default: size-262144
+     * @param trickle  Use trickle-dag format for dag generation. Required: no.
+     * @param rawLeaves Use raw blocks for leaf nodes. (experimental). Required: no.
+     * @param inline Inline small blocks into CIDs. (experimental). Required: no.
+     * @param inlineLimit Maximum block size to inline. (experimental). Default: 32. Required: no.
+     * @param fsCache: Check the filestore for pre-existing blocks. (experimental). Required: no.
+     * @param noCopy Add the file using filestore. Implies raw-leaves. (experimental). Required: no.
+     */
+    @JvmOverloads
+    @JvmStatic
+    fun add(
+      data: String? = null,
+      file: File? = null,
+      recurseDirectory: Boolean? = null,
+      fileName: String? = null,
+      wrapWithDirectory: Boolean? = null,
+      chunker: String? = null,
+      pin: Boolean = true,
+      onlyHash: Boolean? = null,
+      trickle: Boolean? = null,
+      rawLeaves: Boolean? = null,
+      inline: Boolean? = null,
+      inlineLimit: Int? = null,
+      fsCache: Boolean? = null,
+      noCopy: Boolean? = null
+    ) =
+      apiCall<FileResponse>(
+        "add",
+        "wrap-with-directory" to wrapWithDirectory,
+        "pin" to pin,
+        "only-hash" to onlyHash,
+        "chunker" to chunker,
+        "trickle" to trickle,
+        "raw-leaves" to rawLeaves,
+        "inline" to inline,
+        "inline-limit" to inlineLimit,
+        "fscache" to fsCache,
+        "nocopy" to noCopy
+      ).also { call ->
+        if (data != null)
+          call.addData(data, fileName)
+        else if (file != null) {
+          if (file.isDirectory && recurseDirectory != true)
+            throw IllegalArgumentException("${file.path} is a directory. You must set recurseDirectory = true")
+          call.addFile(file)
+        }
       }
-    }
 
 
-  data class VersionResponse(
-    @SerializedName("Commit")
-    val commit: String,
-    @SerializedName("Golang")
-    val goLang: String,
-    @SerializedName("Repo")
-    val repo: String,
-    @SerializedName("Version")
-    val version: String,
-    @SerializedName("System")
-    val system: String
-  )
+    data class VersionResponse(
+      @SerializedName("Commit")
+      val commit: String,
+      @SerializedName("Golang")
+      val goLang: String,
+      @SerializedName("Repo")
+      val repo: String,
+      @SerializedName("Version")
+      val version: String,
+      @SerializedName("System")
+      val system: String
+    )
 
-  fun version() = apiCall<VersionResponse>("version")
-
+    @JvmStatic
+    fun version() = apiCall<VersionResponse>("version")
+  }
 
   object Block {
     /**
@@ -213,6 +216,54 @@ object API {
   }
 
   object Dag {
+    data class CID(@SerializedName("/") val cid: String)
+
+    data class PutResponse(@SerializedName("Cid") val cid: CID)
+
+    /**
+     * /api/v0/dag/put
+     * Add a dag node to ipfs.
+     *
+     * @param format  Format that the object will be added as. Default: cbor. Required: no.
+     * @param inputEnc Format that the input object will be. Default: json. Required: no.
+     * @param pin Pin this object when adding. Required: no.
+     * @param hashFunc Hash function to use. Default: . Required: no.
+     *
+     * <h3>cURL Example</h3>
+     * <pre>curl -X POST -F file=@myfile http://127.0.0.1:5001/api/v0/dag/put?format=cbor&input-enc=json&pin=<value>&hash=<value></pre>
+     */
+
+    fun put(
+      format: String? = null,
+      inputEnc: String? = null,
+      pin: Boolean? = null,
+      hashFunc: String? = null
+    ) = apiCall<PutResponse>(
+      "dag/put",
+      "format" to format,
+      "input-enc" to inputEnc,
+      "pin" to pin,
+      "hash" to hashFunc
+    )
+
+    data class ResolveResponse(
+      @SerializedName("Cid") val cid: CID,
+      @SerializedName("RemPath") val remPath: String
+    )
+
+    /**
+     * /api/v0/dag/resolve
+     * Resolve ipld block
+     *
+     * @param path The path to resolve Required: yes.
+     *
+     * <h3>cURL Example</h3>
+     * <pre>curl -X POST http://127.0.0.1:5001/api/v0/dag/resolve?arg=<ref></pre>
+     */
+
+    @JvmOverloads
+    @JvmStatic
+    fun resolve(path: String) = apiCall<ResolveResponse>("dag/resolve", "arg" to path)
 
     data class StatResponse(
       @SerializedName("NumBlocks") val numBlocks: Long,
@@ -226,7 +277,7 @@ object API {
      * @param progress Return progressive data while reading through the DAG. Default: true. Required: no.
      *
      * <h3>cURL Example</h3>
-     * <pre>curl -X POST "http://127.0.0.1:5001/api/v0/dag/stat?arg=<root>&progress=true"</pre>
+     * <pre>curl -X POST http://127.0.0.1:5001/api/v0/dag/stat?arg=<root>&progress=true</pre>
      **/
 
     @JvmStatic
@@ -236,7 +287,29 @@ object API {
 
   }
 
+
   object Files {
+
+    /**
+     *   ipfs files cp <source> <dest> - Copy any IPFS files and directories into MFS
+     *   (or copy within MFS).
+     *
+     *   @param source Source IPFS or MFS path to copy. Required: yes.
+     *   @param dest Destination within MFS. Required: yes.
+     *
+     * cURL Example
+     * <pre>curl -X POST http://127.0.0.1:5001/api/v0/files/cp?arg=[source]&arg=[dest]</pre>
+     */
+
+    @JvmStatic
+    fun cp(source: String, dest: String) =
+      ApiCall(
+        "files/cp".addUrlArgs(
+          "arg" to source,
+          "arg" to dest
+        ),
+        ResponseProcessors.constantResult(true)
+      )
 
 
     data class LsResponse(
@@ -493,15 +566,17 @@ object API {
       val rateOut: Double
     )
 
+    @JvmStatic
     fun bw() = apiCall<BandwidthResponse>("stats/bw")
   }
 
+  object Swarm {
+
+  }
 
 //private val log = org.slf4j.LoggerFactory.getLogger(API::class.java)
 
 }
-
-
 
 
 

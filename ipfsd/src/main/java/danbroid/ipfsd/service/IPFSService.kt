@@ -103,6 +103,8 @@ class IPFSService : Service() {
           IPFSMessage.TIMEOUT_RESET ->
             resetTimeout()
 
+          IPFSMessage.REPO_STAT -> repoStat()
+
           IPFSMessage.STATS_RESET -> readStats(true)
         }
       }
@@ -346,6 +348,15 @@ class IPFSService : Service() {
     return messenger.binder
   }
 
+
+  private fun repoStat() {
+    log.debug("repoStat()")
+    coroutineScope.launch {
+      ipfs.newRequest("repo/stat").send().also {
+        log.warn("RESULT: ${it.toString()}")
+      }
+    }
+  }
 
 }
 

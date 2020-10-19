@@ -1,5 +1,6 @@
 package danbroid.ipfsd.demo
 
+import android.content.Context
 import android.content.Intent
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
@@ -10,8 +11,8 @@ import danbroid.ipfsd.demo.ui.TestFragment
 import danbroid.ipfsd.demo.ui.settings.SettingsFragment
 import danbroid.ipfsd.demo.ui.www.BrowserFragment
 import danbroid.ipfsd.service.settings.SettingsActivity
-import danbroid.util.menu.navigation.UniqueIDS
-import danbroid.util.menu.navigation.createMenuGraph
+import danbroid.util.menu.createMenuNavGraph
+import danbroid.util.misc.UniqueIDS
 
 private const val pkg = "danbroid.ipfsd.demo"
 const val ACTION_SETTINGS = "$pkg.ACTION_SETTINGS"
@@ -47,9 +48,9 @@ object DemoNavGraph : UniqueIDS {
 const val URL_PREFIX_DEMO = "ipfsdemo:/"
 const val URL_CONTENT_BASE = "$URL_PREFIX_DEMO/content"
 
-fun NavController.createDemoNavGraph() =
+fun NavController.createDemoNavGraph(context: Context) =
 
-  createMenuGraph(deeplinkPrefix = URL_CONTENT_BASE) {
+  createMenuNavGraph(context, defaultMenuID = URL_CONTENT_BASE) {
 
     fragment<BrowserFragment>(DemoNavGraph.dest.browser_id) {
       label = "WebUI"

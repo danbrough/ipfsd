@@ -113,7 +113,7 @@ dependencies {
   implementation(AndroidX.appCompat)
   implementation(project(":api"))
 
-  implementation(Danbroid.utils.misc)
+  implementation("com.github.danbrough.androidutils:misc:_")
 
 //  implementation(project(":misc"))
 
@@ -137,7 +137,7 @@ dependencies {
   // testImplementation("net.sf.kxml:kxml2-min:_")
   //testImplementation(Libs.robolectric)
   androidTestImplementation(Testing.junit4)
-  androidTestImplementation(Danbroid.utils.slf4j)
+  androidTestImplementation("com.github.danbrough.androidutils:slf4j:_")
 
   androidTestImplementation(AndroidX.test.core)
   androidTestImplementation(AndroidX.test.runner)
