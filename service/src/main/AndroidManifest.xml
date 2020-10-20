@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="danbroid.ipfsd">
+    package="danbroid.ipfsd.service">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -14,16 +14,31 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:ignore="UnusedAttribute">
         <service
-            android:name=".service.IPFSService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE"></service>
+            android:name=".IPFSService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <data
+                    android:host="start"
+                    android:scheme="ipfsd" />
+            </intent-filter>
+        </service>
+        <!--
+         android:process=":remote"
+        android:permission="android.permission.BIND_JOB_SERVICE"-->
 
         <activity
-            android:name=".service.settings.SettingsActivity"
+            android:name=".settings.SettingsActivity"
             android:excludeFromRecents="true"
             android:label="Setting"
             android:noHistory="true"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

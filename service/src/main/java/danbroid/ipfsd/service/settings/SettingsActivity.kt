@@ -7,8 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
-import danbroid.ipfsd.R
 import danbroid.ipfsd.service.IPFSService
+import danbroid.ipfsd.service.R
 import java.lang.IllegalArgumentException
 
 class SettingsActivity : AppCompatActivity() {
@@ -37,7 +37,9 @@ class SettingsActivity : AppCompatActivity() {
 
     when (intent?.data?.toString()) {
       URI_RESET_STATS_PROMPT -> resetStatsConfirm()
-      else -> throw IllegalArgumentException("No uri specified")
+      else -> {
+        log.warn("no uri specified")
+      }
     }
   }
 

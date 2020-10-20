@@ -9,8 +9,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import danbroid.ipfs.api.CallExecutor
-import danbroid.ipfsd.service.ApiClient
-import danbroid.ipfsd.service.IPFSMessage
+import danbroid.ipfsd.client.ApiClient
+import danbroid.ipfsd.client.IPFSMessage
+
 
 class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   init {

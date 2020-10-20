@@ -13,8 +13,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import danbroid.ipfsd.BuildConfig
-import danbroid.ipfsd.R
 import danbroid.ipfsd.service.settings.SettingsActivity
 
 class NotificationManager(
@@ -33,7 +31,8 @@ class NotificationManager(
   companion object {
     const val NOTIFICATION_ID = 19381
     const val EXTRA_INSTANCE_ID = "extra_instance_id"
-    const val ACTION_CLOSE = "${BuildConfig.LIBRARY_PACKAGE_NAME}.close"
+    const val ACTION_CLOSE = "danbroid.ipfsd.service.close" //TODO REFACTOR THIS
+
   }
 
   private var notificationID = 0

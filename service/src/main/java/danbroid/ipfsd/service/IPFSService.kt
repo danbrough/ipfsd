@@ -10,7 +10,7 @@ import android.os.Looper
 import android.os.Messenger
 import android.widget.Toast
 import androidx.annotation.MainThread
-import danbroid.ipfsd.R
+import danbroid.ipfsd.client.toIPFSMessage
 import danbroid.ipfsd.service.settings.IPFSServicePrefs
 import danbroid.util.format.humanReadableByteCount
 import kotlinx.coroutines.*
@@ -34,6 +34,7 @@ class IPFSService : Service() {
     private const val pkg = "danbroid.ipfsd.service"
 
     //const val ACTION_SETTINGS = "$pkg.ACTION_SETTINGS"
+    const val ACTION_START = "$pkg.ACTION_START"
     const val ACTION_STOP = "$pkg.ACTION_STOP"
     const val ACTION_CLEAR_NET_STATS = "$pkg.ACTION_CLEAR_NET_STATS"
 
@@ -92,20 +93,20 @@ class IPFSService : Service() {
         val msg = it.toIPFSMessage()
         log.debug("SERVICE MESSAGE: $msg")
         when (msg) {
-          IPFSMessage.CLIENT_CONNECT -> {
+          danbroid.ipfsd.client.IPFSMessage.CLIENT_CONNECT -> {
             clients.add(it.replyTo)
             if (ipfs.isStarted == true)
-              it.replyTo.send(IPFSMessage.SERVICE_STARTED.toMessage())
+              it.replyTo.send(danbroid.ipfsd.client.IPFSMessage.SERVICE_STARTED.toMessage())
           }
-          IPFSMessage.CLIENT_DISCONNECT ->
+          danbroid.ipfsd.client.IPFSMessage.CLIENT_DISCONNECT ->
             clients.remove(it.replyTo)
 
-          IPFSMessage.TIMEOUT_RESET ->
+          danbroid.ipfsd.client.IPFSMessage.TIMEOUT_RESET ->
             resetTimeout()
 
-          IPFSMessage.REPO_STAT -> repoStat()
+          danbroid.ipfsd.client.IPFSMessage.REPO_STAT -> repoStat()
 
-          IPFSMessage.STATS_RESET -> readStats(true)
+          danbroid.ipfsd.client.IPFSMessage.STATS_RESET -> readStats(true)
         }
       }
     }
@@ -170,7 +171,7 @@ class IPFSService : Service() {
       readStats()
 
       clients.forEach {
-        it.send(IPFSMessage.SERVICE_STARTED.toMessage())
+        it.send(danbroid.ipfsd.client.IPFSMessage.SERVICE_STARTED.toMessage())
       }
     }
 
@@ -244,7 +245,7 @@ class IPFSService : Service() {
 
 
             sendMessage(
-              IPFSMessage.BANDWIDTH(
+              danbroid.ipfsd.client.IPFSMessage.BANDWIDTH(
                 newDataIn,
                 newDataOut,
                 rateIn,
@@ -263,7 +264,7 @@ class IPFSService : Service() {
   }
 
   @MainThread
-  private fun sendMessage(msg: IPFSMessage) {
+  private fun sendMessage(msg: danbroid.ipfsd.client.IPFSMessage) {
     val toRemove = mutableListOf<Messenger>()
     clients.forEach { client ->
       runCatching {
@@ -308,7 +309,7 @@ class IPFSService : Service() {
     log.warn("stopService()")
     notificationManager.cancelNotification()
     clients.forEach {
-      val msg = IPFSMessage.SERVICE_STOPPING.toMessage()
+      val msg = danbroid.ipfsd.client.IPFSMessage.SERVICE_STOPPING.toMessage()
       try {
         it.send(msg)
       } catch (err: Exception) {

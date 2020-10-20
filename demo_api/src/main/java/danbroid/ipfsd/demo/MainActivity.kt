@@ -11,42 +11,12 @@ import danbroid.util.menu.MenuActivity
 import danbroid.util.menu.ui.MenuListAdapter
 
 
-class MainActivity : MenuActivity(), ActivityInterface {
+class MainActivity : MenuActivity(R.layout.activity_main), ActivityInterface {
 
-  val rootContent by lazy {
-    rootContent(this)
-  }
 
   override fun createNavGraph(navController: NavController) = navController.createDemoNavGraph(this)
 
   override fun getRootMenu(menuID: String) = rootContent
-
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    log.info("onCreate()")
-    super.onCreate(savedInstanceState)
-
-    log.warn("intent $intent")
-    log.warn("data:${intent?.data}")
-    intent?.extras?.also {
-      it.keySet()?.forEach {
-        log.debug("KEY: $it ${intent?.extras?.get(it)}")
-      }
-    }
-  }
-
-
-  override fun onNewIntent(intent: Intent?) {
-    log.warn("onNewIntent!() $intent")
-    log.warn("data:${intent?.data}")
-    log.warn("extras:${intent?.extras}")
-
-    if (intent?.action == Intent.ACTION_VIEW) {
-      if (navHostFragment.navController.handleDeepLink(intent)) return
-    }
-    super.onNewIntent(intent)
-  }
-
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     // Inflate the menu; this adds items to the action bar if it is present.

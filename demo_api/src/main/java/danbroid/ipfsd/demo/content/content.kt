@@ -1,7 +1,6 @@
 package danbroid.ipfsd.demo.content
 
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
@@ -13,11 +12,10 @@ import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.model.ipfsClient
 import danbroid.ipfsd.demo.openBrowser
-import danbroid.ipfsd.service.IPFSService
-import danbroid.ipfsd.service.settings.SettingsActivity
+import danbroid.util.menu.MenuItem
 import danbroid.util.menu.MenuItemBuilder
-import danbroid.util.menu.rootMenu
 import danbroid.util.menu.menu
+import danbroid.util.menu.rootMenu
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
@@ -32,6 +30,14 @@ val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 val Fragment.executor: CallExecutor
   get() = ipfsClient.callExecutor
 
+open class MenuTheme {
+  companion object {
+
+  }
+
+  open val test = 1
+}
+
 inline fun Fragment.debug(msg: String?) {
   val message = msg ?: "null"
   log.debug(message)
@@ -40,12 +46,12 @@ inline fun Fragment.debug(msg: String?) {
   }
 }
 
-fun rootContent(context: Context): MenuItemBuilder =
-  rootMenu(context) {
+val rootContent: MenuItemBuilder =
+  rootMenu {
     id = URI_CONTENT_ROOT
     titleID = R.string.app_name
 
-    onCreate = { item, model ->
+    onCreate = { _, _ ->
       //auto connect to the IPFS service
       ipfsClient.connect()
     }
@@ -55,15 +61,20 @@ fun rootContent(context: Context): MenuItemBuilder =
 
     menu {
       title = "Stop Service"
+      imageURI = "https://ipfs.io/ipfs/QmU4zgfoWCR6UdeveKbzff1JZeE5fGFnT573YepsJJFA2i"
       onClick = {
-        IPFSService.stopService(requireContext())
+        //TODO IPFSService.stopService(requireContext())
+        TODO("Fix this")
       }
     }
 
     menu {
       title = "Reset Stats"
+      imageID = R.drawable.ipfs_logo_128
+      tintRes = MenuItem.TINT_DISABLED
       onClick = {
-        SettingsActivity.resetStatsPrompt(requireContext())
+        //SettingsActivity.resetStatsPrompt(requireContext())
+        TODO("Fix this")
       }
     }
 
@@ -77,6 +88,7 @@ fun rootContent(context: Context): MenuItemBuilder =
             debug("GOT KITTY: $it")
           }
         }
+
       }
 
       menu {

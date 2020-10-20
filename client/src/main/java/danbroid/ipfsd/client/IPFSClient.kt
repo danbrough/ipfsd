@@ -1,4 +1,4 @@
-package danbroid.ipfsd.service
+package danbroid.ipfsd.client
 
 import android.content.ComponentName
 import android.content.Context
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
-import kotlin.system.measureTimeMillis
 
 /**
  *
@@ -88,7 +87,13 @@ open class IPFSClient(val context: Context) {
       _connectionState.value = ConnectionState.CONNECTING
 
 
-      val intent = Intent(context, IPFSService::class.java)
+      val intent = Intent().setComponent(
+        ComponentName(
+          "danbroid.ipfsd.service",
+          "danbroid.ipfsd.service.IPFSService"
+        )
+      )
+      //val intent = Intent(context, IPFSService::class.java)
 /*
       log.warn("starting service")
       context.startService(intent)*/
@@ -159,7 +164,7 @@ open class IPFSClient(val context: Context) {
 
 
         if (connectionState.value == ConnectionState.STARTED) {
-         // sendMessage(IPFSMessage.TIMEOUT_RESET)
+          // sendMessage(IPFSMessage.TIMEOUT_RESET)
           job.invoke()
         } else throw IllegalStateException("Failed to connect")
 

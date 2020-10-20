@@ -87,7 +87,7 @@ project.afterEvaluate {
 */
 
 dependencies {
-  implementation(project(":ipfsd"))
+  implementation(project(":client"))
   implementation(project(":api"))
   implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(AndroidX.lifecycle.liveDataKtx)
@@ -109,9 +109,10 @@ dependencies {
     implementation(project(":menu"))
     implementation(project(":misc"))
   } else {
-    implementation("com.github.danbrough.androidutils:menu:_")
-    implementation("com.github.danbrough.androidutils:misc:_")
+    implementation(Danbroid.menu)
+    implementation(Danbroid.misc)
   }
+
 
   implementation("com.github.danbrough.androidutils:slf4j:_")
 

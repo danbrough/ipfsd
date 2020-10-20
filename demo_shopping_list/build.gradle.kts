@@ -1,3 +1,4 @@
+
 plugins {
   id("com.android.application")
   kotlin("android")
@@ -6,7 +7,6 @@ plugins {
 //kotlin("org.jetbrains.kotlin:kotlin-android-extensions-runtime:")
   id("org.jetbrains.dokka")
 }
-
 
 
 android {
@@ -75,7 +75,7 @@ tasks.withType<Test> {
 
 
 dependencies {
-  implementation(project(":ipfsd"))
+  implementation(project(":client"))
   implementation(project(":api"))
   implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(AndroidX.lifecycle.liveDataKtx)
