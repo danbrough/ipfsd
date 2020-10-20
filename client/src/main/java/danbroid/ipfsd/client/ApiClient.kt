@@ -1,4 +1,4 @@
-package danbroid.ipfsd.service
+package danbroid.ipfsd.client
 
 import android.content.Context
 import danbroid.ipfs.api.ApiCall

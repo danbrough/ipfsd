@@ -1,4 +1,4 @@
-package danbroid.ipfsd.service
+package danbroid.ipfsd.client
 
 import android.os.Message
 import android.os.Messenger

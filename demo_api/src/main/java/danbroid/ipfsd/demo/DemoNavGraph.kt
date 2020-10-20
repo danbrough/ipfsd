@@ -10,7 +10,6 @@ import danbroid.ipfsd.demo.ui.QRCodeFragment
 import danbroid.ipfsd.demo.ui.TestFragment
 import danbroid.ipfsd.demo.ui.settings.SettingsFragment
 import danbroid.ipfsd.demo.ui.www.BrowserFragment
-import danbroid.ipfsd.service.settings.SettingsActivity
 import danbroid.util.menu.createMenuNavGraph
 import danbroid.util.misc.UniqueIDS
 
@@ -49,7 +48,6 @@ const val URL_PREFIX_DEMO = "ipfsdemo:/"
 const val URL_CONTENT_BASE = "$URL_PREFIX_DEMO/content"
 
 fun NavController.createDemoNavGraph(context: Context) =
-
   createMenuNavGraph(context, defaultMenuID = URL_CONTENT_BASE) {
 
     fragment<BrowserFragment>(DemoNavGraph.dest.browser_id) {
@@ -96,7 +94,7 @@ fun NavController.createDemoNavGraph(context: Context) =
 
     deepLink {
       action = Intent.ACTION_VIEW
-      uriPattern = SettingsActivity.URI_RESET_STATS_PROMPT
+      uriPattern = "ipfsd://settings/reset_stats" //TODO refactor this
     }
 
     /*   deepLink {

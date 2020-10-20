@@ -17,15 +17,6 @@ android {
     versionName = ProjectVersions.VERSION_NAME
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
-
-    javaCompileOptions {
-      annotationProcessorOptions {
-        argument("room.schemaLocation", "$projectDir/schemas")
-        argument("room.incremental", "true")
-        argument("room.expandProjection", "true")
-      }
-    }
-
   }
 
 
@@ -52,26 +43,16 @@ android {
     //freeCompilerArgs = listOf("-Xjsr305=strict")
   }
 
-  sourceSets {
-    getByName("main") {
-      java {
-        srcDir("src/bridge/java")
-      }
-      jniLibs {
-        srcDir("src/bridge/jniLibs")
-      }
-    }
-  }
-
   testOptions {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true
   }
-  buildTypes {
+
+/*  buildTypes {
     forEach {
       it.buildConfigField("String", "URL_PREFIX", "\"ipfsd:/\"")
     }
-  }
+  }*/
 
 }
 
@@ -86,7 +67,7 @@ afterEvaluate {
       val release by publications.registering(MavenPublication::class) {
         from(components["release"])
         artifact(sourcesJar.get())
-        artifactId = "ipfsd"
+        artifactId = "client"
         groupId = ProjectVersions.GROUP_ID
         version = ProjectVersions.VERSION_NAME
       }
@@ -113,11 +94,9 @@ dependencies {
   implementation(AndroidX.appCompat)
   implementation(project(":api"))
 
-  implementation("com.github.danbrough.androidutils:misc:_")
+  implementation(Danbroid.misc)
 
-//  implementation(project(":misc"))
-
-  implementation("commons-io:commons-io:_")
+  //implementation("commons-io:commons-io:_")
   //implementation("ipfs.gomobile:core:0.8.0-dan04@aar")
 
   //api(Libs.kotlinx_coroutines_android)
@@ -137,7 +116,7 @@ dependencies {
   // testImplementation("net.sf.kxml:kxml2-min:_")
   //testImplementation(Libs.robolectric)
   androidTestImplementation(Testing.junit4)
-  androidTestImplementation("com.github.danbrough.androidutils:slf4j:_")
+  androidTestImplementation(Danbroid.slf4j)
 
   androidTestImplementation(AndroidX.test.core)
   androidTestImplementation(AndroidX.test.runner)
