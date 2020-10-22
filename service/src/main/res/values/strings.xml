@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">gomobile-ipfs</string>
+    <string name="app_name">IPFSD Service</string>
     <string name="lbl_service_running">Running.</string>
     <string name="lbl_service_starting">Starting ..</string>
     <string name="title_service">IPFS Node</string>

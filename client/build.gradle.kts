@@ -54,6 +54,12 @@ android {
     }
   }*/
 
+  buildTypes {
+    forEach {
+      it.buildConfigField("String", "ipfsd_scheme", "\"${Danbroid.IPFSD_SCHEME}\"")
+    }
+  }
+
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
@@ -92,7 +98,7 @@ dependencies {
    }*/
   api("org.slf4j:slf4j-api:_")
   implementation(AndroidX.appCompat)
-  implementation(project(":api"))
+  api(project(":api"))
 
   implementation(Danbroid.misc)
 

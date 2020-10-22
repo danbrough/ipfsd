@@ -114,7 +114,7 @@ dependencies {
   }
 
 
-  implementation("com.github.danbrough.androidutils:slf4j:_")
+  implementation(Danbroid.slf4j)
 
   implementation("com.google.zxing:android-core:_")
 
@@ -132,7 +132,7 @@ dependencies {
   androidTestImplementation(AndroidX.test.rules)
   androidTestImplementation(AndroidX.test.ext.junitKtx)
   androidTestImplementation("com.google.truth:truth:_")
-  androidTestImplementation("com.github.danbrough.androidutils:slf4j:_")
+  androidTestImplementation(Danbroid.slf4j)
 
 
   testImplementation("ch.qos.logback:logback-classic:_")

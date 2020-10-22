@@ -10,6 +10,7 @@ import android.os.Looper
 import android.os.Messenger
 import android.widget.Toast
 import androidx.annotation.MainThread
+import danbroid.ipfsd.client.IPFSMessage
 import danbroid.ipfsd.client.toIPFSMessage
 import danbroid.ipfsd.service.settings.IPFSServicePrefs
 import danbroid.util.format.humanReadableByteCount
@@ -90,7 +91,7 @@ class IPFSService : Service() {
         onTimeout()
 
       else -> {
-        val msg = it.toIPFSMessage()
+        val msg = it.toIPFSMessage(classLoader)
         log.debug("SERVICE MESSAGE: $msg")
         when (msg) {
           danbroid.ipfsd.client.IPFSMessage.CLIENT_CONNECT -> {
@@ -171,7 +172,7 @@ class IPFSService : Service() {
       readStats()
 
       clients.forEach {
-        it.send(danbroid.ipfsd.client.IPFSMessage.SERVICE_STARTED.toMessage())
+        it.send(IPFSMessage.SERVICE_STARTED.toMessage())
       }
     }
 
@@ -182,6 +183,9 @@ class IPFSService : Service() {
     log.warn("onCreate()")
     super.onCreate()
 
+    val connectMessage = IPFSMessage.CLIENT_CONNECT.toMessage()
+    log.error("CONNECT MESSAGE: $connectMessage")
+
     notificationManager = NotificationManager(
       this, CHANNEL_ID,
       CHANNEL_NAME, CHANNEL_DESCRIPTION,
@@ -190,6 +194,7 @@ class IPFSService : Service() {
 
     messengerHandler = Handler(Looper.myLooper()!!, messengerCallback)
     messenger = Messenger(messengerHandler)
+
 
     coroutineScope.launch {
       startFlow().firstOrNull {
@@ -309,7 +314,7 @@ class IPFSService : Service() {
     log.warn("stopService()")
     notificationManager.cancelNotification()
     clients.forEach {
-      val msg = danbroid.ipfsd.client.IPFSMessage.SERVICE_STOPPING.toMessage()
+      val msg = IPFSMessage.SERVICE_STOPPING.toMessage()
       try {
         it.send(msg)
       } catch (err: Exception) {

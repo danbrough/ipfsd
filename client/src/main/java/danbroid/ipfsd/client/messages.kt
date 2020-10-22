@@ -63,5 +63,8 @@ sealed class IPFSMessage : Parcelable {
 
 }
 
-fun Message.toIPFSMessage(): IPFSMessage = data.getParcelable(MESSAGE_KEY)!!
+fun Message.toIPFSMessage(classLoader: ClassLoader): IPFSMessage = let {
+  data.classLoader = classLoader
+  data.getParcelable(MESSAGE_KEY)!!
+}
 
