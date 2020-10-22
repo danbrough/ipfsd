@@ -12,10 +12,7 @@ import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.model.ipfsClient
 import danbroid.ipfsd.demo.openBrowser
-import danbroid.util.menu.MenuItem
-import danbroid.util.menu.MenuItemBuilder
-import danbroid.util.menu.menu
-import danbroid.util.menu.rootMenu
+import danbroid.util.menu.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
@@ -71,7 +68,7 @@ val rootContent: MenuItemBuilder =
     menu {
       title = "Reset Stats"
       imageID = R.drawable.ipfs_logo_128
-      tintRes = MenuItem.TINT_DISABLED
+      tintRes = MENU_TINT_DISABLED
       onClick = {
         //SettingsActivity.resetStatsPrompt(requireContext())
         TODO("Fix this")

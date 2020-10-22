@@ -13,14 +13,14 @@ buildscript {
 
 
 bootstrapRefreshVersionsAndDependencies()
-include(":demo_api", ":demo_shopping_list", ":service", ":client", ":api")
+include( ":service", ":client", ":api", ":demo_shopping", ":demo_chat",":demo_api")
 
 rootProject.name = "ipfsd"
 
 
 
 
-if (false) {
+if (true) {
   include(":menu", ":slf4j", ":misc")
   project(":menu").projectDir = file("../androidutils/menu")
   project(":slf4j").projectDir = file("../androidutils/slf4j")

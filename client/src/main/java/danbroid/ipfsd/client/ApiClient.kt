@@ -4,6 +4,7 @@ import android.content.Context
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfs.api.ResultHandler
+import danbroid.ipfsd.IPFSD
 
 class ApiClient(
   val context: Context, port: Int = 5001,
@@ -18,6 +19,7 @@ class ApiClient(
     }
 
   fun close() {
+
   }
 }
 

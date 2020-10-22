@@ -13,7 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import danbroid.ipfsd.service.settings.SettingsActivity
+import danbroid.ipfsd.service.activities.MainActivity
 
 class NotificationManager(
   val context: Context,
@@ -31,7 +31,6 @@ class NotificationManager(
   companion object {
     const val NOTIFICATION_ID = 19381
     const val EXTRA_INSTANCE_ID = "extra_instance_id"
-    const val ACTION_CLOSE = "danbroid.ipfsd.service.close" //TODO REFACTOR THIS
 
   }
 
@@ -75,6 +74,7 @@ class NotificationManager(
     setSmallIcon(smallIcon)
     setOngoing(true)
     setContentTitle(title ?: context.getString(R.string.title_service))
+    setContentInfo("the content info")
     if (contentText != null)
       setContentText(contentText)
     setOnlyAlertOnce(true)
@@ -106,7 +106,7 @@ class NotificationManager(
     addAction(
       0,
       context.getString(R.string.lbl_reset_stats),
-      SettingsActivity.resetStatsPending(context)
+      MainActivity.resetStatsPending(context)
     )
   }
 

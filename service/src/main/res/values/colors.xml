@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+  <color name="colorPrimary">#1c3b3c</color>
+  <color name="colorPrimaryDark">#001616</color>
+  <color name="colorPrimaryLight">#466566</color>
+  <color name="colorAccent">#2196f3</color>
+  <!--<color name="colorPlaying">#ffb74d</color>-->
+  <!--  <color name="colorPlaying">#dddddd</color>
+    <color name="colorPlaylist">#8b6b61</color>-->
+  <color name="loadingTextColor">#26c6da</color>
+  <color name="colorWarning">#e53935</color>
+
+</resources>

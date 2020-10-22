@@ -3,7 +3,7 @@ plugins {
   kotlin("android")
   kotlin("android.extensions")
   id("org.jetbrains.dokka")
- // `maven-publish`
+  // `maven-publish`
 }
 
 android {
@@ -70,7 +70,7 @@ android {
 
   buildTypes {
     forEach {
-      it.buildConfigField("String", "URL_PREFIX", "\"ipfsd:/\"")
+      it.buildConfigField("String", "ipfsd_scheme", "\"${Danbroid.IPFSD_SCHEME}\"")
     }
   }
 
@@ -113,13 +113,23 @@ dependencies {
      exclude(group = "com.android", module = "android")
    }*/
   implementation(project(":client"))
+
   api("org.slf4j:slf4j-api:_")
   implementation(AndroidX.appCompat)
   //implementation(project(":api"))
+  implementation(Google.android.material)
+  if (Danbroid.useLocalUtils) {
+    implementation(project(":menu"))
+    implementation(project(":misc"))
+  } else {
+    implementation(Danbroid.menu)
+    implementation(Danbroid.misc)
+  }
 
-  implementation(Danbroid.misc)
+  implementation(Danbroid.slf4j)
+  implementation("com.mikepenz:google-material-typeface:_")
 
-//  implementation(project(":misc"))
+//
 
   implementation("commons-io:commons-io:_")
   //implementation("ipfs.gomobile:core:0.8.0-dan04@aar")

@@ -12,6 +12,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
+import danbroid.ipfsd.IPFSD
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -29,7 +30,7 @@ open class IPFSClient(val context: Context) {
   }
 
   init {
-    log.error("CREATED IPFS CLIENT")
+    log.info("CREATED IPFS CLIENT")
   }
 
   companion object {
@@ -51,7 +52,7 @@ open class IPFSClient(val context: Context) {
 
   private val messageCallback = Handler.Callback {
 
-    val msg = it.toIPFSMessage()
+    val msg = it.toIPFSMessage(this@IPFSClient.javaClass.classLoader)
     log.debug("inMessage: $msg")
 
     when (msg) {
@@ -87,12 +88,6 @@ open class IPFSClient(val context: Context) {
       _connectionState.value = ConnectionState.CONNECTING
 
 
-      val intent = Intent().setComponent(
-        ComponentName(
-          "danbroid.ipfsd.service",
-          "danbroid.ipfsd.service.IPFSService"
-        )
-      )
       //val intent = Intent(context, IPFSService::class.java)
 /*
       log.warn("starting service")
@@ -100,7 +95,7 @@ open class IPFSClient(val context: Context) {
 
       log.warn("binding to service ..")
       context.bindService(
-        intent,
+        IPFSD.intent.service_intent,
         serviceConnection,
         Context.BIND_AUTO_CREATE
       )
