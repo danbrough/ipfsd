@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import danbroid.ipfsd.demo.DemoNavGraph
 import danbroid.ipfsd.demo.R
-import danbroid.ipfsd.demo.model.ipfsClient
 import kotlinx.android.synthetic.main.fragment_browser.*
 
 
@@ -126,8 +125,7 @@ class BrowserFragment : Fragment() {
     //shadow.visibility = View.GONE
 
 
-    with(webView!!.settings)
-    {
+    with(webView!!.settings) {
       // this.minimumFontSize=12
       javaScriptCanOpenWindowsAutomatically = true
       javaScriptEnabled = true
@@ -143,9 +141,7 @@ class BrowserFragment : Fragment() {
     }
 
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
-
     //webView?.addJavascriptInterface(Console(), "audienz")
-
 
     log.debug("loading url: ${url}")
     webView?.loadUrl(url)

@@ -2,7 +2,6 @@ package danbroid.ipfs.api
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonStreamParser
-import java.io.EOFException
 import java.lang.IllegalArgumentException
 
 object ResponseProcessors {
@@ -26,13 +25,13 @@ object ResponseProcessors {
   }
 
   @JvmStatic
-  fun <T> constantResult(result: T): ResponseProcessor<T> = { input, handler ->
+  fun <T> constantResult(result: T): ResponseProcessor<T> = { _, handler ->
     handler.invoke(Result.success(result))
   }
 
 }
 
-private inline fun Any.toResponseProcessor(): ResponseProcessor<*> =
+private inline fun Any.toResponseProcessor() =
   when {
     this::class.isData -> ResponseProcessors.jsonParser(this::class.java)
     else -> throw IllegalArgumentException("Cannot produce ResponseProcessor for $this")

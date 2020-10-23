@@ -52,7 +52,7 @@ open class IPFSClient(val context: Context) {
 
   private val messageCallback = Handler.Callback {
 
-    val msg = it.toIPFSMessage(this@IPFSClient.javaClass.classLoader)
+    val msg = it.toIPFSMessage(this@IPFSClient.javaClass.classLoader!!)
     log.debug("inMessage: $msg")
 
     when (msg) {
@@ -202,6 +202,9 @@ open class IPFSClient(val context: Context) {
 
 
 }
+
+val Context.ipfsClient: IPFSClient
+  get() = IPFSClient.getInstance(this)
 
 private val log = org.slf4j.LoggerFactory.getLogger(IPFSClient::class.java)
 

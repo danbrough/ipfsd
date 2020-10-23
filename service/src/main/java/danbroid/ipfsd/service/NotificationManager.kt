@@ -13,6 +13,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.utils.toAndroidIconCompat
+import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.service.activities.MainActivity
 
 class NotificationManager(
@@ -73,10 +77,8 @@ class NotificationManager(
   ) = NotificationCompat.Builder(context, channelID).apply {
     setSmallIcon(smallIcon)
     setOngoing(true)
-    setContentTitle(title ?: context.getString(R.string.title_service))
-    setContentInfo("the content info")
-    if (contentText != null)
-      setContentText(contentText)
+    //setContentTitle(title ?: context.getString(R.string.title_service))
+    setContentText(contentText ?: "COntent Text")
     setOnlyAlertOnce(true)
     setLargeIcon(
       ResourcesCompat.getDrawable(context.resources, R.drawable.ipfs_icon, context.theme)
@@ -104,10 +106,19 @@ class NotificationManager(
       })
 
     addAction(
+      NotificationCompat.Action.Builder(
+        IconicsDrawable(
+          context,
+          FontAwesome.Icon.faw_anchor
+        ).toAndroidIconCompat(), "Reset Stats",
+        IPFSD.intent.resetStatsPromptPending(context)
+      ).build()
+    )
+    /*addAction(
       0,
       context.getString(R.string.lbl_reset_stats),
-      MainActivity.resetStatsPending(context)
-    )
+      IPFSD.intent.resetStatsPromptPending(context)
+    )*/
   }
 
   @MainThread

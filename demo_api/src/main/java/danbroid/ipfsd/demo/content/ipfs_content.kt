@@ -1,16 +1,13 @@
 package danbroid.ipfsd.demo.content
 
-import androidx.appcompat.app.AppCompatActivity
 import danbroid.ipfs.api.API
-import danbroid.ipfsd.demo.model.IPFSClientModel
-import danbroid.ipfsd.demo.model.ipfsClient
+import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.util.menu.MenuDSL
 import danbroid.util.menu.MenuItem
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.model.menuViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+
 
 @MenuDSL
 fun MenuItemBuilder.ipfsDir(
@@ -21,7 +18,7 @@ fun MenuItemBuilder.ipfsDir(
     id = "ipfsd:/$path"
 
     onClick = { callback ->
-      ipfsClient.callExecutor.exec(API.Basic.ls(path)) {
+      ipfsModel.callExecutor.exec(API.Basic.ls(path)) {
         val items = mutableListOf<MenuItem>()
         it.getOrNull()?.objects?.forEach { file ->
           file.links.forEach { link ->

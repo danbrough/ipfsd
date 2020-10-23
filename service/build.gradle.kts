@@ -3,7 +3,7 @@ plugins {
   kotlin("android")
   kotlin("android.extensions")
   id("org.jetbrains.dokka")
-  // `maven-publish`
+  `maven-publish`
 }
 
 android {
@@ -28,12 +28,6 @@ android {
 
   }
 
-
-  compileOptions {
-    sourceCompatibility = ProjectVersions.JAVA_VERSION
-    targetCompatibility = ProjectVersions.JAVA_VERSION
-  }
-
   buildTypes {
 
     getByName("release") {
@@ -45,6 +39,12 @@ android {
     }
 
   }
+  compileOptions {
+    sourceCompatibility = ProjectVersions.JAVA_VERSION
+    targetCompatibility = ProjectVersions.JAVA_VERSION
+  }
+
+
 
 
   kotlinOptions {
@@ -68,24 +68,40 @@ android {
     unitTests.isReturnDefaultValues = true
   }
 
-  buildTypes {
-    forEach {
-      it.buildConfigField("String", "ipfsd_scheme", "\"${Danbroid.IPFSD_SCHEME}\"")
-    }
+/*  val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(android.sourceSets.getByName("main").java.srcDirs)
   }
+
+  afterEvaluate {
+    publishing {
+      publications {
+        val debug by registering(MavenPublication::class) {
+          components.forEach {
+            println("COMPONENT: ${it.name}")
+          }
+          from(components["debug_aab"])
+          artifact(sourcesJar.get())
+          artifactId = "service"
+          groupId = ProjectVersions.GROUP_ID
+          version = ProjectVersions.VERSION_NAME
+        }
+      }
+    }
+  }*/
 
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
+
+/*val sourcesJar by tasks.registering(Jar::class) {
   archiveClassifier.set("sources")
   from(android.sourceSets.getByName("main").java.srcDirs)
 }
 
-/*
 afterEvaluate {
   publishing {
     publications {
-      val release by publications.registering(MavenPublication::class) {
+      val release by registering(MavenPublication::class) {
         from(components["release"])
         artifact(sourcesJar.get())
         artifactId = "service"
@@ -94,8 +110,7 @@ afterEvaluate {
       }
     }
   }
-}
-*/
+}*/
 
 tasks.withType<Test> {
   useJUnit()
@@ -108,6 +123,7 @@ tasks.withType<Test> {
   }
 }
 
+
 dependencies {
   /* api(project(":common_domain")) {
      exclude(group = "com.android", module = "android")
@@ -115,9 +131,10 @@ dependencies {
   implementation(project(":client"))
 
   api("org.slf4j:slf4j-api:_")
+
   implementation(AndroidX.appCompat)
-  //implementation(project(":api"))
   implementation(Google.android.material)
+
   if (Danbroid.useLocalUtils) {
     implementation(project(":menu"))
     implementation(project(":misc"))
@@ -128,6 +145,7 @@ dependencies {
 
   implementation(Danbroid.slf4j)
   implementation("com.mikepenz:google-material-typeface:_")
+  implementation("com.mikepenz:fontawesome-typeface:_")
 
 //
 
