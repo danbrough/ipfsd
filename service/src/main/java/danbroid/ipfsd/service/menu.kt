@@ -2,9 +2,8 @@ package danbroid.ipfsd.service
 
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import danbroid.ipfs.api.API
-import danbroid.ipfs.api.ApiCall
 import danbroid.ipfsd.IPFSD
-import danbroid.ipfsd.client.model.ipfsClient
+import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.util.menu.Icons
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
@@ -17,9 +16,9 @@ internal val rootMenu: MenuItemBuilder = rootMenu {
 
   menu {
     title = "Start Service"
-    icon = Icons.iconicsIcon(GoogleMaterial.Icon.gmd_playlist_play)
+    icon = Icons.iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
     onClick = {
-      ipfsClient.callExecutor.exec(API.Network.id()) {
+      ipfsModel.callExecutor.exec(API.Network.id()) {
         log.info("ID: $it")
       }
     }
@@ -27,7 +26,7 @@ internal val rootMenu: MenuItemBuilder = rootMenu {
 
   menu {
     title = "Stop Service"
-    icon = Icons.iconicsIcon(GoogleMaterial.Icon.gmd_local_play)
+    icon = Icons.iconicsIcon(GoogleMaterial.Icon.gmd_stop)
   }
 
   menu {

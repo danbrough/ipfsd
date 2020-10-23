@@ -233,6 +233,7 @@ object API {
      * <pre>curl -X POST -F file=@myfile http://127.0.0.1:5001/api/v0/dag/put?format=cbor&input-enc=json&pin=<value>&hash=<value></pre>
      */
 
+    @JvmStatic
     fun put(
       format: String? = null,
       inputEnc: String? = null,
@@ -261,7 +262,6 @@ object API {
      * <pre>curl -X POST http://127.0.0.1:5001/api/v0/dag/resolve?arg=<ref></pre>
      */
 
-    @JvmOverloads
     @JvmStatic
     fun resolve(path: String) = apiCall<ResolveResponse>("dag/resolve", "arg" to path)
 

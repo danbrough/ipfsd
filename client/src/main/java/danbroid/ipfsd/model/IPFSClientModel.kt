@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.client.ApiClient
+import danbroid.ipfsd.client.IPFSClient
 import danbroid.ipfsd.client.IPFSMessage
 
 
@@ -18,20 +19,19 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
     log.error("CREATED IPFS CLIENT MODEL ")
   }
 
-  private var apiClient = ApiClient(context)
+  val ipfsClient = IPFSClient.getInstance(context)
+  private var apiClient = ApiClient(ipfsClient)
 
   val callExecutor: CallExecutor = apiClient
 
   suspend fun sendMessage(msg: IPFSMessage) {
-    apiClient.ipfsClient.sendMessage(msg)
+    ipfsClient.sendMessage(msg)
   }
 
   override fun onCleared() {
     log.error("onCleared()")
     apiClient.close()
   }
-
-  fun connect() = apiClient.ipfsClient.connect()
 
   companion object {
     class ModelFactory(val context: Context) : ViewModelProvider.NewInstanceFactory() {
@@ -43,10 +43,10 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   }
 }
 
-val Fragment.ipfsClient: IPFSClientModel
-  get() = requireActivity().ipfsClient
+val Fragment.ipfsModel: IPFSClientModel
+  get() = requireActivity().ipfsModel
 
-val Activity.ipfsClient: IPFSClientModel
+val Activity.ipfsModel: IPFSClientModel
   get() = ViewModelProvider(
     this as ComponentActivity,
     IPFSClientModel.Companion.ModelFactory(this)

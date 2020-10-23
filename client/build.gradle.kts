@@ -17,24 +17,26 @@ android {
     versionName = ProjectVersions.VERSION_NAME
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
+
+    buildTypes {
+      forEach {
+        it.buildConfigField("String", "ipfsd_scheme", "\"${Danbroid.IPFSD_SCHEME}\"")
+      }
+
+      getByName("release") {
+        isMinifyEnabled = true
+        proguardFiles(
+          getDefaultProguardFile("proguard-android-optimize.txt"),
+          "proguard-rules.pro"
+        )
+      }
+    }
   }
 
 
   compileOptions {
     sourceCompatibility = ProjectVersions.JAVA_VERSION
     targetCompatibility = ProjectVersions.JAVA_VERSION
-  }
-
-  buildTypes {
-
-    getByName("release") {
-      isMinifyEnabled = true
-      proguardFiles(
-        getDefaultProguardFile("proguard-android-optimize.txt"),
-        "proguard-rules.pro"
-      )
-    }
-
   }
 
 
@@ -48,38 +50,31 @@ android {
     unitTests.isReturnDefaultValues = true
   }
 
-/*  buildTypes {
-    forEach {
-      it.buildConfigField("String", "URL_PREFIX", "\"ipfsd:/\"")
+/*  val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(android.sourceSets.getByName("main").java.srcDirs)
+  }
+
+  afterEvaluate {
+    val projectName = name
+    publishing {
+      publications {
+        val release by registering(MavenPublication::class) {
+          components.forEach {
+            println("COMPONENT: ${it.name}")
+          }
+          from(components["release"])
+          artifact(sourcesJar.get())
+          artifactId = projectName
+          groupId = ProjectVersions.GROUP_ID
+          version = ProjectVersions.VERSION_NAME
+        }
+      }
     }
   }*/
 
-  buildTypes {
-    forEach {
-      it.buildConfigField("String", "ipfsd_scheme", "\"${Danbroid.IPFSD_SCHEME}\"")
-    }
-  }
-
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
-  archiveClassifier.set("sources")
-  from(android.sourceSets.getByName("main").java.srcDirs)
-}
-
-afterEvaluate {
-  publishing {
-    publications {
-      val release by publications.registering(MavenPublication::class) {
-        from(components["release"])
-        artifact(sourcesJar.get())
-        artifactId = "client"
-        groupId = ProjectVersions.GROUP_ID
-        version = ProjectVersions.VERSION_NAME
-      }
-    }
-  }
-}
 
 tasks.withType<Test> {
   useJUnit()

@@ -69,10 +69,5 @@ publishing {
       artifact(sourcesJar)
     }
   }
-  repositories {
-    maven {
-      url = uri("$buildDir/repository")
-    }
-  }
 }
 
