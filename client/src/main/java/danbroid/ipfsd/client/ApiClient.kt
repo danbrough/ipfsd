@@ -1,12 +1,13 @@
 package danbroid.ipfsd.client
 
+import android.content.Context
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 
 class ApiClient(
-  val serviceClient: IPFSClient, port: Int = 5001,
-  urlBase: String = "http://localhost:$port/api/v0"
+  val serviceClient: IPFSDClient, port: Int = DEFAULT_PORT,
+  urlBase: String = DEFAULT_API_URL
 ) : OkHttpCallExecutor(urlBase = urlBase) {
 
 
@@ -15,8 +16,23 @@ class ApiClient(
       super.exec(call, handler)
     }
 
-  fun close() {
+  companion object {
+    @Volatile
+    var INSTANCE: ApiClient? = null
+    const val DEFAULT_PORT = 5001
+    const val DEFAULT_API_URL = "http://localhost:$DEFAULT_PORT/api/v0"
 
+    @JvmStatic
+    fun getInstance(
+      context: Context,
+      serviceClient: IPFSDClient = IPFSDClient.getInstance(context),
+      port: Int = DEFAULT_PORT,
+      urlBase: String = DEFAULT_API_URL
+    ) = INSTANCE ?: synchronized(ApiClient::class.java) {
+      INSTANCE ?: ApiClient(serviceClient, port, urlBase).also {
+        INSTANCE = it
+      }
+    }
   }
 }
 

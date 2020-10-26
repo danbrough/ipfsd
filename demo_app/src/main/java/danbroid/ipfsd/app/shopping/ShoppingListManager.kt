@@ -3,6 +3,7 @@ package danbroid.ipfsd.app.shopping
 import android.app.Activity
 import android.content.Context
 import danbroid.ipfs.api.API
+import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfsd.client.model.ipfsModel
 import kotlinx.coroutines.*
 import org.json.JSONObject
@@ -24,12 +25,12 @@ class ShoppingListManager(context: Context) {
     }
   }
 
-  suspend fun createList(): Deferred<ShoppingList> = coroutineScope {
+  suspend fun createList(handler: ResultHandler<ShoppingList>) {
     val json = JSONObject().apply {
       put("name", "Test")
     }
-    val job = async<ShoppingList> {
-      ipfsModel.callExecutor.exec(API.Dag.put().addData(json.toString()))
+    ipfsModel.callExecutor.exec(API.Dag.put().addData(json.toString())) {
+      log.debug("result: $it")
     }
   }
 }

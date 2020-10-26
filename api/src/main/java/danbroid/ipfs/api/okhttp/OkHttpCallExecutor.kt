@@ -6,6 +6,8 @@ import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfs.api.utils.uriEncode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -123,11 +125,11 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
         httpCall.execute().use { response ->
 
           if (!response.isSuccessful) {
-            call.resultHandler?.invoke(Result.failure(Exception("Request failed: ${response.message} code:${response.code}")))
+            call.resultHandler.invoke(Result.failure(Exception("Request failed: ${response.message} code:${response.code}")))
             return@use
           }
 
-          call.responseProcessor.invoke(response.body!!.toInputSource(), call.resultHandler!!)
+          call.responseProcessor.invoke(response.body!!.toInputSource(), call.resultHandler)
         }
       }
     }.exceptionOrNull().also {
@@ -139,12 +141,24 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
           //log.trace("CancellationException: ${it.message}")
         }
         else -> {
-          call.resultHandler?.invoke(Result.failure(it))
+          call.resultHandler.invoke(Result.failure(it))
         }
       }
 
     }
   }
+
+  fun <T> exec(call:ApiCall<T>): Flow<T> = flow {
+    val httpCall = createRequest(call)
+    httpCall.execute().use { response ->
+
+      if (!response.isSuccessful) {
+        call.resultHandler.invoke(Result.failure(Exception("Request failed: ${response.message} code:${response.code}")))
+        return@use
+      }
+
+      call.responseProcessor.invoke(response.body!!.toInputSource(), call.resultHandler)
+  }.flowOn(Dispatchers.IO)
 
 
 }

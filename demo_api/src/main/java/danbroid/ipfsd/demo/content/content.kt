@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.API
 import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
@@ -50,7 +51,7 @@ val rootContent: MenuItemBuilder =
 
     onCreate = { _, _ ->
       //auto connect to the IPFS service
-      ipfsModel.connect()
+      requireContext().ipfsClient.connect()
     }
 
     commands()

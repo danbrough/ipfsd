@@ -29,7 +29,7 @@ val rootContent = rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
-        requireActivity().shoppingListManager.createList().await().also {
+        requireActivity().shoppingListManager.createList {
           log.warn("GOT LIST: $it")
         }
       }
