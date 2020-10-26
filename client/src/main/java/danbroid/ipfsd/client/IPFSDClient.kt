@@ -2,7 +2,6 @@ package danbroid.ipfsd.client
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Handler
 import android.os.IBinder
@@ -23,7 +22,7 @@ import java.lang.ref.WeakReference
 /**
  *
  */
-open class IPFSClient(val context: Context) {
+open class IPFSDClient(val context: Context) {
 
   enum class ConnectionState {
     DISCONNECTED, CONNECTING, CONNECTED, STARTED;
@@ -35,11 +34,11 @@ open class IPFSClient(val context: Context) {
 
   companion object {
     @Volatile
-    private var instance: WeakReference<IPFSClient>? = null
+    private var instance: WeakReference<IPFSDClient>? = null
 
     @JvmStatic
-    fun getInstance(context: Context) = instance?.get() ?: synchronized(IPFSClient::class.java) {
-      instance?.get() ?: IPFSClient(context).also {
+    fun getInstance(context: Context) = instance?.get() ?: synchronized(IPFSDClient::class.java) {
+      instance?.get() ?: IPFSDClient(context).also {
         instance = WeakReference(it)
       }
     }
@@ -52,7 +51,7 @@ open class IPFSClient(val context: Context) {
 
   private val messageCallback = Handler.Callback {
 
-    val msg = it.toIPFSMessage(this@IPFSClient.javaClass.classLoader!!)
+    val msg = it.toIPFSMessage(this@IPFSDClient.javaClass.classLoader!!)
     log.debug("inMessage: $msg")
 
     when (msg) {
@@ -203,8 +202,8 @@ open class IPFSClient(val context: Context) {
 
 }
 
-val Context.ipfsClient: IPFSClient
-  get() = IPFSClient.getInstance(this)
+val Context.ipfsClient: IPFSDClient
+  get() = IPFSDClient.getInstance(this)
 
-private val log = org.slf4j.LoggerFactory.getLogger(IPFSClient::class.java)
+private val log = org.slf4j.LoggerFactory.getLogger(IPFSDClient::class.java)
 

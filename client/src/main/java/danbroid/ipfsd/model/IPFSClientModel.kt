@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.client.ApiClient
-import danbroid.ipfsd.client.IPFSClient
+import danbroid.ipfsd.client.IPFSDClient
 import danbroid.ipfsd.client.IPFSMessage
 
 
@@ -19,18 +19,17 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
     log.error("CREATED IPFS CLIENT MODEL ")
   }
 
-  val ipfsClient = IPFSClient.getInstance(context)
-  private var apiClient = ApiClient(ipfsClient)
+  private var apiClient = ApiClient.getInstance(context)
+  private val serviceClient = apiClient.serviceClient
 
   val callExecutor: CallExecutor = apiClient
 
   suspend fun sendMessage(msg: IPFSMessage) {
-    ipfsClient.sendMessage(msg)
+    serviceClient.sendMessage(msg)
   }
 
   override fun onCleared() {
-    log.error("onCleared()")
-    apiClient.close()
+    log.debug("onCleared()")
   }
 
   companion object {

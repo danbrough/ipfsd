@@ -2,6 +2,7 @@ package danbroid.ipfs.api
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonStreamParser
+import java.io.StringReader
 import java.lang.IllegalArgumentException
 
 object ResponseProcessors {
@@ -9,7 +10,10 @@ object ResponseProcessors {
   @JvmStatic
   fun <T> jsonParser(jsonType: Class<T>): ResponseProcessor<T> = { input, handler ->
     input.getReader().use {
-      val parser = JsonStreamParser(it)
+      val text = it.readText()
+      org.slf4j.LoggerFactory.getLogger("danbroid.ipfs.api").debug(text)
+      val reader = StringReader(text)
+      val parser = JsonStreamParser(reader)
       while (parser.hasNext()) {
         val result = GsonBuilder().create().fromJson(parser.next(), jsonType)
         handler.invoke(Result.success(result))
