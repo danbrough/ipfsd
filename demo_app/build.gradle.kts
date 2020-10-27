@@ -81,6 +81,9 @@ dependencies {
   implementation(AndroidX.appCompatResources)
   implementation(AndroidX.appCompat)
   implementation(Kotlin.stdlib.jdk8)
+  //implementation("org.jetbrains.kotlin:kotlin-reflect:_")
+
+
   //implementation("com.github.ligi:ipfs-api-kotlin:_")
   // implementation("com.github.ipfs:java-ipfs-http-client:_")
 

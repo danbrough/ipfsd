@@ -4,9 +4,10 @@ import android.content.Context
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
+import danbroid.util.misc.SingletonHolder
 
 class ApiClient(
-  val serviceClient: IPFSDClient, port: Int = DEFAULT_PORT,
+  val serviceClient: IPFSDClient,
   urlBase: String = DEFAULT_API_URL
 ) : OkHttpCallExecutor(urlBase = urlBase) {
 
@@ -16,11 +17,19 @@ class ApiClient(
       super.exec(call, handler)
     }
 
-  companion object {
-    @Volatile
-    var INSTANCE: ApiClient? = null
+  companion object : SingletonHolder<ApiClient, Pair<Context, String>>({
+    ApiClient(IPFSDClient.getInstance(it.first), it.second)
+  }) {
     const val DEFAULT_PORT = 5001
     const val DEFAULT_API_URL = "http://localhost:$DEFAULT_PORT/api/v0"
+
+    fun getInstance(context: Context, urlBase: String = DEFAULT_API_URL) =
+      getInstance(Pair(context, urlBase))
+  }
+
+/*    @Volatile
+    var INSTANCE: ApiClient? = null
+
 
     @JvmStatic
     fun getInstance(
@@ -33,7 +42,7 @@ class ApiClient(
         INSTANCE = it
       }
     }
-  }
+  }*/
 }
 
 

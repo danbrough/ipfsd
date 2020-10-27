@@ -78,7 +78,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="${ipfsdScheme}"  />
+                <data android:scheme="${ipfsdScheme}" android:host="service" />
             </intent-filter>
         </activity>
     </application>

@@ -16,7 +16,7 @@ import danbroid.ipfsd.client.IPFSMessage
 
 class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   init {
-    log.error("CREATED IPFS CLIENT MODEL ")
+    log.trace("CREATED IPFS CLIENT MODEL ")
   }
 
   private var apiClient = ApiClient.getInstance(context)

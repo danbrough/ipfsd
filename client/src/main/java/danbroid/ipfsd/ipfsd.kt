@@ -12,7 +12,7 @@ import danbroid.ipfsd.client.BuildConfig
 class IPFSD {
 
   companion object {
-    const val URI_SERVICE_PREFIX = "${BuildConfig.ipfsd_scheme}:/"  // ipfsd:/
+    const val URI_SERVICE_PREFIX = "${BuildConfig.ipfsd_scheme}://service"  // ipfsd:/
     const val SERVICE_PKG = "danbroid.ipfsd.service"
     const val SERVICE_CLASS = "IPFSService"
     // const val SERVICE_DIALOG_ACTIVITY = "activities.DialogActivity"
@@ -31,18 +31,11 @@ class IPFSD {
       val service_intent =
         Intent().setComponent(ComponentName(SERVICE_PKG, "$SERVICE_PKG.$SERVICE_CLASS"))
 
-      @JvmField
-      val service_start = service_intent.setAction(action.service_start)
-
-      @JvmStatic
-      fun startService(context: Context) = context.startService(service_start)
 
       @JvmField
       val reset_stats_prompt =
         Intent(Intent.ACTION_VIEW).setData(deep_link.reset_stats_prompt.toUri())
 
-      @JvmStatic
-      fun showResetStatsPrompt(context: Context) = context.startActivity(Intent())
 
       @JvmStatic
       fun resetStatsPromptPending(
