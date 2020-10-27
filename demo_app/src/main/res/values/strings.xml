@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">IPFSD Demo</string>
+    <string name="app_name">IPFSD App Demo</string>
     <string name="title_new_shopping_list">Create shopping list</string>
+    <string name="title_get_name">Input name</string>
 </resources>

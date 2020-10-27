@@ -2,8 +2,10 @@ package danbroid.ipfs.api
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
+import com.sun.org.apache.xpath.internal.operations.Bool
 import danbroid.ipfs.api.utils.Base58
 import danbroid.ipfs.api.utils.addUrlArgs
+import kotlinx.coroutines.flow.flowOf
 import okio.ByteString.Companion.decodeBase64
 import java.io.File
 
@@ -339,10 +341,171 @@ object API {
     @JvmOverloads
     fun ls(path: String? = null, longListing: Boolean? = null, directoryOrder: Boolean? = null) =
       apiCall<LsResponse>("files/ls", "arg" to path, "long" to longListing, "U" to directoryOrder)
+
+
+    /**
+     * /api/v0/files/read
+     * Read a file in a given MFS.
+     *
+     * @param path Path to file to be read. Required: yes.
+     * @param offset  Byte offset to begin reading from. Required: no.
+     * @param count  Maximum number of bytes to read. Required: no.
+     *
+     * Response
+     * On success, the call to this endpoint will return with 200 and the following body:
+     * This endpoint returns a `text/plain` response body.
+     * cURL Example
+     * `curl -X POST "http://127.0.0.1:5001/api/v0/files/read?arg=<path>&offset=<value>&count=<value>`
+     **/
+
+    @JvmStatic
+    @JvmOverloads
+    fun read(
+      path: String? = null,
+      offset: Long? = null,
+      count: Long? = null
+    ): ApiCall<ApiCall.InputSource> =
+      ApiCall(
+        "files/read".addUrlArgs(
+          "arg" to path,
+          "offset" to offset,
+          "count" to count
+        ),
+        ResponseProcessors.identity()
+      )
+
+
+    data class StatResponse(
+      @SerializedName("Blocks") val blocks: Int,
+      @SerializedName("CumulativeSize") val cumulativeSize: Long,
+      @SerializedName("Hash") val hash: String,
+      @SerializedName("Local") val local: Boolean,
+      @SerializedName("Size") val size: Long,
+      @SerializedName("SizeLocal") val sizeLocal: Long,
+      @SerializedName("Type") val type: String,
+      @SerializedName("WithLocaltity") val withLocality: Boolean
+    )
+
+    /**
+     * /api/v0/files/stat
+     * Display file status.
+     *
+     * @param path Path to node to stat. Required: yes.
+     * @param format Print statistics in given format. Allowed tokens: <hash> <size> <cumulsize> <type> <childs>. Conflicts with other format options. Default: <hash> Size: <size> CumulativeSize: <cumulsize> ChildBlocks: <childs> Type: <type>. Default: <hash> Size: <size> CumulativeSize: <cumulsize> ChildBlocks: <childs> Type: <type>. Required: no.
+     * @param hash Print only hash. Implies '--format=<hash>'. Conflicts with other format options. Required: no.
+     * @param size Print only size. Implies '--format=<cumulsize>'. Conflicts with other format options. Required: no.
+     * @param withLocal Compute the amount of the dag that is local, and if possible the total size. Required: no.
+     *
+     * cURL Example
+     * ```curl -X POST "http://127.0.0.1:5001/api/v0/files/stat?arg=<path>&format=<hash> Size: <size> CumulativeSize: <cumulsize> ChildBlocks: <childs> Type: <type>&hash=<value>&size=<value>&with-local=<value>"```
+     */
+
+    @JvmStatic
+    @JvmOverloads
+    fun stat(
+      path: String,
+      format: String? = null,
+      hash: Boolean? = null,
+      size: Boolean? = null,
+      withLocal: Boolean? = null
+    ): ApiCall<StatResponse> = apiCall(
+      "files/stat",
+      "arg" to path,
+      "format" to format,
+      "hash" to hash,
+      "size" to size,
+      "with-local" to withLocal
+    )
+
+    /**
+     *  /api/v0/files/write
+     *  Write to a mutable file in a given filesystem.
+     *
+     *  @param path Path to write to. Required: yes.
+     *  @param offset Byte offset to begin writing at. Required: no.
+     *  @param create Create the file if it does not exist. Required: no.
+     *  @param parents Make parent directories as needed. Required: no.
+     *  @param truncate Truncate the file to size zero before writing. Required: no.
+     *  @param count Maximum number of bytes to read. Required: no.
+     *  @param rawLeaves Use raw blocks for newly created leaf nodes. (experimental). Required: no.
+     *  @param cidVersion Cid version to use. (experimental). Required: no.
+     *  @param hash Hash function to use. Will set Cid version to 1 if used. (experimental). Required: no.
+     *
+     *
+     * Argument data is of file type. This endpoint expects one or several files (depending on the command) in the body of the request as 'multipart/form-data'.
+     * Response
+     * On success, the call to this endpoint will return with 200 and the following body:
+     * This endpoint returns a `text/plain` response body.
+     * cURL Example
+     * curl -X POST -F file=@myfile "http://127.0.0.1:5001/api/v0/files/write?arg=<path>&offset=<value>&create=<value>&parents=<value>&truncate=<value>&count=<value>&raw-leaves=<value>&cid-version=<value>&hash=<value>"
+     */
+
+    @JvmOverloads
+    @JvmStatic
+    fun write(
+      path: String,
+      offset: Long? = null,
+      create: Boolean? = null,
+      parents: Boolean? = null,
+      truncate: Boolean? = null,
+      count: Long? = null,
+      rawLeaves: Boolean? = null,
+      cidVersion: String? = null,
+      hash: String? = null
+    ) = ApiCall(
+      "files/write".addUrlArgs(
+        "arg" to path,
+        "offset" to offset,
+        "create" to create,
+        "parents" to parents,
+        "truncate" to truncate,
+        "count" to count,
+        "raw-leaves" to rawLeaves,
+        "cid-version" to cidVersion,
+        "hash" to hash
+      ), ResponseProcessors.identity()
+    )
   }
 
 
   object Key {
+
+    data class GenResponse(
+      @SerializedName("Id") val id: String,
+      @SerializedName("Name") val name: String
+    )
+
+    /**
+     * /api/v0/key/gen
+     * Create a new keypair
+     * @param name name of key to create Required: yes.
+     * @param type type of the key to create: rsa, ed25519. Default: ed25519. Required: no.
+     * @param size size of the key to generate. Required: no.
+     * @param ipnsBase Encoding used for keys: Can either be a multibase encoded CID or a base58btc encoded multihash. Takes {b58mh|base36|k|base32|b...}. Default: base36. Required: no.
+     *
+     * On success, the call to this endpoint will return with 200 and the following body:
+     * <pre>{
+     * "Id": "<string>",
+     * "Name": "<string>"
+     * }
+     *
+     * cURL Example
+     * curl -X POST "http://127.0.0.1:5001/api/v0/key/gen?arg=<name>&type=ed25519&size=<value>&ipns-base=base36"
+     * </pre>
+     */
+
+    @JvmOverloads
+    @JvmStatic
+    fun gen(name: String, type: String? = null, size: Int? = null, ipnsBase: String? = null) =
+      apiCall<GenResponse>(
+        "key/gen".addUrlArgs(
+          "arg" to name,
+          "type" to type,
+          "size" to size,
+          "ipns-base" to ipnsBase
+        )
+      )
+
 
     data class Key(
       @SerializedName("Name")
@@ -361,7 +524,8 @@ object API {
      */
     @JvmStatic
     @JvmOverloads
-    fun ls(ipnsBase: String? = null) = apiCall<LsResponse>("key/list", "ipns-base" to ipnsBase)
+    fun ls(ipnsBase: String? = null, extraInfo: Boolean? = null) =
+      apiCall<LsResponse>("key/list", "ipns-base" to ipnsBase, "l" to extraInfo)
 
   }
 
@@ -472,10 +636,10 @@ object API {
     )
 
     @JvmStatic
-    fun publish(topic: String, data: String) = ApiCall<Boolean>(
+    fun publish(topic: String, data: String) = ApiCall(
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
-    ) { _, handler ->
-      handler.invoke(Result.success(true))
+    ) {
+      flowOf(true)
     }
 
 

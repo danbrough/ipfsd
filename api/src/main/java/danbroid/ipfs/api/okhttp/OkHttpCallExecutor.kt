@@ -6,14 +6,14 @@ import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfs.api.utils.uriEncode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 open class OkHttpCallExecutor @JvmOverloads constructor(
@@ -129,7 +129,9 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
             return@use
           }
 
-          call.responseProcessor.invoke(response.body!!.toInputSource(), call.resultHandler)
+          call.responseProcessor.invoke(response.body!!.toInputSource()).collect {
+            call.resultHandler.invoke(Result.success(it))
+          }
         }
       }
     }.exceptionOrNull().also {
@@ -148,18 +150,11 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
     }
   }
 
-  fun <T> exec(call:ApiCall<T>): Flow<T> = flow {
-    val httpCall = createRequest(call)
-    httpCall.execute().use { response ->
-
-      if (!response.isSuccessful) {
-        call.resultHandler.invoke(Result.failure(Exception("Request failed: ${response.message} code:${response.code}")))
-        return@use
-      }
-
-      call.responseProcessor.invoke(response.body!!.toInputSource(), call.resultHandler)
+  override fun <T> exec(call: ApiCall<T>): Flow<T> = flow {
+    @Suppress("BlockingMethodInNonBlockingContext")
+    createRequest(call).execute().use { response ->
+      emitAll(call.responseProcessor.invoke(response.body!!.toInputSource()))
+    }
   }.flowOn(Dispatchers.IO)
-
-
 }
 

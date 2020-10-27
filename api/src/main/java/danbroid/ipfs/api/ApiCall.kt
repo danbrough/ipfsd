@@ -1,5 +1,9 @@
 package danbroid.ipfs.api
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.io.File
 import java.io.InputStream
 import java.io.Reader
@@ -10,7 +14,7 @@ import java.io.Reader
  */
 typealias ResultHandler<T> = (suspend (Result<T>) -> Unit)
 
-typealias  ResponseProcessor<T> = suspend (input: ApiCall.InputSource, handler: ResultHandler<T>) -> Unit
+typealias  ResponseProcessor<T> = (input: ApiCall.InputSource) -> Flow<T>
 
 
 open class ApiCall<T>(
@@ -53,5 +57,8 @@ open class ApiCall<T>(
 
   lateinit var resultHandler: ResultHandler<T>
 
-
+  @Suppress("UNCHECKED_CAST")
+  suspend fun get(executor: CallExecutor) = coroutineScope {
+    executor.exec(this@ApiCall).first()
+  }
 }
