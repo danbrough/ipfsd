@@ -3,6 +3,7 @@ package danbroid.ipfsd.client
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -13,7 +14,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import danbroid.ipfsd.IPFSD
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
 /**
  *
  */
-open class IPFSDClient(val context: Context) {
+open class ServiceClient(val context: Context) {
 
   enum class ConnectionState {
     DISCONNECTED, CONNECTING, CONNECTED, STARTED;
@@ -35,14 +35,32 @@ open class IPFSDClient(val context: Context) {
 
   companion object {
     @Volatile
-    private var instance: WeakReference<IPFSDClient>? = null
+    private var instance: WeakReference<ServiceClient>? = null
 
     @JvmStatic
-    fun getInstance(context: Context) = instance?.get() ?: synchronized(IPFSDClient::class.java) {
-      instance?.get() ?: IPFSDClient(context).also {
+    fun getInstance(context: Context) = instance?.get() ?: synchronized(ServiceClient::class.java) {
+      instance?.get() ?: ServiceClient(context).also {
         instance = WeakReference(it)
       }
     }
+  }
+
+  private var serviceIsInstalled = false
+  fun isServiceInstalled(): Boolean {
+    if (serviceIsInstalled) return true
+    runCatching {
+      context.packageManager.getServiceInfo(
+        ComponentName(
+          IPFSD.SERVICE_PKG,
+          IPFSD.SERVICE_CLASS
+        ), PackageManager.GET_META_DATA
+      )
+    }.onSuccess {
+      serviceIsInstalled = true
+    }.onFailure {
+      serviceIsInstalled = false
+    }
+    return serviceIsInstalled
   }
 
   private val _connectionState: MutableLiveData<ConnectionState> =
@@ -63,7 +81,7 @@ open class IPFSDClient(val context: Context) {
 
   private val messageCallback = Handler.Callback {
 
-    val msg = it.toIPFSMessage(this@IPFSDClient.javaClass.classLoader!!)
+    val msg = it.toIPFSMessage(this@ServiceClient.javaClass.classLoader!!)
     log.debug("inMessage: $msg")
 
     when (msg) {
@@ -214,8 +232,8 @@ open class IPFSDClient(val context: Context) {
 
 }
 
-val Context.ipfsClient: IPFSDClient
-  get() = IPFSDClient.getInstance(this)
+val Context.ipfsClient: ServiceClient
+  get() = ServiceClient.getInstance(this)
 
-private val log = org.slf4j.LoggerFactory.getLogger(IPFSDClient::class.java)
+private val log = org.slf4j.LoggerFactory.getLogger(ServiceClient::class.java)
 

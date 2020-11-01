@@ -13,6 +13,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.io.InputStream
+import java.io.Reader
 import java.util.concurrent.TimeUnit
 
 open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "http://localhost:5001/api/v0") :
@@ -107,29 +109,31 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
         httpClient.newCall(it)
       }
 
-  private fun Response.toInputSource() = object : ApiCall.InputSource {
-    override val isSuccessful: Boolean
-      get() = this@toInputSource.isSuccessful
-    override val responseCode: Int
-      get() = this@toInputSource.code
-    override val responseMessage: String
-      get() = this@toInputSource.message
 
-    override fun getStream() = body!!.byteStream()
-    override fun getReader() = body!!.charStream()
+  internal class HttpResponse<T>(val response: Response) : ApiCall.ApiResponse<T> {
+    override val isSuccessful = response.isSuccessful
+    override val responseCode = response.code
+    override val responseMessage = response.message
+    override val bodyText = response.body?.string()
+
+    override fun getStream(): InputStream = response.body!!.byteStream()
+
+    override fun getReader(): Reader = response.body!!.charStream()
+
+    private var t: T? = null
+    override var value: T
+      get() = t!!
+      set(value) {
+        t = value
+      }
   }
 
-  override fun <T> exec(call: ApiCall<T>): Flow<T> = flow {
+  override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
     @Suppress("BlockingMethodInNonBlockingContext")
-    createRequest(call).execute().use { response ->
-      if (!response.isSuccessful) {
-        log.warn(
-          "response failed: error:${response.code} ${response.message} body:${
-            response.body?.charStream()?.readText()
-          }"
-        )
-      }
-      emitAll(call.responseProcessor.invoke(response.toInputSource()))
+    createRequest(call).execute().use {
+      if (!it.isSuccessful)
+        emit(HttpResponse<T>(it))
+      else emitAll(call.responseProcessor.invoke(HttpResponse(it)))
     }
   }.flowOn(Dispatchers.IO)
 

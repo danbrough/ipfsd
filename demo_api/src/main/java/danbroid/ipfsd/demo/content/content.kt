@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.API
 import danbroid.ipfs.api.ApiCall
@@ -15,9 +14,11 @@ import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.demo.R
 import danbroid.ipfsd.demo.activities.activityInterface
 import danbroid.ipfsd.demo.openBrowser
-import danbroid.util.menu.*
+import danbroid.util.menu.MENU_TINT_DISABLED
+import danbroid.util.menu.MenuItemBuilder
+import danbroid.util.menu.menu
+import danbroid.util.menu.rootMenu
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -190,8 +191,12 @@ fun MenuItemBuilder.commands() = menu {
 inline suspend fun <T> Fragment.apiTest(
   call: ApiCall<T>,
   prompt: String = "result"
-): T {
-  val t = call.get(executor)
-  debug("$prompt: $t")
-  return t
+): ApiCall.ApiResponse<T> {
+  val response = call.get(executor)
+  if (response.isSuccessful)
+    debug("$prompt: ${response.value}")
+  else
+    log.error("Failed: ${response.responseCode}:${response.responseMessage}")
+
+  return response
 }

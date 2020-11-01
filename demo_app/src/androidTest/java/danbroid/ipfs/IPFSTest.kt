@@ -3,9 +3,9 @@ package danbroid.ipfs
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import danbroid.ipfs.api.API
 import danbroid.ipfsd.app.appRegistry
-import danbroid.ipfsd.client.ApiClient
+import danbroid.ipfsd.client.ServiceApiClient
+import danbroid.ipfsd.client.ipfsClient
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
@@ -15,23 +15,22 @@ import org.junit.runner.RunWith
 class IPFSTest {
 
   lateinit var context: Context
-  lateinit var apiClient: ApiClient
+  lateinit var apiClient: ServiceApiClient
 
 
   @Before
   fun setup() {
     log.info("setup()")
     context = InstrumentationRegistry.getInstrumentation().targetContext
-    apiClient = ApiClient.getInstance(context)
+    apiClient = ServiceApiClient.getInstance(context)
   }
 
   @Test
   fun test1() {
     log.info("test1()")
+    context.ipfsClient.isServiceInstalled()
 
-    runBlocking {
-      context.appRegistry.test()
-    }
+
   }
 
 }

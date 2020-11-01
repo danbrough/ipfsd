@@ -8,34 +8,37 @@ import kotlinx.coroutines.flow.flowOf
 object ResponseProcessors {
 
   @JvmStatic
-  fun <T> jsonParser(jsonType: Class<T>): ResponseProcessor<T> = { input ->
+  fun <T> jsonParser(jsonType: Class<T>): ResponseProcessor<T> = { response ->
     flow {
-      input.getReader().use {
+      response.getReader().use {
         val reader = it
         val parser = JsonStreamParser(reader)
         while (parser.hasNext()) {
-          val result = GsonBuilder().create().fromJson(parser.next(), jsonType)
-          emit(result)
+          response.value = GsonBuilder().create().fromJson(parser.next(), jsonType)
+          emit(response)
         }
       }
     }
   }
 
   @JvmStatic
-  fun stringReader(): ResponseProcessor<String> = { input ->
-    flowOf(input.getReader().readText())
+  fun <T> constant(result: T): ResponseProcessor<T> = { response ->
+    flowOf(response.also {
+      it.value = result
+    })
   }
 
   @JvmStatic
-  fun <T> constantResult(result: T): ResponseProcessor<T> = { input ->
-    flowOf(result)
+  fun isSuccessful(): ResponseProcessor<Boolean> = { response ->
+    flowOf(response.also {
+      it.value = response.isSuccessful
+    })
   }
 
   @JvmStatic
-  fun identity(): ResponseProcessor<ApiCall.InputSource> = {
+  fun raw(): ResponseProcessor<Void> = {
     flowOf(it)
   }
-
 }
 
 /*

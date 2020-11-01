@@ -4,7 +4,6 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import danbroid.ipfs.api.utils.Base58
 import danbroid.ipfs.api.utils.addUrlArgs
-import kotlinx.coroutines.flow.flowOf
 import okio.ByteString.Companion.decodeBase64
 import java.io.File
 
@@ -309,7 +308,7 @@ object API {
           "arg" to source,
           "arg" to dest
         ),
-        ResponseProcessors.constantResult(true)
+        ResponseProcessors.isSuccessful()
       )
 
 
@@ -378,14 +377,14 @@ object API {
       path: String? = null,
       offset: Long? = null,
       count: Long? = null
-    ): ApiCall<ApiCall.InputSource> =
+    ): ApiCall<Void> =
       ApiCall(
         "files/read".addUrlArgs(
           "arg" to path,
           "offset" to offset,
           "count" to count
         ),
-        ResponseProcessors.identity()
+        ResponseProcessors.raw()
       )
 
 
@@ -477,7 +476,7 @@ object API {
         "raw-leaves" to rawLeaves,
         "cid-version" to cidVersion,
         "hash" to hash
-      ), ResponseProcessors.constantResult(true)
+      ), ResponseProcessors.isSuccessful()
     )
   }
 
@@ -651,11 +650,8 @@ object API {
 
     @JvmStatic
     fun publish(topic: String, data: String) = ApiCall(
-      "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
-    ) {
-      flowOf(Result.success(true))
-    }
-
+      "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data), ResponseProcessors.isSuccessful()
+    )
 
   }
 
