@@ -12,7 +12,7 @@ import java.io.Reader
  */
 typealias ResultHandler<T> = (suspend (Result<T>) -> Unit)
 
-typealias  ResponseProcessor<T> = (input: ApiCall.InputSource) -> Flow<T>
+typealias  ResponseProcessor<T> = (response: ApiCall.ApiResponse<T>) -> Flow<ApiCall.ApiResponse<T>>
 
 
 open class ApiCall<T>(
@@ -20,15 +20,19 @@ open class ApiCall<T>(
   val responseProcessor: ResponseProcessor<T>
 ) {
 
-  interface InputSource {
+  interface ApiResponse<T> {
     val isSuccessful: Boolean
     val responseCode: Int
     val responseMessage: String
+    var value: T
+    val bodyText: String?
     fun getStream(): InputStream
     fun getReader(): Reader
   }
 
+
   constructor(path: String, type: Class<T>) : this(path, ResponseProcessors.jsonParser(type))
+
 
 /*
   companion object {
@@ -58,8 +62,8 @@ open class ApiCall<T>(
     parts.add(FilePart(file))
   }
 
-  fun exec(executor: CallExecutor): Flow<T> = executor.exec(this)
+  fun exec(executor: CallExecutor): Flow<ApiResponse<T>> = executor.exec(this)
 
-  suspend fun get(executor: CallExecutor): T = exec(executor).first()
+  suspend fun get(executor: CallExecutor): ApiResponse<T> = exec(executor).first()
 
 }

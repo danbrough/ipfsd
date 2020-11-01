@@ -14,7 +14,7 @@ class IPFSD {
   companion object {
     const val URI_SERVICE_PREFIX = "${BuildConfig.ipfsd_scheme}://service"  // ipfsd:/
     const val SERVICE_PKG = "danbroid.ipfsd.service"
-    const val SERVICE_CLASS = "IPFSService"
+    const val SERVICE_CLASS = "$SERVICE_PKG.IPFSService"
     // const val SERVICE_DIALOG_ACTIVITY = "activities.DialogActivity"
 
   }
@@ -29,7 +29,7 @@ class IPFSD {
     companion object {
       @JvmField
       val service_intent =
-        Intent().setComponent(ComponentName(SERVICE_PKG, "$SERVICE_PKG.$SERVICE_CLASS"))
+        Intent().setComponent(ComponentName(SERVICE_PKG, SERVICE_CLASS))
 
 
       @JvmField

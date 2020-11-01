@@ -4,7 +4,9 @@
     package="danbroid.ipfsd.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <queries>
+        <package android:name="danbroid.ipfsd.service" />
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -15,6 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
 
         <activity
             android:name=".MainActivity"

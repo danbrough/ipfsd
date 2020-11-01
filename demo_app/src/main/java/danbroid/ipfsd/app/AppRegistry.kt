@@ -2,7 +2,8 @@ package danbroid.ipfsd.app
 
 import android.content.Context
 import danbroid.ipfs.api.API
-import danbroid.ipfsd.client.ApiClient
+import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfsd.client.ServiceApiClient
 import danbroid.util.misc.SingletonHolder
 
 
@@ -13,8 +14,8 @@ class AppRegistry(val context: Context) {
   }
 
 
-  private val apiClient = ApiClient.getInstance(context)
-  private val executor = apiClient.executor
+  private val apiClient = ServiceApiClient.getInstance(context)
+  private val executor: CallExecutor = apiClient
 
   suspend fun <T : IPFSApp> getOrCreate(name: String): T {
     val conf = "$IPFSD_FILES_PREFIX/$name"
@@ -26,12 +27,11 @@ class AppRegistry(val context: Context) {
     log.warn("test()")
 
     API.Files.read("/tedst.txt").get(executor).also {
-      log.debug(
-        "read: ${
-          if (it.isSuccessful) it.getReader()
-            .readText() else "failed: ${it.responseMessage} : ${it.getReader().readText()}"
-        }"
-      )
+      if (it.isSuccessful) {
+        log.debug("read: ${it.bodyText}")
+      } else {
+        log.error("failed to read file: code:${it.responseCode} message:${it.responseCode} text:${it.bodyText}")
+      }
     }
   }
 }

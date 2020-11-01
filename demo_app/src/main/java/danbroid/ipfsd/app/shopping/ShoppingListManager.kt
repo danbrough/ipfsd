@@ -10,8 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -26,7 +24,7 @@ class ShoppingListManager(context: Context) {
 
   val shoppingLists = coroutineScope.produce {
     log.warn("producing shoppingLists")
-    API.Files.ls("$SHOPPING_FILES_PREFIX/").get(executor).entries.map {
+    API.Files.ls("$SHOPPING_FILES_PREFIX/").get(executor).value.entries.map {
       ShoppingList(it.name, it.hash)
     }.also {
       log.warn("sending shopping lists")
