@@ -106,6 +106,8 @@ dependencies {
   implementation(AndroidX.coreKtx)
   //implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(KotlinX.coroutines.android)
+  api(Google.android.material)
+
 //  implementation(Square.okHttp3.okHttp)
 
   implementation(AndroidX.lifecycle.liveDataKtx)

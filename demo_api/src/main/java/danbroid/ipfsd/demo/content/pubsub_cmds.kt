@@ -11,25 +11,23 @@ fun MenuItemBuilder.pubSubCommands() = menu {
   menu {
     title = "PubSub Publish"
     onClick = {
-      executor.exec(
-        API.PubSub.publish(
-          "poiqwe098123",
-          "Hello from the IPFS app at ${Date()}\n "
-        )
-      ) {
+      API.PubSub.publish(
+        "poiqwe098123",
+        "Hello from the IPFS app at ${Date()}\n "
+      ).get(executor).also {
         debug("RESULT: $it")
       }
+      false
     }
   }
 
   menu {
     title = "Pubsub Test Subscribe"
     onClick = {
-
-      executor.exec(API.PubSub.subscribe("poiqwe098123", discover = true)) {
-        debug("result: ${it.getOrNull()}")
+      API.PubSub.subscribe("poiqwe098123", discover = true).get(executor).also {
+        debug("result: $it")
       }
-
+      false
     }
   }
 }

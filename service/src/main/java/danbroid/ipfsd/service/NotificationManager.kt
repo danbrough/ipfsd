@@ -14,10 +14,9 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.toAndroidIconCompat
 import danbroid.ipfsd.IPFSD
-import danbroid.ipfsd.service.activities.MainActivity
 
 class NotificationManager(
   val context: Context,
@@ -99,17 +98,25 @@ class NotificationManager(
         PendingIntent.getService(context, 0, it, PendingIntent.FLAG_CANCEL_CURRENT)
       })
 
-    addAction(
-      0, context.getString(R.string.lbl_settings),
-      Intent(Intent.ACTION_VIEW).setData("ipfsdemo://settings".toUri()).let {
-        PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_CANCEL_CURRENT)
-      })
 
     addAction(
       NotificationCompat.Action.Builder(
         IconicsDrawable(
           context,
-          FontAwesome.Icon.faw_anchor
+          GoogleMaterial.Icon.gmd_settings
+        ).toAndroidIconCompat(), context.getString(R.string.lbl_settings),
+        Intent(Intent.ACTION_VIEW).setData("ipfsdemo://settings".toUri()).let {
+          PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_CANCEL_CURRENT)
+        }
+      ).build()
+    )
+
+
+    addAction(
+      NotificationCompat.Action.Builder(
+        IconicsDrawable(
+          context,
+          GoogleMaterial.Icon.gmd_clear
         ).toAndroidIconCompat(), "Reset Stats",
         IPFSD.intent.resetStatsPromptPending(context)
       ).build()

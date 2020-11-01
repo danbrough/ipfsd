@@ -1,12 +1,14 @@
 package danbroid.ipfsd.demo.content
 
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.API
+import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfsModel
@@ -16,6 +18,7 @@ import danbroid.ipfsd.demo.openBrowser
 import danbroid.util.menu.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
 
@@ -36,20 +39,21 @@ open class MenuTheme {
   open val test = 1
 }
 
-inline fun Fragment.debug(msg: String?) {
+@Suppress("NOTHING_TO_INLINE")
+inline suspend fun Fragment.debug(msg: String?) {
   val message = msg ?: "null"
   log.debug(message)
-  lifecycleScope.launch(Dispatchers.Main) {
+  withContext(Dispatchers.Main) {
     activityInterface?.showSnackbar(message)
   }
 }
 
-val rootContent: MenuItemBuilder =
-  rootMenu {
+fun rootContent(context: Context): MenuItemBuilder =
+  context.rootMenu {
     id = URI_CONTENT_ROOT
     titleID = R.string.app_name
 
-    onCreate = { _, _ ->
+    onCreate = {
       //auto connect to the IPFS service
       requireContext().ipfsClient.connect()
     }
@@ -82,19 +86,16 @@ val rootContent: MenuItemBuilder =
       menu {
         title = "List kitty"
         onClick = {
-          executor.exec(API.Basic.ls(dir_kitty)) {
-            debug("GOT KITTY: $it")
-          }
+          log.debug("kitty: ${API.Basic.ls(dir_kitty).get(executor)}")
+          false
         }
-
       }
 
       menu {
         title = "List kitty.danbrough.org"
         onClick = {
-          executor.exec(API.Basic.ls("/ipns/kitty.danbrough.org")) {
-            debug("result: $it")
-          }
+          log.debug("kitty: ${API.Basic.ls("/ipns/kitty.danbrough.org").get(executor)}")
+          false
         }
       }
 
@@ -119,6 +120,7 @@ val rootContent: MenuItemBuilder =
             requireContext().startActivity(Intent(Intent.ACTION_VIEW).also {
               it.data = Uri.parse(url_webui)
             })
+            false
           }
         }
 
@@ -126,6 +128,7 @@ val rootContent: MenuItemBuilder =
           title = "WebUI embedded browser"
           onClick = {
             findNavController().openBrowser(url_webui)
+            false
           }
         }
       }
@@ -140,9 +143,8 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Get ID"
     onClick = {
-      executor.exec(API.Network.id()) {
-        debug("id: $it")
-      }
+      apiTest(API.Network.id(), "id")
+      false
     }
   }
 
@@ -151,28 +153,20 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Profile Apply"
     onClick = {
-      executor.exec(API.Config.Profile.apply("lowpower")) {
-        debug("result: $it")
-      }
+      apiTest(API.Config.Profile.apply("lowpower"))
+      false
     }
   }
 
   menu {
     id = "$URI_CONTENT_ROOT/add_string"
     title = "Add string"
-    val parent = this
 
-    onClick = { callback ->
+    onClick = {
       val msg = "Hello from the ipfs demo at ${Date()}.\n"
       log.trace("adding message: $msg")
-      executor.exec(API.Basic.add(msg, fileName = "ipfs_test_message.txt")) { result ->
-        debug("added $msg -> $result")
-        val hashID = result.getOrThrow().hash
-        log.debug("hashID: $hashID")
-        lifecycleScope.launch(Dispatchers.Main) {
-          callback.invoke(true)
-        }
-      }
+      apiTest(API.Basic.add(msg, fileName = "ipfs_test_message.txt"), "added")
+      false
     }
   }
 
@@ -180,21 +174,24 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Bandwidth"
     onClick = {
-      executor.exec(API.Stats.bw()) {
-        debug("bandwidth: $it")
-      }
+      apiTest(API.Stats.bw(), "bandwidth")
+      false
     }
   }
 
-  menu {
-    title = "Repo Stat Test"
-    onClick = {
-      //TODO fragment.ipfsClient?.sendMessage(IPFSMessage.REPO_STAT)
-    }
-  }
 
 
 
   pubSubCommands()
   repoCommands()
+}
+
+
+inline suspend fun <T> Fragment.apiTest(
+  call: ApiCall<T>,
+  prompt: String = "result"
+): T {
+  val t = call.get(executor)
+  debug("$prompt: $t")
+  return t
 }

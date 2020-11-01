@@ -1,4 +1,3 @@
-
 plugins {
   id("com.android.application")
   kotlin("android")
@@ -43,6 +42,11 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
     //freeCompilerArgs = listOf("-Xjsr305=strict")
+
+    freeCompilerArgs = mutableListOf("-Xopt-in=kotlin.ExperimentalStdlibApi").also {
+      it.addAll(freeCompilerArgs)
+    }
+
   }
 
   kotlin.sourceSets.all {
@@ -137,8 +141,6 @@ dependencies {
   implementation(AndroidX.navigation.uiKtx)
   implementation(AndroidX.constraintLayout)
   implementation(AndroidX.preferenceKtx)
-
-  implementation(Google.android.material)
 
 
 }

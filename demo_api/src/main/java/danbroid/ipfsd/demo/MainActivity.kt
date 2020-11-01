@@ -16,7 +16,7 @@ class MainActivity : MenuActivity(R.layout.activity_main), ActivityInterface {
 
   override fun createNavGraph(navController: NavController) = navController.createDemoNavGraph(this)
 
-  override fun getRootMenu(menuID: String) = rootContent
+  override fun getRootMenu(menuID: String) = rootContent(this)
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     // Inflate the menu; this adds items to the action bar if it is present.

@@ -13,12 +13,9 @@ buildscript {
 
 
 bootstrapRefreshVersionsAndDependencies()
-include( ":service", ":client", ":api",  ":demo_app",":demo_api")
+include(":service", ":client", ":api", ":demo_app", ":demo_api")
 
 rootProject.name = "ipfsd"
-
-
-
 
 if (false) {
   include(":menu", ":slf4j", ":misc")

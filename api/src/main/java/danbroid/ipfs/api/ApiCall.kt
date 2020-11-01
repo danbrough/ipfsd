@@ -1,7 +1,5 @@
 package danbroid.ipfs.api
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.io.File
@@ -23,15 +21,20 @@ open class ApiCall<T>(
 ) {
 
   interface InputSource {
+    val isSuccessful: Boolean
+    val responseCode: Int
+    val responseMessage: String
     fun getStream(): InputStream
     fun getReader(): Reader
   }
 
   constructor(path: String, type: Class<T>) : this(path, ResponseProcessors.jsonParser(type))
 
+/*
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(ApiCall::class.java)
   }
+*/
 
   interface Part
 
@@ -55,10 +58,8 @@ open class ApiCall<T>(
     parts.add(FilePart(file))
   }
 
-  lateinit var resultHandler: ResultHandler<T>
+  fun exec(executor: CallExecutor): Flow<T> = executor.exec(this)
 
-  @Suppress("UNCHECKED_CAST")
-  suspend fun get(executor: CallExecutor) = coroutineScope {
-    executor.exec(this@ApiCall).first()
-  }
+  suspend fun get(executor: CallExecutor): T = exec(executor).first()
+
 }

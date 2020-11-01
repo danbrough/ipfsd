@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import danbroid.ipfsd.IPFSD
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
@@ -45,9 +46,20 @@ open class IPFSDClient(val context: Context) {
   }
 
   private val _connectionState: MutableLiveData<ConnectionState> =
-    MutableLiveData(ConnectionState.DISCONNECTED)
+    object : MutableLiveData<ConnectionState>(ConnectionState.DISCONNECTED) {
+      override fun onActive() {
+        connect()
+      }
+    }
 
   val connectionState: LiveData<ConnectionState> = _connectionState
+
+  suspend fun waitTillStarted() {
+    if (connectionState.value == ConnectionState.STARTED) return
+    log.debug("not connected .. waiting for flow ..")
+    connectionState.asFlow().filter { it == ConnectionState.STARTED }.first()
+    log.debug("finished waiting for flow with state ${connectionState.value}")
+  }
 
   private val messageCallback = Handler.Callback {
 
@@ -81,7 +93,7 @@ open class IPFSDClient(val context: Context) {
 
   @MainThread
   fun connect() {
-    log.debug("connect() state: ${_connectionState.value}")
+    log.error("connect() state: ${_connectionState.value}")
     if (_connectionState.value == ConnectionState.DISCONNECTED) {
       log.debug("connecting ..")
       _connectionState.value = ConnectionState.CONNECTING
@@ -140,7 +152,7 @@ open class IPFSDClient(val context: Context) {
     log.trace("call complete: $callCount")
   }
 
-  suspend fun runWhenConnected(job: suspend () -> Unit) {
+  suspend fun <T> runWhenConnected(job: suspend () -> T) {
 
     withContext(Dispatchers.Main) {
       log.trace("runWhenConnected()")
@@ -154,7 +166,6 @@ open class IPFSDClient(val context: Context) {
             .first()
           log.trace("connection state: ${connectionState.value}")
         }
-
 
 
         if (connectionState.value == ConnectionState.STARTED) {
@@ -178,6 +189,7 @@ open class IPFSDClient(val context: Context) {
 
 
   protected inner class IPFSServiceConnection : ServiceConnection {
+
     override fun onBindingDied(name: ComponentName?) {
       log.warn("onBindindDied() name:$name")
     }

@@ -17,27 +17,21 @@ fun MenuItemBuilder.ipfsDir(
   menu {
     id = "ipfsd:/$path"
 
-    onClick = { callback ->
-      ipfsModel.callExecutor.exec(API.Basic.ls(path)) {
-        val items = mutableListOf<MenuItem>()
-        it.getOrNull()?.objects?.forEach { file ->
-          file.links.forEach { link ->
-            items.add(
-              MenuItem(
-                "ipfsd://ipfs/${link.hash}",
-                link.name,
-                "${link.hash} size:${link.size}"
-              )
-            )
+    onClick = {
+      children?.clear()
+      API.Basic.ls(path).get(ipfsModel.callExecutor).objects.forEach { obj ->
+        obj.links.forEach { link ->
+          menu {
+            id = "ipfsd://ipfs/${link.hash}"
+            title = link.name
+            subtitle = "${link.hash} size:${link.size}"
           }
         }
-        log.warn("updaing children with $items")
-        menuViewModel().also {
-          it.updateChildren(items)
-        }
-        callback.invoke(true)
+        menuViewModel().invalidate(this)
       }
+      true
     }
+
 
     block?.invoke(this)
   }

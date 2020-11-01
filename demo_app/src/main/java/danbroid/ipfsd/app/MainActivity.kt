@@ -8,7 +8,7 @@ class MainActivity : MenuActivity() {
   override fun createNavGraph(navController: NavController) =
     navController.createShoppingListNavGraph(this)
 
-  override fun getRootMenu(menuID: String) = rootContent
+  override fun getRootMenu(menuID: String) = rootContent(this)
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(MainActivity::class.java)

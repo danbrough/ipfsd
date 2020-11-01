@@ -2,14 +2,8 @@ package danbroid.ipfsd.app
 
 import android.content.Context
 import danbroid.ipfs.api.API
-import danbroid.ipfs.api.ApiCall
 import danbroid.ipfsd.client.ApiClient
-import danbroid.ipfsd.client.ipfsClient
 import danbroid.util.misc.SingletonHolder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
-import kotlin.coroutines.suspendCoroutine
 
 
 class AppRegistry(val context: Context) {
@@ -18,18 +12,32 @@ class AppRegistry(val context: Context) {
     const val IPFSD_FILES_PREFIX = "/ipfsd/apps"
   }
 
-  private val apiClient: ApiClient
-    get() = ApiClient.getInstance(context)
 
-  suspend fun <T : IPFSApp> getOrCreate(name: String): T =
-    suspendCoroutine {
-      val conf = "$IPFSD_FILES_PREFIX/$name"
-      apiClient.exec(API.Files.read())
+  private val apiClient = ApiClient.getInstance(context)
+  private val executor = apiClient.executor
+
+  suspend fun <T : IPFSApp> getOrCreate(name: String): T {
+    val conf = "$IPFSD_FILES_PREFIX/$name"
+    TODO("IMPLEMENT")
+  }
+
+
+  suspend fun test() {
+    log.warn("test()")
+
+    API.Files.read("/tedst.txt").get(executor).also {
+      log.debug(
+        "read: ${
+          if (it.isSuccessful) it.getReader()
+            .readText() else "failed: ${it.responseMessage} : ${it.getReader().readText()}"
+        }"
+      )
     }
+  }
 }
 
 
-val Context.registry: AppRegistry
+val Context.appRegistry: AppRegistry
   get() = AppRegistry.getInstance(this)
 
 private val log = org.slf4j.LoggerFactory.getLogger(AppRegistry::class.java)
