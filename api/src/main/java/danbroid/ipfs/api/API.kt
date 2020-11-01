@@ -2,7 +2,6 @@ package danbroid.ipfs.api
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
-import com.sun.org.apache.xpath.internal.operations.Bool
 import danbroid.ipfs.api.utils.Base58
 import danbroid.ipfs.api.utils.addUrlArgs
 import kotlinx.coroutines.flow.flowOf
@@ -324,6 +323,21 @@ object API {
         @SerializedName("Size") val size: Long,
         @SerializedName("Type") val type: Int
       )
+
+      override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LsResponse
+
+        if (!entries.contentEquals(other.entries)) return false
+
+        return true
+      }
+
+      override fun hashCode(): Int {
+        return entries.contentHashCode()
+      }
     }
 
     /**
@@ -333,13 +347,13 @@ object API {
      * curl -X POST "http://127.0.0.1:5001/api/v0/files/ls?arg=<path>&long=<value>&U=<value>"
      *
      *   Arguments
-     *   @param path Path to show listing for. Defaults to '/'. Required: no.
-     *   @param longListing Use long listing format. Required: no.
-     *   @param directoryOrder Do not sort; list entries in directory order. Required: no.
+     *   @param path Path to show listing for.
+     *   @param longListing Use long listing format. Required: no. Default true
+     *   @param directoryOrder Do not sort; list entries in directory order. Required: no. Default true
      */
     @JvmStatic
     @JvmOverloads
-    fun ls(path: String? = null, longListing: Boolean? = null, directoryOrder: Boolean? = null) =
+    fun ls(path: String, longListing: Boolean = true, directoryOrder: Boolean = true) =
       apiCall<LsResponse>("files/ls", "arg" to path, "long" to longListing, "U" to directoryOrder)
 
 
@@ -463,7 +477,7 @@ object API {
         "raw-leaves" to rawLeaves,
         "cid-version" to cidVersion,
         "hash" to hash
-      ), ResponseProcessors.identity()
+      ), ResponseProcessors.constantResult(true)
     )
   }
 
@@ -639,7 +653,7 @@ object API {
     fun publish(topic: String, data: String) = ApiCall(
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data)
     ) {
-      flowOf(true)
+      flowOf(Result.success(true))
     }
 
 

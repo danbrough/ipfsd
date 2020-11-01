@@ -89,6 +89,8 @@ project.afterEvaluate {
 dependencies {
   implementation(project(":client"))
   implementation(project(":api"))
+  androidTestImplementation(project(":service"))
+
   implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(AndroidX.lifecycle.liveDataKtx)
   implementation(AndroidX.coreKtx)
@@ -143,8 +145,6 @@ dependencies {
   implementation(AndroidX.navigation.uiKtx)
   implementation(AndroidX.constraintLayout)
   implementation(AndroidX.preferenceKtx)
-
-  implementation(Google.android.material)
 
 
 }

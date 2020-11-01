@@ -3,6 +3,7 @@ package danbroid.ipfs
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import danbroid.ipfs.api.API
+import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfsd.service.IPFS
 import kotlinx.coroutines.Dispatchers
@@ -41,22 +42,23 @@ class IPFSTest {
     }
   }
 
+  suspend fun <T> callTest(call: ApiCall<T>) {
+    call.get(executor).also {
+      log.debug("result: $it")
+    }
+  }
+
   @Test
   fun test1() {
     log.debug("publishing something to poiqwe098123")
     runBlocking {
       log.debug("calling id")
-      executor.exec(API.id()) {
-        log.debug("GOT RESULT: $it")
-      }
+      callTest(API.Network.id())
+
       log.debug("calling publish")
-      executor.exec(API.PubSub.publish("poiqwe098123", "Hello World")) {
-        log.debug("GOT RESULT: $it")
-      }
+      callTest(API.PubSub.publish("poiqwe098123", "Hello World"))
       log.debug("calling repo/stat")
-      executor.exec(API.Repo.stat()) {
-        log.debug("GOT RESULT: $it")
-      }
+      callTest(API.Repo.stat())
 
     }
   }

@@ -1,28 +1,24 @@
 package danbroid.ipfsd.app
 
 
-import android.app.AlertDialog
-import androidx.navigation.fragment.findNavController
+import android.content.Context
+import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import danbroid.ipfs.api.API
 import danbroid.ipfsd.app.shopping.ShoppingListManager
-import danbroid.ipfsd.app.shopping.shoppingListManager
-import danbroid.ipfsd.app.ui.Prompts
 import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfsModel
+import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
-import danbroid.util.menu.navigateToHome
 import danbroid.util.menu.rootMenu
-import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
-import kotlin.coroutines.coroutineContext
-import kotlin.coroutines.resume
 
-val rootContent = rootMenu<MenuItemBuilder> {
+fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
 
   id = URI_CONTENT
   titleID = R.string.app_name
 
-  onCreate = { _, _ ->
+  onCreate = {
     log.info("${URI_SHOPPING_LISTS}.onCreate()")
     requireContext().ipfsClient.connect()
   }
@@ -38,15 +34,35 @@ val rootContent = rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
-        runCatching {
-          requireContext().shoppingListManager.createList()
-        }.exceptionOrNull()?.also {
-          log.error("FAILED: $it")
+        requireContext().appRegistry.test()
+        false
+      }
+    }
+
+    menu {
+      title = "Lists"
+      onClick = {
+        API.Files.ls("${ShoppingListManager.SHOPPING_FILES_PREFIX}/").also {
+          it.get(ipfsModel.callExecutor).also {
+            log.debug("result: $it")
+          }
         }
+        false
+      }
+    }
+
+    menu {
+      title = "Get ID"
+      icon = iconicsIcon(FontAwesome.Icon.faw_accessible_icon)
+      onClick = {
+        API.Network.id().get(ipfsModel.callExecutor).also {
+          log.warn("ID: $it")
+        }
+        false
       }
     }
   }
 }
 
-private val log = LoggerFactory.getLogger("danbroid.ipfsd.app.shoppinglist")
+private val log = LoggerFactory.getLogger("danbroid.ipfsd.app")
 

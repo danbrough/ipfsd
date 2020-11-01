@@ -2,24 +2,21 @@ package danbroid.ipfs.api.okhttp
 
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
-import danbroid.ipfs.api.ResultHandler
 import danbroid.ipfs.api.utils.uriEncode
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-open class OkHttpCallExecutor @JvmOverloads constructor(
-  port: Int = 5001,
-  val urlBase: String = "http://localhost:$port/api/v0"
-) : CallExecutor {
+open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "http://localhost:5001/api/v0") :
+  CallExecutor {
 
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpCallExecutor::class.java)
@@ -73,7 +70,6 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
         }
       }
 
-
       file.isDirectory -> {
         val rootDirLength = rootLength ?: file.parentFile.absolutePath.let {
           if (it == "/") 0 else it.length + 1
@@ -111,50 +107,32 @@ open class OkHttpCallExecutor @JvmOverloads constructor(
         httpClient.newCall(it)
       }
 
-  private fun ResponseBody.toInputSource() = object : ApiCall.InputSource {
-    override fun getStream() = this@toInputSource.byteStream()
-    override fun getReader() = this@toInputSource.charStream()
-  }
+  private fun Response.toInputSource() = object : ApiCall.InputSource {
+    override val isSuccessful: Boolean
+      get() = this@toInputSource.isSuccessful
+    override val responseCode: Int
+      get() = this@toInputSource.code
+    override val responseMessage: String
+      get() = this@toInputSource.message
 
-  override suspend fun <T> exec(call: ApiCall<T>, handler: ResultHandler<T>?) {
-    if (handler != null) call.resultHandler = handler
-    runCatching {
-      log.trace("exec() url: ${call.path}")
-      withContext(Dispatchers.IO) {
-        val httpCall = createRequest(call)
-        httpCall.execute().use { response ->
-
-          if (!response.isSuccessful) {
-            call.resultHandler.invoke(Result.failure(Exception("Request failed: ${response.message} code:${response.code}")))
-            return@use
-          }
-
-          call.responseProcessor.invoke(response.body!!.toInputSource()).collect {
-            call.resultHandler.invoke(Result.success(it))
-          }
-        }
-      }
-    }.exceptionOrNull().also {
-      when (it) {
-        null -> {
-          //no exception was thrown
-        }
-        is CancellationException -> {
-          //log.trace("CancellationException: ${it.message}")
-        }
-        else -> {
-          call.resultHandler.invoke(Result.failure(it))
-        }
-      }
-
-    }
+    override fun getStream() = body!!.byteStream()
+    override fun getReader() = body!!.charStream()
   }
 
   override fun <T> exec(call: ApiCall<T>): Flow<T> = flow {
     @Suppress("BlockingMethodInNonBlockingContext")
     createRequest(call).execute().use { response ->
-      emitAll(call.responseProcessor.invoke(response.body!!.toInputSource()))
+      if (!response.isSuccessful) {
+        log.warn(
+          "response failed: error:${response.code} ${response.message} body:${
+            response.body?.charStream()?.readText()
+          }"
+        )
+      }
+      emitAll(call.responseProcessor.invoke(response.toInputSource()))
     }
   }.flowOn(Dispatchers.IO)
+
+
 }
 
