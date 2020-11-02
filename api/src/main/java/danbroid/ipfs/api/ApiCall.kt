@@ -28,6 +28,7 @@ open class ApiCall<T>(
     val bodyText: String?
     fun getStream(): InputStream
     fun getReader(): Reader
+    fun copy(t: T?): ApiResponse<T>
   }
 
 

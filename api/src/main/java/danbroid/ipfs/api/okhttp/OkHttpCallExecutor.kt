@@ -114,18 +114,29 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
     override val isSuccessful = response.isSuccessful
     override val responseCode = response.code
     override val responseMessage = response.message
-    override val bodyText = response.body?.string()
+
+    private constructor(response: Response, t: T?) : this(response) {
+      this.t = t
+    }
+
+    override val bodyText: String?
+      get() = response.body?.string()
 
     override fun getStream(): InputStream = response.body!!.byteStream()
 
     override fun getReader(): Reader = response.body!!.charStream()
 
     private var t: T? = null
+
+    override fun copy(t: T?) = HttpResponse(response, t)
+
     override var value: T
       get() = t!!
       set(value) {
         t = value
       }
+
+    override fun toString() = "HttpResponse[${response.code}:${response.message}:${t ?: bodyText}]"
   }
 
   override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {

@@ -16,14 +16,14 @@ class ServiceApiClient(
 ) : CallExecutor {
 
   init {
-    if (!serviceClient.isServiceInstalled()) throw Exception("Package ${IPFSD.SERVICE_PKG} is not installed")
+    if (!serviceClient.isServiceInstalled()) {
+      log.error("Package ${IPFSD.SERVICE_PKG} is not installed")
+      showIPFSDNotInstalledDialog(serviceClient.context)
+    }
   }
 
   override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
-    if (!serviceClient.isServiceInstalled()) throw Exception("Package ${IPFSD.SERVICE_PKG} is not installed")
-    log.warn("ApiClient: flow started..")
     serviceClient.waitTillStarted()
-    log.warn("finished waiting for connect")
     emitAll(executor.exec(call))
   }
 
@@ -46,3 +46,5 @@ class ServiceApiClient(
 
 
 private val log = org.slf4j.LoggerFactory.getLogger(ServiceApiClient::class.java)
+
+

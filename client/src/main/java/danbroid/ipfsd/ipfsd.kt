@@ -13,6 +13,7 @@ class IPFSD {
 
   companion object {
     const val URI_SERVICE_PREFIX = "${BuildConfig.ipfsd_scheme}://service"  // ipfsd:/
+    const val URI_ACTION_PREFIX = "${BuildConfig.ipfsd_scheme}://action"
     const val SERVICE_PKG = "danbroid.ipfsd.service"
     const val SERVICE_CLASS = "$SERVICE_PKG.IPFSService"
     // const val SERVICE_DIALOG_ACTIVITY = "activities.DialogActivity"
@@ -50,9 +51,9 @@ class IPFSD {
 
   class deep_link {
     companion object {
-
-      const val ipfs_settings = "$URI_SERVICE_PREFIX/settings"
-      const val reset_stats_prompt = "$URI_SERVICE_PREFIX/reset_stats"
+      const val ipfsd_home = "$URI_SERVICE_PREFIX/"
+      const val ipfsd_settings = "$URI_SERVICE_PREFIX/settings"
+      const val reset_stats_prompt = "$URI_ACTION_PREFIX/reset_stats"
     }
   }
 }

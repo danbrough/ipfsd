@@ -48,9 +48,7 @@ val Activity.ipfsModel: IPFSClientModel
   get() = ViewModelProvider(
     this as ComponentActivity,
     IPFSClientModel.Companion.ModelFactory(this)
-  ).get(
-    IPFSClientModel::class.java
-  )
+  ).get(IPFSClientModel::class.java)
 
 
 private val log = org.slf4j.LoggerFactory.getLogger(IPFSClientModel::class.java)

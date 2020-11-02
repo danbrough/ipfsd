@@ -1,0 +1,5 @@
+<resources>
+    <string name="title_prefs_general">General</string>
+    <string name="key_general">general</string>
+    <string name="key_test">test</string>
+</resources>

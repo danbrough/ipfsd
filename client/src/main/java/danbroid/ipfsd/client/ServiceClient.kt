@@ -1,5 +1,7 @@
 package danbroid.ipfsd.client
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
@@ -27,10 +29,6 @@ open class ServiceClient(val context: Context) {
 
   enum class ConnectionState {
     DISCONNECTED, CONNECTING, CONNECTED, STARTED;
-  }
-
-  init {
-    log.info("CREATED IPFS CLIENT")
   }
 
   companion object {
@@ -73,10 +71,11 @@ open class ServiceClient(val context: Context) {
   val connectionState: LiveData<ConnectionState> = _connectionState
 
   suspend fun waitTillStarted() {
-    if (connectionState.value == ConnectionState.STARTED) return
-    log.debug("not connected .. waiting for flow ..")
-    connectionState.asFlow().filter { it == ConnectionState.STARTED }.first()
-    log.debug("finished waiting for flow with state ${connectionState.value}")
+    if (connectionState.value != ConnectionState.STARTED) {
+      log.debug("not connected .. waiting for flow ..")
+      connectionState.asFlow().filter { it == ConnectionState.STARTED }.first()
+      log.debug("finished waiting for flow with state ${connectionState.value}")
+    }
   }
 
   private val messageCallback = Handler.Callback {
@@ -229,6 +228,25 @@ open class ServiceClient(val context: Context) {
     }
   }
 
+
+}
+
+
+//TODO add link to install the ipfsd service app
+
+
+internal fun showIPFSDNotInstalledDialog(context: Context) {
+  AlertDialog.Builder(context)
+    .setTitle(android.R.string.dialog_alert_title)
+    .setMessage(R.string.msg_ipfsd_not_installed)
+    .setPositiveButton(android.R.string.ok) { _, _ ->
+      if (context is Activity)
+        context.finish()
+    }
+    .setOnDismissListener {
+      if (context is Activity)
+        context.finish()
+    }.show()
 
 }
 
