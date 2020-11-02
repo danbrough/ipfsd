@@ -17,6 +17,7 @@ import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.toAndroidIconCompat
 import danbroid.ipfsd.IPFSD
+import danbroid.util.intent.toPendingIntent
 
 class NotificationManager(
   val context: Context,
@@ -105,9 +106,7 @@ class NotificationManager(
           context,
           GoogleMaterial.Icon.gmd_settings
         ).toAndroidIconCompat(), context.getString(R.string.lbl_settings),
-        Intent(Intent.ACTION_VIEW).setData("ipfsdemo://settings".toUri()).let {
-          PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_CANCEL_CURRENT)
-        }
+        IPFSDNavGraph.deep_link.settings.toUri().toPendingIntent(context)
       ).build()
     )
 

@@ -3,10 +3,10 @@ package danbroid.ipfs
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import danbroid.ipfsd.app.appRegistry
+import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.ServiceApiClient
 import danbroid.ipfsd.client.ipfsClient
-import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -23,6 +23,11 @@ class IPFSTest {
     log.info("setup()")
     context = InstrumentationRegistry.getInstrumentation().targetContext
     apiClient = ServiceApiClient.getInstance(context)
+    Assert.assertEquals(
+      "${IPFSD.SERVICE_PKG} is not installed",
+      true,
+      apiClient.serviceClient.isServiceInstalled()
+    )
   }
 
   @Test

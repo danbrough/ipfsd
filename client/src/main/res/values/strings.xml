@@ -6,4 +6,5 @@
     <string name="lbl_reset_stats">Reset Stats</string>
     <string name="msg_confirm_reset_stats">Are you sure you want to reset the stats ?</string>
     <string name="msg_stats_reset">Stats have been reset</string>
+    <string name="msg_ipfsd_not_installed">The IPFSD Service is not installed</string>
 </resources>

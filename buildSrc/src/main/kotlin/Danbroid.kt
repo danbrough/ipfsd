@@ -1,6 +1,6 @@
 object Danbroid {
   val useLocalUtils = false
-  const val version = "1.1.2-beta14"
+  const val version = "1.1.2"
   const val IPFSD_SCHEME = "ipfsd"
 
   private const val pkg = "com.github.danbrough.androidutils"

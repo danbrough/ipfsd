@@ -1,17 +1,16 @@
 package danbroid.ipfsd.service.activities
 
-import danbroid.ipfsd.IPFSD
+import androidx.navigation.NavController
+import danbroid.ipfsd.service.createIPFSDNavGraph
 import danbroid.ipfsd.service.rootContent
 import danbroid.util.menu.MenuActivity
-import danbroid.util.menu.createMenuNavGraph
 
 class MainActivity : MenuActivity() {
 
 
-  override fun createNavGraph(navController: androidx.navigation.NavController) =
-    navController.createMenuNavGraph(this, defaultMenuID = IPFSD.deep_link.ipfs_settings) {
+  override fun createNavGraph(navController: NavController) =
+    navController.createIPFSDNavGraph(this)
 
-    }
 
   override fun getRootMenu(menuID: String) = rootContent(this)
 
