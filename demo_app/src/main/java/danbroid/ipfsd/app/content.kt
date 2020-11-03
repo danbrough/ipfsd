@@ -42,11 +42,10 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
     menu {
       title = "Lists"
       onClick = {
-        API.Files.ls("${ShoppingListManager.SHOPPING_FILES_PREFIX}/").also {
-          it.get(ipfsModel.callExecutor).use {
+        API.Files.ls("${ShoppingListManager.SHOPPING_FILES_PREFIX}/").get(ipfsModel.callExecutor)
+          .use {
             log.warn("RESULT: $it")
           }
-        }
         false
       }
     }

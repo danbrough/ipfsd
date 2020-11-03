@@ -7,4 +7,5 @@
     <string name="lbl_reset_stats">Reset Stats</string>
     <string name="msg_confirm_reset_stats">Are you sure you want to reset the stats ?</string>
     <string name="msg_stats_reset">Stats have been reset</string>
+    <string name="key_test2">test2</string>
 </resources>

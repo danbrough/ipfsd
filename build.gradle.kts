@@ -29,8 +29,8 @@ allprojects {
     //mavenLocal()
     google()
     jcenter()
-    //maven("https://h1.danbrough.org/maven")
-    maven("https://jitpack.io")
+    maven("https://h1.danbrough.org/maven")
+    //maven("https://jitpack.io")
   }
 
   tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
