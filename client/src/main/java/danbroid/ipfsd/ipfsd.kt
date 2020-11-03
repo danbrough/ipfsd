@@ -16,8 +16,6 @@ class IPFSD {
     const val URI_ACTION_PREFIX = "${BuildConfig.ipfsd_scheme}://action"
     const val SERVICE_PKG = "danbroid.ipfsd.service"
     const val SERVICE_CLASS = "$SERVICE_PKG.IPFSService"
-    // const val SERVICE_DIALOG_ACTIVITY = "activities.DialogActivity"
-
   }
 
   class action {
@@ -51,26 +49,10 @@ class IPFSD {
 
   class deep_link {
     companion object {
-      const val ipfsd_home = "$URI_SERVICE_PREFIX/"
+      const val ipfsd_home = URI_SERVICE_PREFIX
       const val ipfsd_settings = "$URI_SERVICE_PREFIX/settings"
       const val reset_stats_prompt = "$URI_ACTION_PREFIX/reset_stats"
     }
   }
 }
 
-/*
-  companion object {
-    const val URI_PREFIX = "ipfsd://settings"
-    val URI_RESET_STATS_PROMPT = "$URI_PREFIX/reset_stats"
-    val URI_START = "ipfsd://start"
-
-    val INTENT_RESET_STATS_PROMPT =
-      Intent(Intent.ACTION_VIEW).setData(URI_RESET_STATS_PROMPT.toUri())
-
-    @JvmStatic
-    fun resetStatsPrompt(context: Context) =
-      context.startActivity(INTENT_RESET_STATS_PROMPT)
-
-
-  }
- */
