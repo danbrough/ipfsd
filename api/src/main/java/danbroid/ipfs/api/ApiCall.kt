@@ -2,6 +2,7 @@ package danbroid.ipfs.api
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import java.io.Closeable
 import java.io.File
 import java.io.InputStream
 import java.io.Reader
@@ -20,7 +21,7 @@ open class ApiCall<T>(
   val responseProcessor: ResponseProcessor<T>
 ) {
 
-  interface ApiResponse<T> {
+  interface ApiResponse<T> : Closeable {
     val isSuccessful: Boolean
     val responseCode: Int
     val responseMessage: String

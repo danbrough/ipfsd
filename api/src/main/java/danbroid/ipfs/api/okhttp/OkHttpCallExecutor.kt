@@ -136,15 +136,19 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
         t = value
       }
 
-    override fun toString() = "HttpResponse[${response.code}:${response.message}:${t ?: bodyText}]"
+    override fun toString() = "HttpResponse<${response.code}:${response.message}:${t ?: bodyText}>]"
+
+    override fun close() {
+      response.close()
+    }
   }
 
   override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
     @Suppress("BlockingMethodInNonBlockingContext")
-    createRequest(call).execute().use {
-      if (!it.isSuccessful)
+    createRequest(call).execute().also {
+      if (!it.isSuccessful) {
         emit(HttpResponse<T>(it))
-      else emitAll(call.responseProcessor.invoke(HttpResponse(it)))
+      } else emitAll(call.responseProcessor.invoke(HttpResponse(it)))
     }
   }.flowOn(Dispatchers.IO)
 

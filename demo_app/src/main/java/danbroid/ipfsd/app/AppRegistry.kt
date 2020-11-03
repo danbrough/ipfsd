@@ -13,7 +13,6 @@ class AppRegistry(val context: Context) {
     const val IPFSD_FILES_PREFIX = "/ipfsd/apps"
   }
 
-
   private val apiClient = ServiceApiClient.getInstance(context)
   private val executor: CallExecutor = apiClient
 
