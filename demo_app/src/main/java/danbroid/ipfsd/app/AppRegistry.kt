@@ -25,7 +25,7 @@ class AppRegistry(val context: Context) {
   suspend fun test() {
     log.warn("test()")
 
-    API.Files.read("/tedst.txt").get(executor).also {
+    API.Files.ls(IPFSD_FILES_PREFIX).get(executor).use {
       if (it.isSuccessful) {
         log.debug("read: ${it.bodyText}")
       } else {

@@ -44,15 +44,14 @@ open class ServiceClient(val context: Context) {
   }
 
   private var serviceIsInstalled = false
-  fun isServiceInstalled(): Boolean {
-    if (serviceIsInstalled) return true
+
+  fun isServiceInstalled(recheck: Boolean = false): Boolean {
+    if (serviceIsInstalled && !recheck) return true
+
     runCatching {
-      context.packageManager.getServiceInfo(
-        ComponentName(
-          IPFSD.SERVICE_PKG,
-          IPFSD.SERVICE_CLASS
-        ), PackageManager.GET_META_DATA
-      )
+      context.packageManager.getPackageInfo(IPFSD.SERVICE_PKG, PackageManager.GET_META_DATA).also {
+        log.info("service versionName:${it.versionName}")
+      }
     }.onSuccess {
       serviceIsInstalled = true
     }.onFailure {
