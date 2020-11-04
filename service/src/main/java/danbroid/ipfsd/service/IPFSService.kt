@@ -94,20 +94,19 @@ class IPFSService : Service() {
         val msg = it.toIPFSMessage(classLoader)
         log.debug("SERVICE MESSAGE: $msg")
         when (msg) {
-          danbroid.ipfsd.client.IPFSMessage.CLIENT_CONNECT -> {
+          IPFSMessage.CLIENT_CONNECT -> {
             clients.add(it.replyTo)
             if (ipfs.isStarted == true)
-              it.replyTo.send(danbroid.ipfsd.client.IPFSMessage.SERVICE_STARTED.toMessage())
+              it.replyTo.send(IPFSMessage.SERVICE_STARTED.toMessage())
           }
-          danbroid.ipfsd.client.IPFSMessage.CLIENT_DISCONNECT ->
+          IPFSMessage.CLIENT_DISCONNECT ->
             clients.remove(it.replyTo)
 
-          danbroid.ipfsd.client.IPFSMessage.TIMEOUT_RESET ->
+          IPFSMessage.TIMEOUT_RESET ->
             resetTimeout()
 
-          danbroid.ipfsd.client.IPFSMessage.REPO_STAT -> repoStat()
-
-          danbroid.ipfsd.client.IPFSMessage.STATS_RESET -> readStats(true)
+          IPFSMessage.REPO_STAT -> repoStat()
+          IPFSMessage.STATS_RESET -> readStats(true)
         }
       }
     }

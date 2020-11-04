@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="danbroid.ipfsd.app">
+    package="danbroid.ipfsd.appdemo">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <queries>
-        <package android:name="danbroid.ipfsd.service" />
-    </queries>
+
 
     <application
         android:allowBackup="true"

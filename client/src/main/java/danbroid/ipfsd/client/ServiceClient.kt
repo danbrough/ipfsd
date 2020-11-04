@@ -46,6 +46,7 @@ open class ServiceClient(val context: Context) {
   private var serviceIsInstalled = false
 
   fun isServiceInstalled(recheck: Boolean = false): Boolean {
+    return true
     if (serviceIsInstalled && !recheck) return true
 
     runCatching {

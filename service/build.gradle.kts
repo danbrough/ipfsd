@@ -1,5 +1,5 @@
 plugins {
-  id("com.android.application")
+  id("com.android.library")
   kotlin("android")
   kotlin("android.extensions")
   id("org.jetbrains.dokka")
@@ -7,9 +7,11 @@ plugins {
 }
 
 android {
+
   ndkVersion = ProjectVersions.NDK_VERSION
 
   compileSdkVersion(ProjectVersions.SDK_VERSION)
+
   defaultConfig {
     minSdkVersion(ProjectVersions.MIN_SDK_VERSION)
     targetSdkVersion(ProjectVersions.SDK_VERSION)
@@ -17,19 +19,9 @@ android {
     versionName = ProjectVersions.VERSION_NAME
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
-
-/*    javaCompileOptions {
-      annotationProcessorOptions {
-        argument("room.schemaLocation", "$projectDir/schemas")
-        argument("room.incremental", "true")
-        argument("room.expandProjection", "true")
-      }
-    }*/
-
   }
 
   buildTypes {
-
     getByName("release") {
       isMinifyEnabled = true
       proguardFiles(
@@ -37,15 +29,12 @@ android {
         "proguard-rules.pro"
       )
     }
-
   }
+
   compileOptions {
     sourceCompatibility = ProjectVersions.JAVA_VERSION
     targetCompatibility = ProjectVersions.JAVA_VERSION
   }
-
-
-
 
   kotlinOptions {
     jvmTarget = "1.8"
@@ -55,65 +44,13 @@ android {
     }
   }
 
-  sourceSets {
-    getByName("main") {
-      java {
-        srcDir("src/bridge/java")
-      }
-      jniLibs {
-        srcDir("src/bridge/jniLibs")
-      }
-    }
-  }
-
   testOptions {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true
   }
 
-/*  val sourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-    from(android.sourceSets.getByName("main").java.srcDirs)
-  }
-
-  afterEvaluate {
-    publishing {
-      publications {
-        val debug by registering(MavenPublication::class) {
-          components.forEach {
-            println("COMPONENT: ${it.name}")
-          }
-          from(components["debug_aab"])
-          artifact(sourcesJar.get())
-          artifactId = "service"
-          groupId = ProjectVersions.GROUP_ID
-          version = ProjectVersions.VERSION_NAME
-        }
-      }
-    }
-  }*/
-
 }
 
-
-/*val sourcesJar by tasks.registering(Jar::class) {
-  archiveClassifier.set("sources")
-  from(android.sourceSets.getByName("main").java.srcDirs)
-}
-
-afterEvaluate {
-  publishing {
-    publications {
-      val release by registering(MavenPublication::class) {
-        from(components["release"])
-        artifact(sourcesJar.get())
-        artifactId = "service"
-        groupId = ProjectVersions.GROUP_ID
-        version = ProjectVersions.VERSION_NAME
-      }
-    }
-  }
-}*/
 
 tasks.withType<Test> {
   useJUnit()
@@ -131,7 +68,12 @@ dependencies {
   /* api(project(":common_domain")) {
      exclude(group = "com.android", module = "android")
    }*/
-  implementation(project(":client"))
+  //implementation("com.github.danbrough.ipfsd:bridge:0.7.0_01")
+
+  //implementation("com.github.danbrough.ipfsd:bridge:0.7.0_02")
+
+  implementation(project(":bridge"))
+  //implementation(project(":client"))
 
   api("org.slf4j:slf4j-api:_")
 
@@ -148,12 +90,11 @@ dependencies {
 
   implementation(Danbroid.slf4j)
   implementation("com.mikepenz:google-material-typeface:_")
- // implementation("com.mikepenz:fontawesome-typeface:_")
+  // implementation("com.mikepenz:fontawesome-typeface:_")
 
 //
 
   implementation("commons-io:commons-io:_")
-  //implementation("ipfs.gomobile:core:0.8.0-dan04@aar")
 
   //api(Libs.kotlinx_coroutines_android)
   //implementation("com.google.code.gson:gson:_")

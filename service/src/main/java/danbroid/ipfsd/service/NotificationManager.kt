@@ -106,7 +106,7 @@ class NotificationManager(
           context,
           GoogleMaterial.Icon.gmd_settings
         ).toAndroidIconCompat(), context.getString(R.string.lbl_settings),
-        IPFSDNavGraph.deep_link.settings.toUri().toPendingIntent(context)
+        IPFSD.deep_link.ipfsd_settings.toUri().toPendingIntent(context)
       ).build()
     )
 
