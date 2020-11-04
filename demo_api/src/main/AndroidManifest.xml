@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="danbroid.ipfsd.demo">
+    package="danbroid.ipfsd.apidemo">
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
@@ -25,7 +25,7 @@
 
         <activity
 
-            android:name="danbroid.ipfsd.demo.MainActivity"
+            android:name="danbroid.ipfsd.apidemo.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar">
@@ -50,13 +50,13 @@
 
 
         <provider
-            android:name="danbroid.ipfsd.demo.sync.DBContentProvider"
-            android:authorities="danbroid.ipfsd.demo.datasync.provider"
+            android:name="danbroid.ipfsd.apidemo.sync.DBContentProvider"
+            android:authorities="danbroid.ipfsd.apidemo.datasync.provider"
             android:exported="false"
             android:syncable="true" />
 
 
-        <service android:name="danbroid.ipfsd.demo.sync.AuthenticatorService">
+        <service android:name="danbroid.ipfsd.apidemo.sync.AuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -66,7 +66,7 @@
         </service>
 
         <service
-            android:name="danbroid.ipfsd.demo.sync.SyncService"
+            android:name="danbroid.ipfsd.apidemo.sync.SyncService"
             android:exported="false"
             android:process=":sync">
             <intent-filter>

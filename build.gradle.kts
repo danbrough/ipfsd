@@ -26,9 +26,10 @@ apply("project.gradle.kts")
 allprojects {
 
   repositories {
-    //mavenLocal()
+    mavenLocal()
     google()
     jcenter()
+
     maven("https://h1.danbrough.org/maven")
     //maven("https://jitpack.io")
   }
@@ -60,17 +61,7 @@ subprojects {
     (extensions.findByType(com.android.build.gradle.LibraryExtension::class)
       ?: extensions.findByType(com.android.build.gradle.AppExtension::class))?.apply {
 
-      println("Found android subproject $name")
       lintOptions.isAbortOnError = false
-
-      if (this is com.android.build.gradle.LibraryExtension) {
-        println("$name is a library")
-        compileSdkVersion(30)
-
-      } else if (this is com.android.build.gradle.AppExtension) {
-        println("$name is an application")
-        compileSdkVersion(30)
-      }
 
       defaultConfig {
         buildConfigField("String", "IPFSD_SCHEME", "\"${Danbroid.IPFSD_SCHEME}\"")
@@ -82,24 +73,23 @@ subprojects {
         val publishing =
           extensions.findByType(PublishingExtension::class.java) ?: return@afterEvaluate
 
+
         val sourcesJar by tasks.registering(Jar::class) {
           archiveClassifier.set("sources")
           from(sourceSets.getByName("main").java.srcDirs)
         }
+
 
         afterEvaluate {
           publishing.apply {
             val projectName = name
             publications {
               val release by registering(MavenPublication::class) {
-                components.forEach {
-                  println("Publication component: ${it.name}")
-                }
                 from(components["release"])
                 artifact(sourcesJar.get())
                 artifactId = projectName
                 groupId = ProjectVersions.GROUP_ID
-                version = ProjectVersions.VERSION_NAME
+                version = defaultConfig.versionName
               }
             }
           }
