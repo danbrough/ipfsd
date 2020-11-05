@@ -120,9 +120,10 @@ dependencies {
   /* api(project(":common_domain")) {
      exclude(group = "com.android", module = "android")
    }*/
-  implementation(project(":service"))
+  //implementation(project(":service"))
   implementation(project(":client"))
 
+  implementation(project(":service"))
 
   api("org.slf4j:slf4j-api:_")
 

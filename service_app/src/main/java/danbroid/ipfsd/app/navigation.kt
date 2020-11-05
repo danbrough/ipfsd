@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.navigation.NavController
 import androidx.navigation.fragment.fragment
 import danbroid.ipfsd.IPFSD
-import danbroid.ipfsd.app.R
 import danbroid.ipfsd.service.ui.SettingsFragment
 import danbroid.util.menu.createMenuNavGraph
 import danbroid.util.misc.UniqueIDS

@@ -12,7 +12,7 @@ android {
     minSdkVersion(ProjectVersions.MIN_SDK_VERSION)
     targetSdkVersion(ProjectVersions.SDK_VERSION)
     versionCode = 1
-    versionName = "0.7.0_02"
+    versionName = Danbroid.bridge_version
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
   }
