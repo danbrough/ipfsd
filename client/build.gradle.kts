@@ -33,7 +33,6 @@ android {
     }
   }
 
-
   compileOptions {
     sourceCompatibility = ProjectVersions.JAVA_VERSION
     targetCompatibility = ProjectVersions.JAVA_VERSION
@@ -49,29 +48,6 @@ android {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true
   }
-
-/*  val sourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-    from(android.sourceSets.getByName("main").java.srcDirs)
-  }
-
-  afterEvaluate {
-    val projectName = name
-    publishing {
-      publications {
-        val release by registering(MavenPublication::class) {
-          components.forEach {
-            println("COMPONENT: ${it.name}")
-          }
-          from(components["release"])
-          artifact(sourcesJar.get())
-          artifactId = projectName
-          groupId = ProjectVersions.GROUP_ID
-          version = ProjectVersions.VERSION_NAME
-        }
-      }
-    }
-  }*/
 
 }
 

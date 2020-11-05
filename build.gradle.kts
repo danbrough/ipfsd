@@ -26,12 +26,13 @@ apply("project.gradle.kts")
 allprojects {
 
   repositories {
-    mavenLocal()
     google()
     jcenter()
 
-    maven("https://h1.danbrough.org/maven")
+  //  maven("https://h1.danbrough.org/maven")
     //maven("https://jitpack.io")
+    mavenLocal()
+
   }
 
   tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
@@ -85,7 +86,7 @@ subprojects {
             val projectName = name
             publications {
               val release by registering(MavenPublication::class) {
-                from(components["release"])
+                from(components["debug"])
                 artifact(sourcesJar.get())
                 artifactId = projectName
                 groupId = ProjectVersions.GROUP_ID

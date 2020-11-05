@@ -68,12 +68,11 @@ dependencies {
   /* api(project(":common_domain")) {
      exclude(group = "com.android", module = "android")
    }*/
-  //implementation("com.github.danbrough.ipfsd:bridge:0.7.0_01")
 
-  //implementation("com.github.danbrough.ipfsd:bridge:0.7.0_02")
+  implementation("com.github.danbrough.ipfsd:bridge:${Danbroid.bridge_version}")
+  //implementation(project(":bridge"))
 
-  implementation(project(":bridge"))
-  //implementation(project(":client"))
+  implementation(project(":client"))
 
   api("org.slf4j:slf4j-api:_")
 

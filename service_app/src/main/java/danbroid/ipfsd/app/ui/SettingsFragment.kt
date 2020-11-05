@@ -10,7 +10,7 @@ import com.mikepenz.iconics.IconicsSize
 import com.mikepenz.iconics.dsl.ExperimentalIconicsDSL
 import com.mikepenz.iconics.dsl.iconicsDrawable
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import danbroid.ipfsd.service.R
+import danbroid.ipfsd.app.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
 

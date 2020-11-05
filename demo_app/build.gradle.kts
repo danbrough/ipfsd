@@ -78,7 +78,6 @@ tasks.withType<Test> {
 
 dependencies {
   implementation(project(":api"))
-  implementation(project(":service"))
   implementation(project(":client"))
 
   implementation(AndroidX.lifecycle.runtimeKtx)
