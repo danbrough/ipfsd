@@ -1,10 +1,11 @@
-package danbroid.ipfsd.app
+package danbroid.ipfsd.service
 
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import danbroid.ipfs.api.API
 import danbroid.ipfsd.IPFSD
-import danbroid.ipfsd.app.R
 import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.ui.snackBar
 import danbroid.util.menu.Icons.iconicsIcon
@@ -34,6 +35,29 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
     id = IPFSDNavGraph.deep_link.settings
     titleID = R.string.lbl_settings
     icon = iconicsIcon(GoogleMaterial.Icon.gmd_settings)
+  }
+
+  menu {
+    title = "Test1"
+    onClick = {
+      context.startService(
+        Intent().setComponent(
+          ComponentName(
+            "danbroid.ipfsd.service",
+            "danbroid.ipfsd.service.IPFSService"
+          )
+        )
+      )
+      false
+    }
+  }
+
+  menu {
+    title = "Test2"
+    onClick = {
+      context.startService(Intent(context, IPFSService::class.java))
+      false
+    }
   }
 }
 

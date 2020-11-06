@@ -1,8 +1,8 @@
-package danbroid.ipfsd.app.activities
+package danbroid.ipfsd.service.activities
 
 import androidx.navigation.NavController
-import danbroid.ipfsd.app.createIPFSDNavGraph
-import danbroid.ipfsd.app.rootContent
+import danbroid.ipfsd.service.createIPFSDNavGraph
+import danbroid.ipfsd.service.rootContent
 import danbroid.util.menu.MenuActivity
 
 class MainActivity : MenuActivity() {
