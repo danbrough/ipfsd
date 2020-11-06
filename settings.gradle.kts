@@ -13,7 +13,7 @@ buildscript {
 
 
 bootstrapRefreshVersionsAndDependencies()
-include(":service", ":bridge",":client", ":api", ":demo_app", ":demo_api")
+include(":service", ":bridge",":client", ":api", ":demos:app", ":demos:api")
 
 rootProject.name = "ipfsd"
 
