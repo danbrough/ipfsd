@@ -1,4 +1,4 @@
-package danbroid.ipfsd.app
+package danbroid.ipfsd.service
 
 import android.content.Context
 import androidx.navigation.NavController
