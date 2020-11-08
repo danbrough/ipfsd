@@ -9,21 +9,21 @@ import java.io.StringReader
 
 object ResponseProcessors {
 
-  //private val log = LoggerFactory.getLogger(ResponseProcessors::class.java)
+  private val log = LoggerFactory.getLogger(ResponseProcessors::class.java)
 
   @JvmStatic
   fun <T> jsonParser(jsonType: Class<T>): ResponseProcessor<T> = { response ->
     flow {
-    //  log.warn("parsing json: successful: ${response.isSuccessful}")
+      //  log.warn("parsing json: successful: ${response.isSuccessful}")
       response.getReader().use {
         val reader = it
-       // val text = reader.readText()
-       // log.warn("PARSING JSON: $text")
-        val parser = JsonStreamParser(reader)
+        val text = reader.readText()
+        log.warn("PARSING JSON: $text")
+        val parser = JsonStreamParser(StringReader(text))
 
         while (parser.hasNext()) {
           val t = GsonBuilder().create().fromJson(parser.next(), jsonType)
-         // log.warn("PARSED: ${t}")
+          // log.warn("PARSED: ${t}")
           emit(response.copy(t))
         }
       }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IPFSD Demo</string>
+    <string name="app_name">IPFS API Demo</string>
     <string name="action_settings">Settings</string>
     <string name="lbl_prefs_general">General</string>
 

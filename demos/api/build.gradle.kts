@@ -29,12 +29,10 @@ android {
     isAbortOnError = false
   }
 
-
   compileOptions {
     sourceCompatibility = ProjectVersions.JAVA_VERSION
     targetCompatibility = ProjectVersions.JAVA_VERSION
   }
-
 
   androidExtensions {
     isExperimental = true
@@ -55,8 +53,6 @@ android {
   }
 }
 
-
-
 tasks.withType<Test> {
   useJUnit()
 
@@ -68,23 +64,6 @@ tasks.withType<Test> {
     }
   }
 }
-
-/*
-configurations.all {
-  resolutionStrategy.force "com.squareup.okhttp3:okhttp:$okhttp_version"
-}
-
-project.afterEvaluate {
-  android.applicationVariants.all { variant ->
-    task "installRun${variant.name.capitalize()}"(type: Exec, dependsOn: "install${variant.name.capitalize()}", group: "run") {
-      commandLine = ["adb", "shell", "monkey", "-p", variant.applicationId + " 1"]
-      doLast {
-        println "Launching ${variant.applicationId}"
-      }
-    }
-  }
-}
-*/
 
 dependencies {
   implementation(project(":client"))
@@ -106,7 +85,6 @@ dependencies {
   implementation("org.slf4j:slf4j-api:_")
   //implementation(Libs.slf4j)
 
-
   if (Danbroid.useLocalUtils) {
     implementation(project(":menu"))
     implementation(project(":misc"))
@@ -115,7 +93,6 @@ dependencies {
     implementation(Danbroid.misc)
   }
 
-
   implementation(Danbroid.slf4j)
 
   implementation("com.google.zxing:android-core:_")
@@ -123,9 +100,6 @@ dependencies {
   implementation("com.google.zxing:core:_")
 
   implementation(Square.okHttp3.okHttp)
-
-
-//  implementation(project(":menu"))
 
   androidTestImplementation(Testing.junit4)
 

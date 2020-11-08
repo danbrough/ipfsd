@@ -147,6 +147,7 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
     @Suppress("BlockingMethodInNonBlockingContext")
     createRequest(call).execute().also {
       if (!it.isSuccessful) {
+        log.warn("REQUEST FAILED: ${it.code}:${it.message}")
         emit(HttpResponse<T>(it))
       } else emitAll(call.responseProcessor.invoke(HttpResponse(it)))
     }

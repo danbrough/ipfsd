@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accountType="danbroid.ipfsd.demo.demo"
+    android:accountType="danbroid.ipfsd.demo.api"
     android:allowParallelSyncs="false"
-    android:contentAuthority="danbroid.ipfsd.demo.demo.datasync.provider"
+    android:contentAuthority="danbroid.ipfsd.demo.api.datasync.provider"
     android:isAlwaysSyncable="true"
     android:supportsUploading="true"
     android:userVisible="false" />
