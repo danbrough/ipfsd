@@ -79,7 +79,7 @@ tasks.withType<Test> {
 dependencies {
   implementation(project(":api"))
   implementation(project(":client"))
-
+  implementation("com.google.code.gson:gson:_")
   implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(AndroidX.lifecycle.liveDataKtx)
   implementation(AndroidX.coreKtx)

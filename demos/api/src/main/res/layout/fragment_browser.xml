@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<danbroid.ipfsd.apidemo.ui.www.NestedScrollWebView xmlns:android="http://schemas.android.com/apk/res/android"
+<danbroid.ipfsd.demo.api.ui.www.NestedScrollWebView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/webView"
     android:layout_width="match_parent"
@@ -9,11 +9,11 @@
     android:focusableInTouchMode="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-  <!--    <WebView
+    <!--    <WebView
 
-          android:id="@+id/webView"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:background="?colorPrimary" />-->
-</danbroid.ipfsd.apidemo.ui.www.NestedScrollWebView>
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?colorPrimary" />-->
+</danbroid.ipfsd.demo.api.ui.www.NestedScrollWebView>
 
