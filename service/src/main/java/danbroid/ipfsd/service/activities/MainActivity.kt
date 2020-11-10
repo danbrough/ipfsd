@@ -7,12 +7,15 @@ import danbroid.util.menu.MenuActivity
 
 class MainActivity : MenuActivity() {
 
+  val rootContent by lazy {
+    rootContent(this)
+  }
 
   override fun createNavGraph(navController: NavController) =
     navController.createIPFSDNavGraph(this)
 
 
-  override fun getRootMenu(menuID: String) = rootContent(this)
+  override fun getRootMenu() = rootContent
 
 
 }

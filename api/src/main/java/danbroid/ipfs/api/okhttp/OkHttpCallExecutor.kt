@@ -131,7 +131,7 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
     override fun copy(t: T?) = HttpResponse(response, t)
 
     override var value: T
-      get() = t!!
+      get() = if (isSuccessful) t!! else throw IllegalArgumentException("Response not successful: $responseCode:$responseMessage")
       set(value) {
         t = value
       }

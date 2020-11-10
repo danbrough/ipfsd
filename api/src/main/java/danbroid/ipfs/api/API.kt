@@ -143,9 +143,9 @@ object API {
      * <pre>curl -X POST "http://127.0.0.1:5001/api/v0/block/get?arg=<key>"</pre>
      */
 
-    fun get(cid: String, responseProcessor: ResponseProcessor<Any>): ApiCall<Any> =
+    fun get(cid: String, responseProcessor: ResponseProcessor<Any>): ApiCall<Void> =
       ApiCall(
-        "block/get".addUrlArgs("arg" to cid), responseProcessor = responseProcessor
+        "block/get".addUrlArgs("arg" to cid), ResponseProcessors.raw()
       )
 
 
@@ -217,6 +217,24 @@ object API {
 
   object Dag {
     data class CID(@SerializedName("/") val cid: String)
+
+    /**
+     * /api/v0/dag/get
+     * Get a dag node from ipfs.
+     *
+     * @param arg The object to get Required: yes.
+     */
+
+    @JvmStatic
+    fun get(arg: String) = ApiCall("dag/get".addUrlArgs("arg" to arg), ResponseProcessors.raw())
+
+    /*data class DagImportResponse(
+      @SerializedName("Root") val root: Root,
+      @SerializedName("PinErrorMsg") val pinErrorMsg: String?
+    ) {
+      data class Root(@SerializedName("Cid") val cid: CID)
+    }*/
+
 
     data class PutResponse(@SerializedName("Cid") val cid: CID)
 
@@ -308,7 +326,7 @@ object API {
           "arg" to source,
           "arg" to dest
         ),
-        ResponseProcessors.isSuccessful()
+        ResponseProcessors.raw()
       )
 
 
@@ -476,7 +494,7 @@ object API {
         "raw-leaves" to rawLeaves,
         "cid-version" to cidVersion,
         "hash" to hash
-      ), ResponseProcessors.isSuccessful()
+      ), ResponseProcessors.raw()
     )
   }
 
@@ -650,7 +668,7 @@ object API {
 
     @JvmStatic
     fun publish(topic: String, data: String) = ApiCall(
-      "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data), ResponseProcessors.isSuccessful()
+      "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data), ResponseProcessors.raw()
     )
 
   }

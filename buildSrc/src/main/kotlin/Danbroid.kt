@@ -1,6 +1,6 @@
 object Danbroid {
   val useLocalUtils = false
-  const val version = "1.1.3-beta02"
+  const val version = "1.1.3-beta03"
   const val IPFSD_SCHEME = "ipfsd"
   const val bridge_version = "0.7.0_01"
 

@@ -57,9 +57,9 @@ tasks.withType<Test> {
   testLogging {
     events("standardOut", "started", "passed", "skipped", "failed")
     showStandardStreams = true
-    /*  outputs.upToDateWhen {
-        false
-      }*/
+    outputs.upToDateWhen {
+      false
+    }
   }
 }
 

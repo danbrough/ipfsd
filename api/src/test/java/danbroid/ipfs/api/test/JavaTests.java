@@ -13,10 +13,12 @@ public class JavaTests extends CallTest {
     @Test
     public void test1() {
         log.info("running test1()");
+/*
 
         new OkHttpCallExecutor(5001).exec(API.Key.ls(), (result) -> {
             log.warn("received result: {}", result);
         });
+*/
 
 
 

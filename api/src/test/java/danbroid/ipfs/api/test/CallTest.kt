@@ -1,7 +1,9 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.*
+import danbroid.ipfs.api.ApiCall
+import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
 import org.junit.Before
@@ -13,26 +15,32 @@ abstract class CallTest {
     var cid: String? = null
   }
 
-  companion object {
 
-    var executor: CallExecutor? = null
+  protected val executor: CallExecutor
+    get() = _executor!!
+
+  companion object {
+    private var _executor: CallExecutor? = null
 
     @BeforeClass
     @JvmStatic
     fun beforeClass() {
-      executor = OkHttpCallExecutor()
+      _executor = OkHttpCallExecutor()
     }
 
     @AfterClass
     @JvmStatic
     fun afterClass() {
-      executor = null
+      _executor = null
     }
   }
 
-  open fun <T> callTest(call: ApiCall<T>, handler: ResultHandler<T>) = runBlocking {
-    executor!!.exec(call, handler)
-  }
+  open fun <T> callTest(call: ApiCall<T>, handler: suspend (ApiCall.ApiResponse<T>) -> Unit) =
+    runBlocking {
+      call.exec(executor).collect {
+        handler.invoke(it)
+      }
+    }
 
 
   @Before

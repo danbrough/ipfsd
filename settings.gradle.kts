@@ -1,5 +1,6 @@
 import de.fayard.dependencies.bootstrapRefreshVersionsAndDependencies
 
+
 buildscript {
   repositories {
     gradlePluginPortal()
