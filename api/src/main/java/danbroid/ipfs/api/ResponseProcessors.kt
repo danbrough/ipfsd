@@ -5,7 +5,7 @@ import com.google.gson.JsonStreamParser
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import org.slf4j.LoggerFactory
-import java.io.StringReader
+import java.io.Reader
 
 object ResponseProcessors {
 
@@ -16,10 +16,15 @@ object ResponseProcessors {
     flow {
       //  log.warn("parsing json: successful: ${response.isSuccessful}")
       response.getReader().use {
-        val reader = it
-        val text = reader.readText()
-        log.warn("PARSING JSON: $text")
-        val parser = JsonStreamParser(StringReader(text))
+        val reader: Reader
+        if (false) {
+          reader = it
+          val text = reader.readText()
+          log.trace("PARSING JSON: $text")
+        } else {
+          reader = it
+        }
+        val parser = JsonStreamParser(reader)
 
         while (parser.hasNext()) {
           val t = GsonBuilder().create().fromJson(parser.next(), jsonType)
@@ -37,12 +42,6 @@ object ResponseProcessors {
     })
   }
 
-  @JvmStatic
-  fun isSuccessful(): ResponseProcessor<Boolean> = { response ->
-    flowOf(response.also {
-      it.value = response.isSuccessful
-    })
-  }
 
   @JvmStatic
   fun raw(): ResponseProcessor<Void> = {

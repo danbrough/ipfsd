@@ -1,7 +1,6 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.API
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.io.File
@@ -24,7 +23,7 @@ class AddTest : CallTest() {
     log.info("addTest()")
     val msg = "${javaClass.simpleName} addMessage at ${Date()}\n"
     callTest(API.Basic.add(msg, fileName = "test_message.txt")) {
-      SharedData.cid = it.getOrNull()?.hash
+      SharedData.cid = it.value.hash
     }
   }
 

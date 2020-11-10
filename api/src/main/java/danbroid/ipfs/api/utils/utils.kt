@@ -1,6 +1,10 @@
 package danbroid.ipfs.api.utils
 
 
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
+import java.io.StringReader
 import java.net.URLDecoder
 import java.net.URLEncoder
 
@@ -19,3 +23,13 @@ fun String.addUrlArgs(vararg keywords: Pair<String, Any?>): String {
   return url
 }
 
+inline fun <reified T> CharSequence.parseJson() =
+  GsonBuilder().create().fromJson(StringReader(this.toString()), T::class.java)
+
+fun <T> CharSequence.parseJson(type: Class<T>) =
+  GsonBuilder().create().fromJson(StringReader(this.toString()), type)
+
+fun CharSequence.toJson(): JsonElement =
+  JsonParser.parseString(this.toString())
+
+fun Any.toJson(): String = GsonBuilder().create().toJson(this)

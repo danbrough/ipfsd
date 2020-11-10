@@ -1,5 +1,8 @@
 package danbroid.ipfs.api
 
+import com.google.gson.JsonElement
+import danbroid.ipfs.api.utils.parseJson
+import danbroid.ipfs.api.utils.toJson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.io.Closeable
@@ -11,7 +14,6 @@ import java.io.Reader
 /**
  * Receives the result of an API call
  */
-typealias ResultHandler<T> = (suspend (Result<T>) -> Unit)
 
 typealias  ResponseProcessor<T> = (response: ApiCall.ApiResponse<T>) -> Flow<ApiCall.ApiResponse<T>>
 
@@ -30,6 +32,8 @@ open class ApiCall<T>(
     fun getStream(): InputStream
     fun getReader(): Reader
     fun copy(t: T?): ApiResponse<T>
+    fun <T> parseJson(type: Class<T>) = bodyText!!.parseJson(type)
+    fun toJson(): JsonElement = bodyText!!.toJson()
   }
 
 

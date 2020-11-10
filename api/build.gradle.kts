@@ -36,8 +36,9 @@ dependencies {
    exclude(group = "com.android", module = "android")
  }*/
 
-  testImplementation(Testing.junit4)
 
+  testImplementation(Kotlin.Test.junit)
+  testImplementation("org.slf4j:slf4j-api:_")
   testImplementation("ch.qos.logback:logback-core:_")
   testImplementation("ch.qos.logback:logback-classic:_")
 

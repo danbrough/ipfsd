@@ -1,6 +1,5 @@
 package danbroid.ipfs.api
 
-import com.sun.crypto.provider.DHKeyAgreement
 import org.junit.After
 import org.junit.Before
 

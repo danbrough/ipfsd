@@ -1,10 +1,7 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.API
-import danbroid.ipfs.api.ResponseProcessors
 import org.junit.Test
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.util.*
 
 class BlockTest : CallTest() {
@@ -17,11 +14,11 @@ class BlockTest : CallTest() {
 
     callTest(API.Block.put().addData(msg)) {
       log.debug("response: $it")
-      val key = it.getOrThrow().key
 
-      callTest(API.Block.get(key, ResponseProcessors.stringReader())) {
+
+     /* callTest(API.Block.get(key)) {
         log.debug("response: $it")
-      }
+      }*/
     }
   }
 

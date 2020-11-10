@@ -4,7 +4,6 @@ package danbroid.ipfsd.demo.app
 import android.content.Context
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import danbroid.ipfs.api.API
-import danbroid.ipfsd.demo.app.shopping.ShoppingListManager
 import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.util.menu.Icons.iconicsIcon
@@ -36,6 +35,17 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       onClick = {
         requireContext().appRegistry.test()
         false
+      }
+    }
+
+    menu {
+      inlineChildren = true
+      isBrowsable = true
+      menu {
+        title = "Test1"
+      }
+      menu {
+        title = "Test2"
       }
     }
 
