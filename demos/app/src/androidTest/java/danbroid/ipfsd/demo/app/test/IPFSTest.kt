@@ -3,10 +3,11 @@ package danbroid.ipfsd.demo.app.test
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import danbroid.ipfs.api.API
 import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.ServiceApiClient
 import danbroid.ipfsd.client.ipfsClient
+import danbroid.ipfsd.demo.app.appRegistry
+import danbroid.ipfsd.demo.app.shopping.ShoppingList
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
@@ -39,8 +40,8 @@ class IPFSTest {
     log.info("test1()")
     context.ipfsClient.isServiceInstalled()
     runBlocking {
-      API.Dag.put(pin = true).addData("").get(apiClient).also {
-        log.warn("RESULT: $it")
+      context.appRegistry.get(ShoppingList::class.java).forEach {
+        log.warn("SHOPPING LIST: $it")
       }
     }
 

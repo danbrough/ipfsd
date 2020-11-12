@@ -3,6 +3,7 @@ package danbroid.ipfsd.demo.app.shopping
 import danbroid.ipfsd.demo.app.IPFSApp
 
 class ShoppingList : IPFSApp() {
+  var title: String = "Shopping List: $id"
 
 
 }
