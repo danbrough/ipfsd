@@ -19,10 +19,11 @@ const val IPFSD_APP_PREF_PREFIX = "/ipfsd/apps"
 open class IPFSApp {
 
   var id: String = UUID.randomUUID().toString()
-  var hash: String? = null
+  var cid: String? = null
   val type: String = javaClass.name
+  val created: Long = System.currentTimeMillis()
 
-  override fun toString() = "$type<$id:$hash>"
+  override fun toString() = "$type<$id:$cid:$created>"
 
 }
 
@@ -48,7 +49,7 @@ class AppRegistry(val context: Context) {
         if (hash == null) throw IllegalArgumentException("$prefKey not found")
         val app = type.newInstance()
         app.id = id
-        app.hash = hash
+        app.cid = hash
         return@withContext app
       }
       val keyPrefix = "$IPFSD_APP_PREF_PREFIX/${type.name}"
@@ -60,25 +61,36 @@ class AppRegistry(val context: Context) {
       if (cid != null) {
         log.debug("loading $cid")
         return@withContext API.Dag.get(cid).get(executor).parseJson(type).also {
-          it.hash = cid
+          it.cid = cid
         }
       }
 
       save(type.newInstance(), prefs)
     }
 
+  suspend fun <T : IPFSApp> getAll(type: Class<T>): List<T> =
+    withContext(Dispatchers.IO) {
+      getIDs(type).entries.map {
+        API.Dag.get(it.value!!.toString()).get(executor).parseJson(type)
+      }
+    }
 
-  fun <T> getIDs(type: Class<T>, prefs: SharedPreferences = defaultPrefs.prefs): List<String> =
-    prefs.all.filter { it.key.startsWith("$IPFSD_APP_PREF_PREFIX/${type.name}") }
-      .map { it.key }
+
+  fun <T> getIDs(
+    type: Class<T>,
+    prefs: SharedPreferences = defaultPrefs.prefs
+  ): Map<String, Any?> =
+    prefs.all.filter {
+      it.key.startsWith("$IPFSD_APP_PREF_PREFIX/${type.name}")
+    }
 
 
   @Suppress("BlockingMethodInNonBlockingContext")
   suspend fun <T : IPFSApp> save(app: T, prefs: SharedPreferences = defaultPrefs.prefs): T =
     withContext(Dispatchers.IO) {
-      app.hash = API.Dag.put(pin = true).addData(app.toJson()).get(executor).value.cid.cid
+      app.cid = API.Dag.put(pin = true).addData(app.toJson()).get(executor).value.cid.cid
       prefs.edit(commit = true) {
-        putString("$IPFSD_APP_PREF_PREFIX/${app.javaClass.name}/${app.id}", app.hash)
+        putString("$IPFSD_APP_PREF_PREFIX/${app.javaClass.name}/${app.id}", app.cid)
       }
       app
     }

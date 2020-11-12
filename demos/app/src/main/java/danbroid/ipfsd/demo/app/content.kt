@@ -6,6 +6,8 @@ import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
 import danbroid.ipfs.api.API
 import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfsModel
+import danbroid.ipfsd.demo.app.shopping.ShoppingList
+import danbroid.ipfsd.demo.app.shopping.shoppingListManager
 import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
@@ -33,7 +35,7 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
-        requireContext().appRegistry.test()
+        context.shoppingListManager.test()
         false
       }
     }

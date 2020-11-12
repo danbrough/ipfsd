@@ -40,27 +40,28 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
         .setType(MultipartBody.FORM)
         .also { builder ->
           call.parts.forEach { part ->
-            if (part is ApiCall.StringPart) {
-              MultipartBody.Part.createFormData(
-                "file", part.name, part.data.toRequestBody(
-                  MEDIA_TYPE_APPLICATION
-                )
-              ).addHeaders("Abspath" to part.absPath).also {
-                builder.addPart(it)
-              }
+            when (part) {
+              is ApiCall.StringPart ->
+                MultipartBody.Part.createFormData(
+                  "file", part.name, part.data.toRequestBody(
+                    MEDIA_TYPE_APPLICATION
+                  )
+                ).addHeaders("Abspath" to part.absPath).also {
+                  builder.addPart(it)
+                }
+
+              is ApiCall.FilePart -> addFile(builder, part.file)
             }
-            if (part is ApiCall.FilePart) {
-              addFile(builder, part.file)
-            }
+
           }
         }.build()
 
 
   protected fun addFile(builder: MultipartBody.Builder, file: File, rootLength: Int? = null) {
-    log.trace("addFile() $file isDir:${file.isDirectory} isFile:${file.isFile}")
 
     val fileName: String =
       rootLength?.let { file.absolutePath.substring(rootLength).uriEncode() } ?: file.name
+    log.trace("addFile() $file isDir:${file.isDirectory} isFile:${file.isFile} fileName: $fileName")
 
     when {
 

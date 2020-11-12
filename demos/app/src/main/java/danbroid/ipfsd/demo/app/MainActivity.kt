@@ -14,7 +14,6 @@ class MainActivity : MenuActivity() {
 
   override fun getRootMenu() = rootContent
 
-
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(MainActivity::class.java)

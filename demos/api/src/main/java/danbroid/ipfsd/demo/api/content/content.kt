@@ -56,7 +56,9 @@ fun rootContent(context: Context): MenuItemBuilder =
 
     onCreate = {
       //auto connect to the IPFS service
-      requireContext().ipfsClient.connect()
+      withContext(Dispatchers.Main) {
+        requireContext().ipfsClient.connect()
+      }
     }
 
     commands()
