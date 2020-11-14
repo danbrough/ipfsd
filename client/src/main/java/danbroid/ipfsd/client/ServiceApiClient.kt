@@ -1,9 +1,9 @@
 package danbroid.ipfsd.client
 
+import OkHttpCallExecutor
 import android.content.Context
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
-import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
 import kotlinx.coroutines.flow.Flow
@@ -33,13 +33,13 @@ class ServiceApiClient(
     const val DEFAULT_PORT = 5001
     const val DEFAULT_API_URL = "http://localhost:$DEFAULT_PORT/api/v0"
 
-    fun getInstance(context: Context, urlBase: String = DEFAULT_API_URL) =
+    fun getInstance(context: Context, urlBase: String = DEFAULT_API_URL): ServiceApiClient =
       getInstance(Pair(ServiceClient.getInstance(context), OkHttpCallExecutor(urlBase)))
 
-    fun getInstance(ipfsdClient: ServiceClient, executor: CallExecutor) =
+    fun getInstance(ipfsdClient: ServiceClient, executor: CallExecutor): ServiceApiClient =
       getInstance(Pair(ipfsdClient, executor))
 
-    fun getInstance(context: Context, executor: CallExecutor) =
+    fun getInstance(context: Context, executor: CallExecutor): ServiceApiClient =
       getInstance(Pair(ServiceClient.getInstance(context), executor))
   }
 }

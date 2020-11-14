@@ -4,9 +4,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import danbroid.ipfs.api.API;
-import danbroid.ipfs.api.okhttp.OkHttpCallExecutor;
-
 public class JavaTests extends CallTest {
     private static final Logger log = LoggerFactory.getLogger(JavaTests.class);
 

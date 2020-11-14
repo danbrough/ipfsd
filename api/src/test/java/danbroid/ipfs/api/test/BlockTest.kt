@@ -12,7 +12,7 @@ class BlockTest : CallTest() {
 
     val msg = "BlockTest put message at ${Date()}"
 
-    callTest(API.Block.put().addData(msg)) {
+    callTest(API.Block.put().add(msg)) {
       log.debug("response: $it")
 
 
