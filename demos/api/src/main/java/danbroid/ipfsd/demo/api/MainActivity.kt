@@ -6,6 +6,7 @@ import com.google.android.material.snackbar.Snackbar
 import danbroid.ipfsd.demo.api.activities.ActivityInterface
 import danbroid.ipfsd.demo.api.content.rootContent
 import danbroid.util.menu.MenuActivity
+import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.ui.MenuListAdapter
 
 
@@ -14,7 +15,11 @@ class MainActivity : MenuActivity(R.layout.activity_main), ActivityInterface {
 
   override fun createNavGraph(navController: NavController) = navController.createDemoNavGraph(this)
 
-  override fun getRootMenu(menuID: String) = rootContent(this)
+  private val rootContent by lazy {
+    rootContent(this)
+  }
+
+  override fun getRootMenu(): MenuItemBuilder = rootContent
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     // Inflate the menu; this adds items to the action bar if it is present.

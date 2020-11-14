@@ -92,8 +92,8 @@ object API {
       inlineLimit: Int? = null,
       fsCache: Boolean? = null,
       noCopy: Boolean? = null
-    ) =
-      apiCall<FileResponse>(
+    ): ApiCall<FileResponse> =
+      apiCall<FileResponse> (
         "add",
         "wrap-with-directory" to wrapWithDirectory,
         "pin" to pin,
@@ -107,11 +107,11 @@ object API {
         "nocopy" to noCopy
       ).also { call ->
         if (data != null)
-          call.addData(data, fileName)
+          call.add(data, fileName ?: "")
         else if (file != null) {
           if (file.isDirectory && recurseDirectory != true)
             throw IllegalArgumentException("${file.path} is a directory. You must set recurseDirectory = true")
-          call.addFile(file)
+          call.add(file)
         }
       }
 
@@ -143,7 +143,7 @@ object API {
      * <pre>curl -X POST "http://127.0.0.1:5001/api/v0/block/get?arg=<key>"</pre>
      */
 
-    fun get(cid: String, responseProcessor: ResponseProcessor<Any>): ApiCall<Void> =
+    fun get(cid: String): ApiCall<Void> =
       ApiCall(
         "block/get".addUrlArgs("arg" to cid), ResponseProcessors.raw()
       )
@@ -183,7 +183,7 @@ object API {
       "mhlen" to mhLen,
       "pin" to pin
     ).also {
-      if (data != null) it.addData(data, fileName ?: "/dev/stdin")
+      if (data != null) it.add(data, fileName ?: "")
     }
 
   }
@@ -281,7 +281,7 @@ object API {
      */
 
     @JvmStatic
-    fun resolve(path: String) = apiCall<ResolveResponse>("dag/resolve", "arg" to path)
+    fun resolve(path: String): ApiCall<ResolveResponse> = apiCall("dag/resolve", "arg" to path)
 
     data class StatResponse(
       @SerializedName("NumBlocks") val numBlocks: Long,
@@ -300,8 +300,8 @@ object API {
 
     @JvmStatic
     @JvmOverloads
-    fun stat(cid: String, progress: Boolean? = null) =
-      apiCall<StatResponse>("dag/stat", "arg" to cid, "progress" to progress)
+    fun stat(cid: String, progress: Boolean? = null): ApiCall<StatResponse> =
+      apiCall("dag/stat", "arg" to cid, "progress" to progress)
 
   }
 
@@ -527,8 +527,13 @@ object API {
 
     @JvmOverloads
     @JvmStatic
-    fun gen(name: String, type: String? = null, size: Int? = null, ipnsBase: String? = null) =
-      apiCall<GenResponse>(
+    fun gen(
+      name: String,
+      type: String? = null,
+      size: Int? = null,
+      ipnsBase: String? = null
+    ): ApiCall<GenResponse> =
+      apiCall(
         "key/gen".addUrlArgs(
           "arg" to name,
           "type" to type,
@@ -555,8 +560,8 @@ object API {
      */
     @JvmStatic
     @JvmOverloads
-    fun ls(ipnsBase: String? = null, extraInfo: Boolean? = null) =
-      apiCall<LsResponse>("key/list", "ipns-base" to ipnsBase, "l" to extraInfo)
+    fun ls(ipnsBase: String? = null, extraInfo: Boolean? = null): ApiCall<LsResponse> =
+      apiCall("key/list", "ipns-base" to ipnsBase, "l" to extraInfo)
 
   }
 

@@ -1,8 +1,5 @@
-package danbroid.ipfs.api.okhttp
-
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
-import danbroid.ipfs.api.utils.uriEncode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -10,9 +7,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
+import okio.BufferedSink
+import okio.source
 import java.io.InputStream
 import java.io.Reader
 import java.util.concurrent.TimeUnit
@@ -39,57 +36,39 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
       MultipartBody.Builder()
         .setType(MultipartBody.FORM)
         .also { builder ->
-          call.parts.forEach { part ->
-            when (part) {
-              is ApiCall.StringPart ->
-                MultipartBody.Part.createFormData(
-                  "file", part.name, part.data.toRequestBody(
-                    MEDIA_TYPE_APPLICATION
-                  )
-                ).addHeaders("Abspath" to part.absPath).also {
-                  builder.addPart(it)
-                }
-
-              is ApiCall.FilePart -> addFile(builder, part.file)
-            }
-
+          call.parts.forEach {
+            builder.addPart(it)
           }
         }.build()
 
 
-  protected fun addFile(builder: MultipartBody.Builder, file: File, rootLength: Int? = null) {
-
-    val fileName: String =
-      rootLength?.let { file.absolutePath.substring(rootLength).uriEncode() } ?: file.name
-    log.trace("addFile() $file isDir:${file.isDirectory} isFile:${file.isFile} fileName: $fileName")
-
-    when {
-
-      file.isFile -> {
-        MultipartBody.Part.createFormData(
-          "file", fileName, file.asRequestBody(MEDIA_TYPE_APPLICATION)
-        ).addHeaders("Abspath" to file.absolutePath).also {
-          builder.addPart(it)
-        }
-      }
-
-      file.isDirectory -> {
-        val rootDirLength = rootLength ?: file.parentFile.absolutePath.let {
-          if (it == "/") 0 else it.length + 1
-        }
-
-        MultipartBody.Part.createFormData(
-          "file", fileName, "".toRequestBody(MEDIA_TYPE_DIRECTORY)
-        ).also {
-          builder.addPart(it)
-        }
-
-        file.listFiles()?.forEach {
-          addFile(builder, it, rootDirLength)
-        }
+  private fun MultipartBody.Builder.addPart(part: ApiCall.Part): MultipartBody.Builder {
+    addPart(part.toOkHttpPart())
+    if (part.isDirectory) {
+      part.getChildren().forEach {
+        addPart(it)
       }
     }
+    return this
   }
+
+  private fun ApiCall.Part.toOkHttpPart(): MultipartBody.Part =
+    MultipartBody.Part.createFormData("file", name, toRequestBody()).let {
+      if (!isDirectory) {
+        it.addHeaders("Abspath" to absPath!!)
+      } else it
+    }
+
+
+  private fun ApiCall.Part.toRequestBody(): RequestBody =
+    if (isDirectory) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else
+      object : RequestBody() {
+        override fun contentLength() = length()
+        override fun contentType() = MEDIA_TYPE_APPLICATION
+        override fun writeTo(sink: BufferedSink) {
+          read().source().use { source -> sink.writeAll(source) }
+        }
+      }
 
 
   protected fun MultipartBody.Part.addHeaders(vararg headers: Pair<String, String>): MultipartBody.Part =

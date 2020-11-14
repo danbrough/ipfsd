@@ -2,8 +2,12 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.API
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Test
 import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 
 class AddTest : CallTest() {
@@ -31,7 +35,21 @@ class AddTest : CallTest() {
   @Test
   fun addDirectory() {
     log.info("addDirectory()")
-    val testDir = Files.createDirectories(Files.createTempDirectory("addTest").resolve("a"))
+
+    val testPath =
+      Paths.get(System.getProperty("java.io.tmpdir")).resolve("ipfsd_test").resolve("a")
+
+    fun deleteDir(path: Path) {
+      if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+        Files.newDirectoryStream(path).forEach {
+          deleteDir(it)
+        }
+      }
+      Files.deleteIfExists(path)
+    }
+
+    deleteDir(testPath)
+    val testDir = Files.createDirectories(testPath)
 
     val msg1 = "message.txt in directory a\n"
     val msg2 = "message.txt in directory a/b\n"
@@ -42,14 +60,16 @@ class AddTest : CallTest() {
       msg2.toByteArray()
     )
 
+    val actual_cid = "QmZ5GtGGqYdcFm3GA5dWfiWjuvdBnQJtkSTVsNeRuFRQoL"
     var cid: String? = null
-    callTest(
-      API.Basic.add(file = testDir.toFile(), recurseDirectory = true)
-    ) {
+    callTest(API.Basic.add(file = testDir.toFile(), recurseDirectory = true)) {
+      log.debug("result: $it")
       cid = it.value.hash
-      log.debug("result: ${it.value}")
     }
-    log.warn("DIRECTORY: $cid")
+
+    Assert.assertEquals("Invalid CID", actual_cid, cid)
+
+
   }
 }
 
