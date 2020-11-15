@@ -3,6 +3,7 @@ package danbroid.ipfs.api.test
 import OkHttpCallExecutor
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfs.api.PartContainer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -35,7 +36,7 @@ abstract class CallTest {
     }
   }
 
-  open fun <T> callTest(call: ApiCall<T>, handler: suspend (ApiCall.ApiResponse<T>) -> Unit) =
+  open fun <T> callTest(call: PartContainer<T>, handler: suspend (ApiCall.ApiResponse<T>) -> Unit) =
     runBlocking {
       call.exec(executor).collect {
         handler.invoke(it)

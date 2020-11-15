@@ -93,7 +93,7 @@ object API {
       fsCache: Boolean? = null,
       noCopy: Boolean? = null
     ): ApiCall<FileResponse> =
-      apiCall<FileResponse> (
+      apiCall<FileResponse>(
         "add",
         "wrap-with-directory" to wrapWithDirectory,
         "pin" to pin,
@@ -107,7 +107,7 @@ object API {
         "nocopy" to noCopy
       ).also { call ->
         if (data != null)
-          call.add(data, fileName ?: "")
+          call.addData(data.toByteArray(), fileName ?: "")
         else if (file != null) {
           if (file.isDirectory && recurseDirectory != true)
             throw IllegalArgumentException("${file.path} is a directory. You must set recurseDirectory = true")
@@ -183,7 +183,7 @@ object API {
       "mhlen" to mhLen,
       "pin" to pin
     ).also {
-      if (data != null) it.add(data, fileName ?: "")
+      if (data != null) it.addData(data.toByteArray(), fileName ?: "")
     }
 
   }

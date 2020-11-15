@@ -1,5 +1,5 @@
-import danbroid.ipfs.api.ApiCall
-import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfs.api.*
+import danbroid.ipfs.api.utils.uriEncode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -29,39 +29,34 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
 
   private val httpClient = okHttpClientNoTimeout
 
-  protected fun createRequestBody(call: ApiCall<*>): RequestBody =
-    if (call.parts.isEmpty())
-      "".toRequestBody()
+  protected fun createRequestBody(call: ApiCall<*>): RequestBody {
+    val parts = call.iterator()
+    return if (!parts.hasNext()) "".toRequestBody()
     else
       MultipartBody.Builder()
         .setType(MultipartBody.FORM)
         .also { builder ->
-          call.parts.forEach {
+          parts.forEach {
             builder.addPart(it)
           }
         }.build()
-
-
-  private fun MultipartBody.Builder.addPart(part: ApiCall.Part): MultipartBody.Builder {
-    addPart(part.toOkHttpPart())
-    if (part.isDirectory) {
-      part.getChildren().forEach {
-        addPart(it)
-      }
-    }
-    return this
   }
 
-  private fun ApiCall.Part.toOkHttpPart(): MultipartBody.Part =
-    MultipartBody.Part.createFormData("file", name, toRequestBody()).let {
-      if (!isDirectory) {
-        it.addHeaders("Abspath" to absPath!!)
-      } else it
-    }
 
+  private fun MultipartBody.Builder.addPart(part: Part): MultipartBody.Builder = apply {
+    addPart(part.toOkHttpPart())
+    if (part is DirectoryPart<*>)
+      part.forEach {
+        addPart(it)
+      }
+  }
 
-  private fun ApiCall.Part.toRequestBody(): RequestBody =
-    if (isDirectory) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else
+  private fun Part.toOkHttpPart(): MultipartBody.Part =
+    MultipartBody.Part.createFormData("file", name.uriEncode(), toRequestBody())
+
+  private fun Part.toRequestBody(): RequestBody =
+    if (this is DirectoryPart<*>) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else let {
+      this as DataPart
       object : RequestBody() {
         override fun contentLength() = length()
         override fun contentType() = MEDIA_TYPE_APPLICATION
@@ -69,6 +64,7 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
           read().source().use { source -> sink.writeAll(source) }
         }
       }
+    }
 
 
   protected fun MultipartBody.Part.addHeaders(vararg headers: Pair<String, String>): MultipartBody.Part =

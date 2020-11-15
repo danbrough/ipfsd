@@ -11,7 +11,7 @@ class DagTest : CallTest() {
   fun test() {
     log.info("test()")
     runBlocking {
-      API.Dag.put().add("\"Hello World\"").get(executor).value
+      API.Dag.put().addData("\"Hello World\"".toByteArray()).get(executor).value
     }
 
   }
