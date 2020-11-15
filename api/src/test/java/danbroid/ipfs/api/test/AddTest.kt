@@ -31,13 +31,17 @@ class AddTest : CallTest() {
     }
   }
 
+  val msg1 = "message.txt in directory a\n"
+  val msg2 = "message.txt in directory a/b\n"
+  val test_dir_cid = "QmZ5GtGGqYdcFm3GA5dWfiWjuvdBnQJtkSTVsNeRuFRQoL"
+
+  val testPath =
+    Paths.get(System.getProperty("java.io.tmpdir")).resolve("ipfsd_test").resolve("a")
 
   @Test
   fun addDirectory() {
     log.info("addDirectory()")
 
-    val testPath =
-      Paths.get(System.getProperty("java.io.tmpdir")).resolve("ipfsd_test").resolve("a")
 
     fun deleteDir(path: Path) {
       if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
@@ -51,8 +55,6 @@ class AddTest : CallTest() {
     deleteDir(testPath)
     val testDir = Files.createDirectories(testPath)
 
-    val msg1 = "message.txt in directory a\n"
-    val msg2 = "message.txt in directory a/b\n"
     Files.write(testDir.resolve("message.txt"), msg1.toByteArray())
 
     Files.write(
@@ -60,17 +62,27 @@ class AddTest : CallTest() {
       msg2.toByteArray()
     )
 
-    val actual_cid = "QmZ5GtGGqYdcFm3GA5dWfiWjuvdBnQJtkSTVsNeRuFRQoL"
     var cid: String? = null
-    callTest(API.Basic.add(file = testDir.toFile(), recurseDirectory = true)) {
+    callTest(API.Basic.add(file = testDir.toFile(), recurseDirectory = true, onlyHash = true)) {
       log.debug("result: $it")
       cid = it.value.hash
     }
 
-    Assert.assertEquals("Invalid CID", actual_cid, cid)
+    Assert.assertEquals("Invalid CID", test_dir_cid, cid)
+  }
 
-
+  @Test
+  fun addDirectory2() {
+    callTest(
+      API.Basic.add(onlyHash = true).addDirectory("a").apply {
+        addData(msg1.toByteArray(), "message.txt")
+        addDirectory("b").addData(msg2.toByteArray(), "message.txt")
+      }
+    ) {
+      log.error("RESULT: $it")
+    }
   }
 }
+
 
 private val log = org.slf4j.LoggerFactory.getLogger(AddTest::class.java)
