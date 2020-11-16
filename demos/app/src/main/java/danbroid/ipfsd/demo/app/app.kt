@@ -18,20 +18,25 @@ const val IPFSD_APP_PREF_PREFIX = "/ipfsd/apps"
 
 open class IPFSApp {
 
-  var id: String = UUID.randomUUID().toString()
-  var cid: String? = null
-  val type: String = javaClass.name
-  val created: Long = System.currentTimeMillis()
+  @Dag
+  data class AppDescription(
+    @Transient
+    val clazz: Class<*>,
+    val type: String = clazz.name,
+    var id: String = UUID.randomUUID().toString(),
+    var cid: String? = null,
+    val created: Long = System.currentTimeMillis()
+  )
 
-  override fun toString() = "$type<$id:$cid:$created>"
+  val description = AppDescription(javaClass)
 
+  override fun toString() = description.toString()
 }
 
 
 class AppRegistry(val context: Context) {
 
   companion object : SingletonHolder<AppRegistry, Context>(::AppRegistry)
-
 
   private val apiClient = ServiceApiClient.getInstance(context)
   private val executor: CallExecutor = apiClient
@@ -48,8 +53,8 @@ class AppRegistry(val context: Context) {
         val hash = prefs.getString(prefKey, null)
         if (hash == null) throw IllegalArgumentException("$prefKey not found")
         val app = type.newInstance()
-        app.id = id
-        app.cid = hash
+        app.description.id = id
+        app.description.cid = hash
         return@withContext app
       }
       val keyPrefix = "$IPFSD_APP_PREF_PREFIX/${type.name}"
@@ -61,7 +66,7 @@ class AppRegistry(val context: Context) {
       if (cid != null) {
         log.debug("loading $cid")
         return@withContext API.Dag.get(cid).get(executor).parseJson(type).also {
-          it.cid = cid
+          it.description.cid = cid
         }
       }
 
@@ -88,9 +93,13 @@ class AppRegistry(val context: Context) {
   @Suppress("BlockingMethodInNonBlockingContext")
   suspend fun <T : IPFSApp> save(app: T, prefs: SharedPreferences = defaultPrefs.prefs): T =
     withContext(Dispatchers.IO) {
-      app.cid = API.Dag.put(pin = true).addData(app.toJson()).get(executor).value.cid.cid
+      app.description.cid =
+        API.Dag.put(pin = true).addData(app.toJson().toByteArray()).get(executor).value.cid.cid
       prefs.edit(commit = true) {
-        putString("$IPFSD_APP_PREF_PREFIX/${app.javaClass.name}/${app.id}", app.cid)
+        putString(
+          "$IPFSD_APP_PREF_PREFIX/${app.javaClass.name}/${app.description.id}",
+          app.description.cid
+        )
       }
       app
     }
