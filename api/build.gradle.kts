@@ -2,6 +2,7 @@ plugins {
   `java-library`
   `maven-publish`
   kotlin("jvm")
+  kotlin("plugin.serialization")
   id("org.jetbrains.dokka")
 }
 
@@ -50,6 +51,9 @@ dependencies {
   implementation("com.google.code.gson:gson:_")
   implementation(Square.okHttp3.okHttp)
 
+  //implementation(KotlinX.serialization.runtimeCommon)
+
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:_")
 
 }
 
