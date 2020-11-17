@@ -7,6 +7,12 @@ import com.google.gson.TypeAdapterFactory
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
+import danbroid.ipfs.api.API
+import danbroid.ipfs.api.ApiCall
+import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfs.api.parseDAG
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.jvm.javaField
@@ -17,6 +23,7 @@ annotation class Dag
 
 
 object DagSupport
+
 private val log = org.slf4j.LoggerFactory.getLogger(DagSupport::class.java)
 
 var cid = 1
@@ -50,6 +57,7 @@ fun createGson(): GsonBuilder {
       }
     })
 }
+
 
 
 fun walkDag2(o: Any, cids: MutableMap<Any, String> = mutableMapOf(), dag: Boolean = false) {

@@ -5,6 +5,7 @@ import danbroid.ipfs.api.utils.parseJson
 import danbroid.ipfs.api.utils.toJson
 import kotlinx.coroutines.flow.Flow
 import java.io.Closeable
+import java.io.IOException
 import java.io.InputStream
 import java.io.Reader
 
@@ -32,7 +33,10 @@ open class ApiCall<T>(
     fun copy(t: T?): ApiResponse<T>
     fun <T> parseJson(type: Class<T>) = bodyText!!.parseJson(type)
     fun toJson(): JsonElement = bodyText!!.toJson()
+    fun valueOrThrow(): T =
+      if (isSuccessful) value else throw IOException("Failure: $responseCode:$responseMessage")
   }
+
 
   constructor(path: String, type: Class<T>) : this(path, ResponseProcessors.jsonParser(type))
 
