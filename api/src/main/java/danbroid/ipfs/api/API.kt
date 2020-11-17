@@ -7,12 +7,15 @@ import danbroid.ipfs.api.utils.addUrlArgs
 import okio.ByteString.Companion.decodeBase64
 import java.io.File
 
+private inline fun <reified T> apiCall(path: String, vararg args: Pair<String, Any?>) =
+  ApiCall(path.addUrlArgs(*args), T::class.java)
+
+
 /**
  * API for calls to an IPFS node
  */
-object API {
-  private inline fun <reified T> apiCall(path: String, vararg args: Pair<String, Any?>) =
-    ApiCall(path.addUrlArgs(*args), T::class.java)
+class API {
+
 
   object Basic {
     data class Object(
