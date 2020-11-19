@@ -8,9 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import danbroid.ipfs.api.API
 import danbroid.ipfs.api.CallExecutor
-import danbroid.ipfsd.client.ServiceApiClient
 import danbroid.ipfsd.client.IPFSMessage
+import danbroid.ipfsd.client.ServiceApiClient
 
 
 class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
@@ -22,6 +23,7 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   private val serviceClient = apiClient.serviceClient
 
   val callExecutor: CallExecutor = apiClient
+  val api = API(callExecutor)
 
   suspend fun sendMessage(msg: IPFSMessage) {
     serviceClient.sendMessage(msg)
@@ -49,6 +51,12 @@ val Activity.ipfsModel: IPFSClientModel
     this as ComponentActivity,
     IPFSClientModel.Companion.ModelFactory(this)
   ).get(IPFSClientModel::class.java)
+
+val Activity.ipfs: API
+  get() = ipfsModel.api
+
+val Fragment.ipfs: API
+  get() = ipfsModel.api
 
 
 private val log = org.slf4j.LoggerFactory.getLogger(IPFSClientModel::class.java)

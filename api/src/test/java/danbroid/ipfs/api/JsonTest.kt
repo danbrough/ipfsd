@@ -1,5 +1,5 @@
 package danbroid.ipfs.api
-
+/*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -102,3 +102,4 @@ class JsonTest {
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(JsonTest::class.java)
+*/

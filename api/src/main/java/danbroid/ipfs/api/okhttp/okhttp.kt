@@ -16,7 +16,7 @@ import java.io.Reader
 import java.util.concurrent.TimeUnit
 
 open class OkHttpCallExecutor(val urlBase: String) :
-    CallExecutor {
+  CallExecutor {
 
   constructor() : this("http://localhost:5001/api/v0")
 
@@ -39,12 +39,12 @@ open class OkHttpCallExecutor(val urlBase: String) :
     return if (!parts.hasNext()) "".toRequestBody()
     else
       MultipartBody.Builder()
-          .setType(MultipartBody.FORM)
-          .also { builder ->
-            parts.forEach {
-              builder.addPart(it)
-            }
-          }.build()
+        .setType(MultipartBody.FORM)
+        .also { builder ->
+          parts.forEach {
+            builder.addPart(it)
+          }
+        }.build()
   }
 
 
@@ -57,38 +57,38 @@ open class OkHttpCallExecutor(val urlBase: String) :
   }
 
   private fun Part.toOkHttpPart(): MultipartBody.Part =
-      MultipartBody.Part.createFormData("file", name.uriEncode(), toRequestBody())
+    MultipartBody.Part.createFormData("file", name.uriEncode(), toRequestBody())
 
   private fun Part.toRequestBody(): RequestBody =
-      if (this is DirectoryPart<*>) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else let {
-        this as DataPart
-        object : RequestBody() {
-          override fun contentLength() = length()
-          override fun contentType() = MEDIA_TYPE_APPLICATION
-          override fun writeTo(sink: BufferedSink) {
-            read().source().use { source -> sink.writeAll(source) }
-          }
+    if (this is DirectoryPart<*>) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else let {
+      this as DataPart
+      object : RequestBody() {
+        override fun contentLength() = length()
+        override fun contentType() = MEDIA_TYPE_APPLICATION
+        override fun writeTo(sink: BufferedSink) {
+          read().source().use { source -> sink.writeAll(source) }
         }
       }
+    }
 
 
   protected fun MultipartBody.Part.addHeaders(vararg headers: Pair<String, String>): MultipartBody.Part =
-      this.headers!!.newBuilder().apply {
-        headers.forEach {
-          add(it.first, it.second)
-        }
-      }.build().let {
-        MultipartBody.Part.Companion.create(it, body)
+    this.headers!!.newBuilder().apply {
+      headers.forEach {
+        add(it.first, it.second)
       }
+    }.build().let {
+      MultipartBody.Part.Companion.create(it, body)
+    }
 
 
   protected fun createRequest(call: ApiCall<*>): Call =
-      Request.Builder()
-          .url("${urlBase}/${call.path}")
-          .post(createRequestBody(call))
-          .build().let {
-            httpClient.newCall(it)
-          }
+    Request.Builder()
+      .url("${urlBase}/${call.path}")
+      .post(createRequestBody(call))
+      .build().let {
+        httpClient.newCall(it)
+      }
 
 
   class HttpResponse<T>(val response: Response) : ApiCall.ApiResponse<T> {
@@ -137,3 +137,5 @@ open class OkHttpCallExecutor(val urlBase: String) :
 
 }
 
+//No idea why we need to do this for java. Compiler bug perhaps
+class JavaOkCallExecutor : OkHttpCallExecutor()

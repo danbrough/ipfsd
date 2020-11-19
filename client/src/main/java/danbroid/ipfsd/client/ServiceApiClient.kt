@@ -6,6 +6,8 @@ import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -14,6 +16,8 @@ class ServiceApiClient(
   val serviceClient: ServiceClient,
   private val executor: CallExecutor,
 ) : CallExecutor {
+
+  override val coroutineScope = CoroutineScope(Dispatchers.IO)
 
   init {
     if (!serviceClient.isServiceInstalled()) {

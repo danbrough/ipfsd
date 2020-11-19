@@ -7,7 +7,7 @@ import org.junit.Test
 class RepoTest : CallTest() {
 
   @Test
-  fun stat() = callTest(API.Repo.stat(human = true)) {
+  fun stat() = callTest(ipfs.repo.stat(human = true)) {
     log.debug("RESULT: $it")
   }
 

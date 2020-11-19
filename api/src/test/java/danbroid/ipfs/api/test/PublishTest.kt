@@ -14,7 +14,7 @@ class PublishTest : CallTest() {
       return
     }
 
-    callTest(API.Name.publish(cid, key = "test")) {
+    callTest(ipfs.name.publish(cid, key = "test")) {
       log.warn("published $it")
     }
   }

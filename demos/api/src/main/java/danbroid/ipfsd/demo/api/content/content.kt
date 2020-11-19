@@ -32,6 +32,9 @@ val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
 val Fragment.executor: CallExecutor
   get() = ipfsModel.callExecutor
 
+val Fragment.api: API
+  get() = ipfsModel.api
+
 open class MenuTheme {
   companion object {
 
@@ -89,7 +92,7 @@ fun rootContent(context: Context): MenuItemBuilder =
       menu {
         title = "List kitty"
         onClick = {
-          log.debug("kitty: ${API.Basic.ls(dir_kitty).get(executor)}")
+          log.debug("kitty: ${api.basic.ls(dir_kitty).get()}")
           false
         }
       }
@@ -97,7 +100,7 @@ fun rootContent(context: Context): MenuItemBuilder =
       menu {
         title = "List kitty.danbrough.org"
         onClick = {
-          log.debug("kitty: ${API.Basic.ls("/ipns/kitty.danbrough.org").get(executor)}")
+          log.debug("kitty: ${api.basic.ls("/ipns/kitty.danbrough.org").get()}")
           false
         }
       }
@@ -146,7 +149,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Get ID"
     onClick = {
-      apiTest(API.Network.id(), "id")
+      apiTest(api.network.id(), "id")
       false
     }
   }
@@ -156,7 +159,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Profile Apply"
     onClick = {
-      apiTest(API.Config.Profile.apply("lowpower"))
+      apiTest(api.config.profile.apply("lowpower"))
       false
     }
   }
@@ -168,7 +171,7 @@ fun MenuItemBuilder.commands() = menu {
     onClick = {
       val msg = "Hello from the ipfs demo at ${Date()}.\n"
       log.trace("adding message: $msg")
-      apiTest(API.Basic.add(msg, fileName = "ipfs_test_message.txt"), "added")
+      apiTest(api.basic.add(msg, fileName = "ipfs_test_message.txt"), "added")
       false
     }
   }
@@ -177,7 +180,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Bandwidth"
     onClick = {
-      apiTest(API.Stats.bw(), "bandwidth")
+      apiTest(api.stats.bw(), "bandwidth")
       false
     }
   }
@@ -194,7 +197,7 @@ inline suspend fun <T> Fragment.apiTest(
   call: ApiCall<T>,
   prompt: String = "result"
 ): ApiCall.ApiResponse<T> {
-  val response = call.get(executor)
+  val response = call.get()
   if (response.isSuccessful)
     debug("$prompt: ${response.value}")
   else

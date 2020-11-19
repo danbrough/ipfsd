@@ -20,17 +20,12 @@ import java.io.Reader
 typealias  ResponseProcessor<T> = (response: ApiCall.ApiResponse<T>) -> Flow<ApiCall.ApiResponse<T>>
 
 
-inline fun <reified T> apiCall(
-    executor: CallExecutor,
-    path: String,
-    vararg args: Pair<String, Any?>,
-) =
-    ApiCall(executor, path.addUrlArgs(*args), T::class.java)
+
 
 open class ApiCall<T>(
-    val executor: CallExecutor,
-    val path: String,
-    val responseProcessor: ResponseProcessor<T>,
+  val executor: CallExecutor,
+  val path: String,
+  val responseProcessor: ResponseProcessor<T>,
 ) : PartContainer<T>(null) {
 
   companion object {
@@ -49,14 +44,18 @@ open class ApiCall<T>(
     fun <T> parseJson(type: Class<T>) = bodyText!!.parseJson(type)
     fun toJson(): JsonElement = bodyText!!.toJson()
     fun valueOrThrow(): T =
-        if (isSuccessful) value else throw IOException("Failure: $responseCode:$responseMessage")
+      if (isSuccessful) value else throw IOException("Failure: $responseCode:$responseMessage")
   }
 
-  constructor(executor: CallExecutor, path: String, type: Class<T>) : this(executor, path, ResponseProcessors.jsonParser(type))
+  constructor(executor: CallExecutor, path: String, type: Class<T>) : this(
+    executor,
+    path,
+    ResponseProcessors.jsonParser(type)
+  )
 
   override fun toString() = "ApiCall<$path:${hashCode()}>"
 
-  suspend fun get(): ApiResponse<T>  = flow().first()
+  suspend fun get(): ApiResponse<T> = flow().first()
   fun flow() = executor.exec(this)
 
   interface JavaResultCallback<T> {

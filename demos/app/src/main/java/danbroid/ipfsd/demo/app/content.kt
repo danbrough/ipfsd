@@ -3,16 +3,16 @@ package danbroid.ipfsd.demo.app
 
 import android.content.Context
 import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import danbroid.ipfs.api.API
 import danbroid.ipfsd.client.ipfsClient
+import danbroid.ipfsd.client.model.ipfs
 import danbroid.ipfsd.client.model.ipfsModel
-import danbroid.ipfsd.demo.app.shopping.ShoppingList
 import danbroid.ipfsd.demo.app.shopping.shoppingListManager
 import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
 import org.slf4j.LoggerFactory
+
 
 fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
 
@@ -63,7 +63,7 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       title = "Get ID"
       icon = iconicsIcon(FontAwesome.Icon.faw_accessible_icon)
       onClick = {
-        API.Network.id().get(ipfsModel.callExecutor).also {
+        ipfs.network.id().get(ipfsModel.callExecutor).also {
           log.warn("ID: $it")
         }
         false

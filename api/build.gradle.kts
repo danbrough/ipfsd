@@ -2,7 +2,7 @@ plugins {
   `java-library`
   `maven-publish`
   kotlin("jvm")
-  kotlin("plugin.serialization")
+ // kotlin("plugin.serialization")
   id("org.jetbrains.dokka")
 }
 

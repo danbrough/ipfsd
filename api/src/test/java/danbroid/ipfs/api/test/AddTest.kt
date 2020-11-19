@@ -1,6 +1,5 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.API
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
@@ -16,8 +15,8 @@ class AddTest : CallTest() {
   fun idTest() {
     log.debug("test1()")
     runBlocking {
-      callTest(API.Network.id()) {
-        log.info("id: $it")
+      ipfs {
+        log.info("ID: ${network.id()}")
       }
     }
   }
@@ -26,8 +25,10 @@ class AddTest : CallTest() {
   fun addMessage() {
     log.info("addTest()")
     val msg = "${javaClass.simpleName} addMessage at ${Date()}\n"
-    callTest(API.Basic.add(msg, fileName = "test_message.txt")) {
-      SharedData.cid = it.value.hash
+    runBlocking {
+      ipfs {
+        SharedData.cid = basic.add(msg, fileName = "test_message.txt").get().valueOrThrow().hash
+      }
     }
   }
 
@@ -41,7 +42,6 @@ class AddTest : CallTest() {
   @Test
   fun addDirectory() {
     log.info("addDirectory()")
-
 
     fun deleteDir(path: Path) {
       if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
@@ -63,9 +63,11 @@ class AddTest : CallTest() {
     )
 
     var cid: String? = null
-    callTest(API.Basic.add(file = testDir.toFile(), recurseDirectory = true, onlyHash = true)) {
-      log.debug("result: $it")
-      cid = it.value.hash
+    runBlocking {
+      ipfs {
+        cid = basic.add(file = testDir.toFile(), recurseDirectory = true, onlyHash = true).get()
+          .valueOrThrow().hash
+      }
     }
 
     Assert.assertEquals("Invalid CID", test_dir_cid, cid)
@@ -73,13 +75,17 @@ class AddTest : CallTest() {
 
   @Test
   fun addDirectory2() {
-    callTest(
-      API.Basic.add(onlyHash = true).addDirectory("a").apply {
-        addData(msg1.toByteArray(), "message.txt")
-        addDirectory("b").addData(msg2.toByteArray(), "message.txt")
+    runBlocking {
+      ipfs {
+        basic.add(onlyHash = true).apply {
+          addDirectory("a").apply {
+            addData(msg1.toByteArray(), "message.txt")
+            addDirectory("b").addData(msg2.toByteArray(), "message.txt")
+          }
+        }.get().also {
+          log.info("RESULT: $it")
+        }
       }
-    ) {
-      log.error("RESULT: $it")
     }
   }
 }

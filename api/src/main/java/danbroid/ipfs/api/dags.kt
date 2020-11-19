@@ -12,7 +12,7 @@ fun <T> parseDAG(reader: Reader, type: Class<T>): T {
 
 @Suppress("UNCHECKED_CAST")
 suspend inline fun <reified T> CallExecutor.dag(cid: String): ApiCall.ApiResponse<T> {
-  return API.Dag.get(cid).exec(this).map {
+  return API(this).dag.get(cid).exec(this).map {
     if (it.isSuccessful) (it as ApiCall.ApiResponse<T>).value =
       parseDAG(it.getReader(), T::class.java)
     it as ApiCall.ApiResponse<T>

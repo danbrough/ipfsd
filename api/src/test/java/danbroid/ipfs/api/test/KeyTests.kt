@@ -1,14 +1,14 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.API
-import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 class KeyTests : CallTest() {
 
   @Test
-  fun listKeys() = callTest(API.Key.ls()) {
-    log.debug("RESULT: $it")
+  fun listKeys() {
+    callTest(ipfs.key.ls()) {
+      log.debug("RESULT: $it")
+    }
   }
 
 }
