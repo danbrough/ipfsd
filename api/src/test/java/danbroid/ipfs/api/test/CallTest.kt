@@ -1,8 +1,8 @@
 package danbroid.ipfs.api.test
 
 import OkHttpCallExecutor
+import danbroid.ipfs.api.API
 import danbroid.ipfs.api.ApiCall
-import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfs.api.PartContainer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
@@ -17,30 +17,31 @@ abstract class CallTest {
   }
 
 
-  protected val executor: CallExecutor
-    get() = _executor!!
+  protected val ipfs: API
+    get() = _ipfs!!
 
   companion object {
-    private var _executor: CallExecutor? = null
+    private var _ipfs: API? = null
 
     @BeforeClass
     @JvmStatic
     fun beforeClass() {
-      _executor = OkHttpCallExecutor()
+      _ipfs = API(OkHttpCallExecutor())
     }
 
     @AfterClass
     @JvmStatic
     fun afterClass() {
-      _executor = null
+      _ipfs = null
     }
   }
 
   open fun <T> callTest(call: PartContainer<T>, handler: suspend (ApiCall.ApiResponse<T>) -> Unit) =
     runBlocking {
-      call.exec(executor).collect {
-        handler.invoke(it)
+      ipfs {
+        executor.exec(call as ApiCall<T>).collect(handler)
       }
+
     }
 
 

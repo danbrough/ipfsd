@@ -40,6 +40,8 @@ class AppRegistry(val context: Context) {
 
   private val apiClient = ServiceApiClient.getInstance(context)
   private val executor: CallExecutor = apiClient
+  private val ipfs = API(executor)
+
   private val defaultPrefs: Prefs
     get() = context.appPrefs
 
@@ -65,7 +67,7 @@ class AppRegistry(val context: Context) {
 
       if (cid != null) {
         log.debug("loading $cid")
-        return@withContext API.Dag.get(cid).get(executor).parseJson(type).also {
+        return@withContext ipfs.dag.get(cid).get().parseJson(type).also {
           it.description.cid = cid
         }
       }
@@ -76,7 +78,7 @@ class AppRegistry(val context: Context) {
   suspend fun <T : IPFSApp> getAll(type: Class<T>): List<T> =
     withContext(Dispatchers.IO) {
       getIDs(type).entries.map {
-        API.Dag.get(it.value!!.toString()).get(executor).parseJson(type)
+        ipfs.dag.get(it.value!!.toString()).get().parseJson(type)
       }
     }
 
@@ -94,7 +96,7 @@ class AppRegistry(val context: Context) {
   suspend fun <T : IPFSApp> save(app: T, prefs: SharedPreferences = defaultPrefs.prefs): T =
     withContext(Dispatchers.IO) {
       app.description.cid =
-        API.Dag.put(pin = true).addData(app.toJson().toByteArray()).get(executor).value.cid.cid
+        ipfs.dag.put(pin = true).apply { addData(app.toJson().toByteArray()) }.get().value.cid.cid
       prefs.edit(commit = true) {
         putString(
           "$IPFSD_APP_PREF_PREFIX/${app.javaClass.name}/${app.description.id}",

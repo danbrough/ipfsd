@@ -6,7 +6,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-open class IPFSAPI(val executor: CallExecutor) {
+open class IPFSAPI(val executor: CallExecutor = OkHttpCallExecutor()) {
 
   class Basic(private val executor: CallExecutor) {
     fun version() = apiCall<API.Basic.VersionResponse>(executor, "version")

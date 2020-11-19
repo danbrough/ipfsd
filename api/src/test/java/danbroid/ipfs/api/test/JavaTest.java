@@ -1,11 +1,13 @@
-package danbroid.ipfs.api;
+package danbroid.ipfs.api.test;
 
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import danbroid.ipfs.api.okhttp.OkHttpCallExecutor;
+import danbroid.ipfs.api.API;
+import danbroid.ipfs.api.IPFSAPI;
+
 
 public class JavaTest {
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JavaTest.class);
@@ -14,7 +16,7 @@ public class JavaTest {
   @Before
   public void onSetup() {
     log.warn("onSetup()");
-    ipfs = new IPFSAPI(new OkHttpCallExecutor());
+    ipfs = new IPFSAPI();
   }
 
   @After

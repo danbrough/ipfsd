@@ -1,6 +1,5 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.API
 import org.junit.Test
 import java.util.*
 
@@ -12,13 +11,13 @@ class BlockTest : CallTest() {
 
     val msg = "BlockTest put message at ${Date()}"
 
-    callTest(API.Block.put(data = msg)) {
+    callTest(ipfs.block.put(data = msg)) {
       log.debug("response: $it")
 
 
-     /* callTest(API.Block.get(key)) {
-        log.debug("response: $it")
-      }*/
+      /* callTest(API.Block.get(key)) {
+         log.debug("response: $it")
+       }*/
     }
   }
 

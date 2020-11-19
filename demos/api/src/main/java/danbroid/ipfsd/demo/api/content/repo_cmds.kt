@@ -1,6 +1,5 @@
 package danbroid.ipfsd.demo.api.content
 
-import danbroid.ipfs.api.API
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 
@@ -11,7 +10,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Garbage Collect"
     onClick = {
-      apiTest(API.Repo.gc())
+      apiTest(api.repo.gc())
       false
     }
   }
@@ -19,7 +18,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Stat"
     onClick = {
-      apiTest(API.Repo.stat(human = true))
+      apiTest(api.repo.stat(human = true))
       false
     }
   }
@@ -27,7 +26,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Version"
     onClick = {
-      apiTest(API.Repo.version(quiet = false))
+      apiTest(api.repo.version(quiet = false))
       false
     }
   }
@@ -35,7 +34,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Verify"
     onClick = {
-      apiTest(API.Repo.verify())
+      apiTest(api.repo.verify())
       false
     }
   }
