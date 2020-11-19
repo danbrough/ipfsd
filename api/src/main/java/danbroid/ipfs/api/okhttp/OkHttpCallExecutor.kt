@@ -1,5 +1,6 @@
 import danbroid.ipfs.api.*
 import danbroid.ipfs.api.utils.uriEncode
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -14,8 +15,12 @@ import java.io.InputStream
 import java.io.Reader
 import java.util.concurrent.TimeUnit
 
-open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "http://localhost:5001/api/v0") :
-  CallExecutor {
+open class OkHttpCallExecutor(val urlBase: String) :
+    CallExecutor {
+
+  constructor() : this("http://localhost:5001/api/v0")
+
+  override val coroutineScope = CoroutineScope(Dispatchers.IO)
 
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpCallExecutor::class.java)
@@ -34,12 +39,12 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
     return if (!parts.hasNext()) "".toRequestBody()
     else
       MultipartBody.Builder()
-        .setType(MultipartBody.FORM)
-        .also { builder ->
-          parts.forEach {
-            builder.addPart(it)
-          }
-        }.build()
+          .setType(MultipartBody.FORM)
+          .also { builder ->
+            parts.forEach {
+              builder.addPart(it)
+            }
+          }.build()
   }
 
 
@@ -52,41 +57,41 @@ open class OkHttpCallExecutor @JvmOverloads constructor(val urlBase: String = "h
   }
 
   private fun Part.toOkHttpPart(): MultipartBody.Part =
-    MultipartBody.Part.createFormData("file", name.uriEncode(), toRequestBody())
+      MultipartBody.Part.createFormData("file", name.uriEncode(), toRequestBody())
 
   private fun Part.toRequestBody(): RequestBody =
-    if (this is DirectoryPart<*>) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else let {
-      this as DataPart
-      object : RequestBody() {
-        override fun contentLength() = length()
-        override fun contentType() = MEDIA_TYPE_APPLICATION
-        override fun writeTo(sink: BufferedSink) {
-          read().source().use { source -> sink.writeAll(source) }
+      if (this is DirectoryPart<*>) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else let {
+        this as DataPart
+        object : RequestBody() {
+          override fun contentLength() = length()
+          override fun contentType() = MEDIA_TYPE_APPLICATION
+          override fun writeTo(sink: BufferedSink) {
+            read().source().use { source -> sink.writeAll(source) }
+          }
         }
       }
-    }
 
 
   protected fun MultipartBody.Part.addHeaders(vararg headers: Pair<String, String>): MultipartBody.Part =
-    this.headers!!.newBuilder().apply {
-      headers.forEach {
-        add(it.first, it.second)
+      this.headers!!.newBuilder().apply {
+        headers.forEach {
+          add(it.first, it.second)
+        }
+      }.build().let {
+        MultipartBody.Part.Companion.create(it, body)
       }
-    }.build().let {
-      MultipartBody.Part.Companion.create(it, body)
-    }
 
 
   protected fun createRequest(call: ApiCall<*>): Call =
-    Request.Builder()
-      .url("${urlBase}/${call.path}")
-      .post(createRequestBody(call))
-      .build().let {
-        httpClient.newCall(it)
-      }
+      Request.Builder()
+          .url("${urlBase}/${call.path}")
+          .post(createRequestBody(call))
+          .build().let {
+            httpClient.newCall(it)
+          }
 
 
-  internal class HttpResponse<T>(val response: Response) : ApiCall.ApiResponse<T> {
+  class HttpResponse<T>(val response: Response) : ApiCall.ApiResponse<T> {
     override val isSuccessful = response.isSuccessful
     override val responseCode = response.code
     override val responseMessage = response.message

@@ -4,11 +4,24 @@ import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import danbroid.ipfs.api.utils.Base58
 import danbroid.ipfs.api.utils.addUrlArgs
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import okio.ByteString.Companion.decodeBase64
 import java.io.File
 
-private inline fun <reified T> apiCall(path: String, vararg args: Pair<String, Any?>) =
-  ApiCall(path.addUrlArgs(*args), T::class.java)
+
+interface ResultHandler<T> {
+  fun onResult(result: Result<T>)
+}
+
+interface CallExecutor {
+
+  val coroutineScope: CoroutineScope
+
+  fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>>
+
+
+}
 
 
 /**
@@ -19,23 +32,23 @@ class API {
 
   object Basic {
     data class Object(
-      @SerializedName("Hash")
-      val hash: String,
-      @SerializedName("Links")
-      val links: Array<Link>
+        @SerializedName("Hash")
+        val hash: String,
+        @SerializedName("Links")
+        val links: Array<Link>,
     ) {
 
       data class Link(
-        @SerializedName("Hash")
-        val hash: String,
-        @SerializedName("Name")
-        val name: String,
-        @SerializedName("Size")
-        val size: Long,
-        @SerializedName("Target")
-        val target: String,
-        @SerializedName("Type")
-        val type: Int
+          @SerializedName("Hash")
+          val hash: String,
+          @SerializedName("Name")
+          val name: String,
+          @SerializedName("Size")
+          val size: Long,
+          @SerializedName("Target")
+          val target: String,
+          @SerializedName("Type")
+          val type: Int,
       ) {
         val isDirectory = type == 1
         val isFile = type == 2
@@ -43,25 +56,25 @@ class API {
     }
 
     data class LsResponse(
-      @SerializedName("Objects")
-      val objects: Array<Object>
+        @SerializedName("Objects")
+        val objects: Array<Object>,
     )
 
 
     @JvmOverloads
     @JvmStatic
     fun ls(path: String, stream: Boolean = false) =
-      apiCall<LsResponse>("ls", "arg" to path, "stream" to stream)
+        apiCall<LsResponse>("ls", "arg" to path, "stream" to stream)
 
     data class FileResponse(
-      @SerializedName("Bytes")
-      val bytes: Long,
-      @SerializedName("Hash")
-      val hash: String,
-      @SerializedName("Name")
-      val name: String,
-      @SerializedName("Size")
-      val size: Long
+        @SerializedName("Bytes")
+        val bytes: Long,
+        @SerializedName("Hash")
+        val hash: String,
+        @SerializedName("Name")
+        val name: String,
+        @SerializedName("Size")
+        val size: Long,
     )
 
     /**
@@ -81,55 +94,55 @@ class API {
     @JvmOverloads
     @JvmStatic
     fun add(
-      data: String? = null,
-      file: File? = null,
-      recurseDirectory: Boolean? = null,
-      fileName: String? = null,
-      wrapWithDirectory: Boolean? = null,
-      chunker: String? = null,
-      pin: Boolean = true,
-      onlyHash: Boolean? = null,
-      trickle: Boolean? = null,
-      rawLeaves: Boolean? = null,
-      inline: Boolean? = null,
-      inlineLimit: Int? = null,
-      fsCache: Boolean? = null,
-      noCopy: Boolean? = null
+        data: String? = null,
+        file: File? = null,
+        recurseDirectory: Boolean? = null,
+        fileName: String? = null,
+        wrapWithDirectory: Boolean? = null,
+        chunker: String? = null,
+        pin: Boolean = true,
+        onlyHash: Boolean? = null,
+        trickle: Boolean? = null,
+        rawLeaves: Boolean? = null,
+        inline: Boolean? = null,
+        inlineLimit: Int? = null,
+        fsCache: Boolean? = null,
+        noCopy: Boolean? = null,
     ): ApiCall<FileResponse> =
-      apiCall<FileResponse>(
-        "add",
-        "wrap-with-directory" to wrapWithDirectory,
-        "pin" to pin,
-        "only-hash" to onlyHash,
-        "chunker" to chunker,
-        "trickle" to trickle,
-        "raw-leaves" to rawLeaves,
-        "inline" to inline,
-        "inline-limit" to inlineLimit,
-        "fscache" to fsCache,
-        "nocopy" to noCopy
-      ).also { call ->
-        if (data != null)
-          call.addData(data.toByteArray(), fileName ?: "")
-        else if (file != null) {
-          if (file.isDirectory && recurseDirectory != true)
-            throw IllegalArgumentException("${file.path} is a directory. You must set recurseDirectory = true")
-          call.add(file)
+        apiCall<FileResponse>(
+            "add",
+            "wrap-with-directory" to wrapWithDirectory,
+            "pin" to pin,
+            "only-hash" to onlyHash,
+            "chunker" to chunker,
+            "trickle" to trickle,
+            "raw-leaves" to rawLeaves,
+            "inline" to inline,
+            "inline-limit" to inlineLimit,
+            "fscache" to fsCache,
+            "nocopy" to noCopy
+        ).also { call ->
+          if (data != null)
+            call.addData(data.toByteArray(), fileName ?: "")
+          else if (file != null) {
+            if (file.isDirectory && recurseDirectory != true)
+              throw IllegalArgumentException("${file.path} is a directory. You must set recurseDirectory = true")
+            call.add(file)
+          }
         }
-      }
 
 
     data class VersionResponse(
-      @SerializedName("Commit")
-      val commit: String,
-      @SerializedName("Golang")
-      val goLang: String,
-      @SerializedName("Repo")
-      val repo: String,
-      @SerializedName("Version")
-      val version: String,
-      @SerializedName("System")
-      val system: String
+        @SerializedName("Commit")
+        val commit: String,
+        @SerializedName("Golang")
+        val goLang: String,
+        @SerializedName("Repo")
+        val repo: String,
+        @SerializedName("Version")
+        val version: String,
+        @SerializedName("System")
+        val system: String,
     )
 
     @JvmStatic
@@ -147,14 +160,14 @@ class API {
      */
 
     fun get(cid: String): ApiCall<Void> =
-      ApiCall(
-        "block/get".addUrlArgs("arg" to cid), ResponseProcessors.raw()
-      )
+        ApiCall(
+            "block/get".addUrlArgs("arg" to cid), ResponseProcessors.raw()
+        )
 
 
     data class PutResponse(
-      @SerializedName("Key") val key: String,
-      @SerializedName("Size") val size: Int
+        @SerializedName("Key") val key: String,
+        @SerializedName("Size") val size: Int,
     )
 
     /**
@@ -173,18 +186,18 @@ class API {
 
     @JvmOverloads
     fun put(
-      data: String? = null,
-      fileName: String? = null,
-      format: String? = null,
-      mhType: String? = null,
-      mhLen: Int? = null,
-      pin: Boolean? = null
+        data: String? = null,
+        fileName: String? = null,
+        format: String? = null,
+        mhType: String? = null,
+        mhLen: Int? = null,
+        pin: Boolean? = null,
     ) = apiCall<PutResponse>(
-      "block/put",
-      "format" to format,
-      "mhtype" to mhType,
-      "mhlen" to mhLen,
-      "pin" to pin
+        "block/put",
+        "format" to format,
+        "mhtype" to mhType,
+        "mhlen" to mhLen,
+        "pin" to pin
     ).also {
       if (data != null) it.addData(data.toByteArray(), fileName ?: "")
     }
@@ -196,10 +209,10 @@ class API {
     object Profile {
 
       data class ApplyResponse(
-        @SerializedName("NewCfg")
-        val newConfig: JsonObject,
-        @SerializedName("OldCfg")
-        val oldConfig: JsonObject
+          @SerializedName("NewCfg")
+          val newConfig: JsonObject,
+          @SerializedName("OldCfg")
+          val oldConfig: JsonObject,
       )
 
       /**
@@ -209,9 +222,9 @@ class API {
       @JvmOverloads
       @JvmStatic
       fun apply(profile: String, dryRun: Boolean? = null) = apiCall<ApplyResponse>(
-        "config/profile/apply",
-        "arg" to profile,
-        "dry-run" to dryRun
+          "config/profile/apply",
+          "arg" to profile,
+          "dry-run" to dryRun
       )
 
     }
@@ -256,21 +269,21 @@ class API {
 
     @JvmStatic
     fun put(
-      format: String? = null,
-      inputEnc: String? = null,
-      pin: Boolean? = null,
-      hashFunc: String? = null
+        format: String? = null,
+        inputEnc: String? = null,
+        pin: Boolean? = null,
+        hashFunc: String? = null,
     ) = apiCall<PutResponse>(
-      "dag/put",
-      "format" to format,
-      "input-enc" to inputEnc,
-      "pin" to pin,
-      "hash" to hashFunc
+        "dag/put",
+        "format" to format,
+        "input-enc" to inputEnc,
+        "pin" to pin,
+        "hash" to hashFunc
     )
 
     data class ResolveResponse(
-      @SerializedName("Cid") val cid: CID,
-      @SerializedName("RemPath") val remPath: String
+        @SerializedName("Cid") val cid: CID,
+        @SerializedName("RemPath") val remPath: String,
     )
 
     /**
@@ -287,8 +300,8 @@ class API {
     fun resolve(path: String): ApiCall<ResolveResponse> = apiCall("dag/resolve", "arg" to path)
 
     data class StatResponse(
-      @SerializedName("NumBlocks") val numBlocks: Long,
-      @SerializedName("Size") val size: Long
+        @SerializedName("NumBlocks") val numBlocks: Long,
+        @SerializedName("Size") val size: Long,
     )
 
     /**
@@ -304,7 +317,7 @@ class API {
     @JvmStatic
     @JvmOverloads
     fun stat(cid: String, progress: Boolean? = null): ApiCall<StatResponse> =
-      apiCall("dag/stat", "arg" to cid, "progress" to progress)
+        apiCall("dag/stat", "arg" to cid, "progress" to progress)
 
   }
 
@@ -324,24 +337,24 @@ class API {
 
     @JvmStatic
     fun cp(source: String, dest: String) =
-      ApiCall(
-        "files/cp".addUrlArgs(
-          "arg" to source,
-          "arg" to dest
-        ),
-        ResponseProcessors.raw()
-      )
+        ApiCall(
+            "files/cp".addUrlArgs(
+                "arg" to source,
+                "arg" to dest
+            ),
+            ResponseProcessors.raw()
+        )
 
 
     data class LsResponse(
-      @SerializedName("Entries")
-      val entries: Array<Entry>
+        @SerializedName("Entries")
+        val entries: Array<Entry>,
     ) {
       data class Entry(
-        @SerializedName("Hash") val hash: String,
-        @SerializedName("Name") val name: String,
-        @SerializedName("Size") val size: Long,
-        @SerializedName("Type") val type: Int
+          @SerializedName("Hash") val hash: String,
+          @SerializedName("Name") val name: String,
+          @SerializedName("Size") val size: Long,
+          @SerializedName("Type") val type: Int,
       )
 
       override fun equals(other: Any?): Boolean {
@@ -374,7 +387,7 @@ class API {
     @JvmStatic
     @JvmOverloads
     fun ls(path: String, longListing: Boolean = true, directoryOrder: Boolean = true) =
-      apiCall<LsResponse>("files/ls", "arg" to path, "long" to longListing, "U" to directoryOrder)
+        apiCall<LsResponse>("files/ls", "arg" to path, "long" to longListing, "U" to directoryOrder)
 
 
     /**
@@ -395,29 +408,29 @@ class API {
     @JvmStatic
     @JvmOverloads
     fun read(
-      path: String? = null,
-      offset: Long? = null,
-      count: Long? = null
+        path: String? = null,
+        offset: Long? = null,
+        count: Long? = null,
     ): ApiCall<Void> =
-      ApiCall(
-        "files/read".addUrlArgs(
-          "arg" to path,
-          "offset" to offset,
-          "count" to count
-        ),
-        ResponseProcessors.raw()
-      )
+        ApiCall(
+            "files/read".addUrlArgs(
+                "arg" to path,
+                "offset" to offset,
+                "count" to count
+            ),
+            ResponseProcessors.raw()
+        )
 
 
     data class StatResponse(
-      @SerializedName("Blocks") val blocks: Int,
-      @SerializedName("CumulativeSize") val cumulativeSize: Long,
-      @SerializedName("Hash") val hash: String,
-      @SerializedName("Local") val local: Boolean,
-      @SerializedName("Size") val size: Long,
-      @SerializedName("SizeLocal") val sizeLocal: Long,
-      @SerializedName("Type") val type: String,
-      @SerializedName("WithLocaltity") val withLocality: Boolean
+        @SerializedName("Blocks") val blocks: Int,
+        @SerializedName("CumulativeSize") val cumulativeSize: Long,
+        @SerializedName("Hash") val hash: String,
+        @SerializedName("Local") val local: Boolean,
+        @SerializedName("Size") val size: Long,
+        @SerializedName("SizeLocal") val sizeLocal: Long,
+        @SerializedName("Type") val type: String,
+        @SerializedName("WithLocaltity") val withLocality: Boolean,
     )
 
     /**
@@ -437,18 +450,18 @@ class API {
     @JvmStatic
     @JvmOverloads
     fun stat(
-      path: String,
-      format: String? = null,
-      hash: Boolean? = null,
-      size: Boolean? = null,
-      withLocal: Boolean? = null
+        path: String,
+        format: String? = null,
+        hash: Boolean? = null,
+        size: Boolean? = null,
+        withLocal: Boolean? = null,
     ): ApiCall<StatResponse> = apiCall(
-      "files/stat",
-      "arg" to path,
-      "format" to format,
-      "hash" to hash,
-      "size" to size,
-      "with-local" to withLocal
+        "files/stat",
+        "arg" to path,
+        "format" to format,
+        "hash" to hash,
+        "size" to size,
+        "with-local" to withLocal
     )
 
     /**
@@ -477,27 +490,27 @@ class API {
     @JvmOverloads
     @JvmStatic
     fun write(
-      path: String,
-      offset: Long? = null,
-      create: Boolean? = null,
-      parents: Boolean? = null,
-      truncate: Boolean? = null,
-      count: Long? = null,
-      rawLeaves: Boolean? = null,
-      cidVersion: String? = null,
-      hash: String? = null
+        path: String,
+        offset: Long? = null,
+        create: Boolean? = null,
+        parents: Boolean? = null,
+        truncate: Boolean? = null,
+        count: Long? = null,
+        rawLeaves: Boolean? = null,
+        cidVersion: String? = null,
+        hash: String? = null,
     ) = ApiCall(
-      "files/write".addUrlArgs(
-        "arg" to path,
-        "offset" to offset,
-        "create" to create,
-        "parents" to parents,
-        "truncate" to truncate,
-        "count" to count,
-        "raw-leaves" to rawLeaves,
-        "cid-version" to cidVersion,
-        "hash" to hash
-      ), ResponseProcessors.raw()
+        "files/write".addUrlArgs(
+            "arg" to path,
+            "offset" to offset,
+            "create" to create,
+            "parents" to parents,
+            "truncate" to truncate,
+            "count" to count,
+            "raw-leaves" to rawLeaves,
+            "cid-version" to cidVersion,
+            "hash" to hash
+        ), ResponseProcessors.raw()
     )
   }
 
@@ -505,8 +518,8 @@ class API {
   object Key {
 
     data class GenResponse(
-      @SerializedName("Id") val id: String,
-      @SerializedName("Name") val name: String
+        @SerializedName("Id") val id: String,
+        @SerializedName("Name") val name: String,
     )
 
     /**
@@ -531,26 +544,26 @@ class API {
     @JvmOverloads
     @JvmStatic
     fun gen(
-      name: String,
-      type: String? = null,
-      size: Int? = null,
-      ipnsBase: String? = null
+        name: String,
+        type: String? = null,
+        size: Int? = null,
+        ipnsBase: String? = null,
     ): ApiCall<GenResponse> =
-      apiCall(
-        "key/gen".addUrlArgs(
-          "arg" to name,
-          "type" to type,
-          "size" to size,
-          "ipns-base" to ipnsBase
+        apiCall(
+            "key/gen".addUrlArgs(
+                "arg" to name,
+                "type" to type,
+                "size" to size,
+                "ipns-base" to ipnsBase
+            )
         )
-      )
 
 
     data class Key(
-      @SerializedName("Name")
-      val name: String,
-      @SerializedName("Id")
-      val id: String
+        @SerializedName("Name")
+        val name: String,
+        @SerializedName("Id")
+        val id: String,
     )
 
     data class LsResponse(@SerializedName("Keys") val keys: Array<Key>)
@@ -564,17 +577,17 @@ class API {
     @JvmStatic
     @JvmOverloads
     fun ls(ipnsBase: String? = null, extraInfo: Boolean? = null): ApiCall<LsResponse> =
-      apiCall("key/list", "ipns-base" to ipnsBase, "l" to extraInfo)
+        apiCall("key/list", "ipns-base" to ipnsBase, "l" to extraInfo)
 
   }
 
   object Name {
 
     data class PublishResponse(
-      @SerializedName("Name")
-      val name: String,
-      @SerializedName("Value")
-      val value: String
+        @SerializedName("Name")
+        val name: String,
+        @SerializedName("Value")
+        val value: String,
     )
 
     /**
@@ -593,16 +606,16 @@ class API {
     @JvmOverloads
     @JvmStatic
     fun publish(
-      path: String,
-      resolve: Boolean = true,
-      lifetime: String? = null,
-      key: String? = null
+        path: String,
+        resolve: Boolean = true,
+        lifetime: String? = null,
+        key: String? = null,
     ) = apiCall<PublishResponse>(
-      "name/publish",
-      "arg" to path,
-      "resolve" to resolve,
-      "lifetime" to lifetime,
-      "key" to key
+        "name/publish",
+        "arg" to path,
+        "resolve" to resolve,
+        "lifetime" to lifetime,
+        "key" to key
     )
 
   }
@@ -611,18 +624,18 @@ class API {
   object Network {
 
     data class ID(
-      @SerializedName("ID")
-      val id: String,
-      @SerializedName("AgentVersion")
-      val agentVersion: String,
-      @SerializedName("ProtocolVersion")
-      val protocolVersion: String,
-      @SerializedName("PublicKey")
-      val publicKey: String,
-      @SerializedName("Protocols")
-      val protocols: Array<String>,
-      @SerializedName("Addresses")
-      val addresses: Array<String>,
+        @SerializedName("ID")
+        val id: String,
+        @SerializedName("AgentVersion")
+        val agentVersion: String,
+        @SerializedName("ProtocolVersion")
+        val protocolVersion: String,
+        @SerializedName("PublicKey")
+        val publicKey: String,
+        @SerializedName("Protocols")
+        val protocols: Array<String>,
+        @SerializedName("Addresses")
+        val addresses: Array<String>,
     )
 
     /**
@@ -641,8 +654,8 @@ class API {
     @JvmStatic
     @JvmOverloads
     fun id(peerID: String? = null, peerIDBase: String? = null) = apiCall<ID>(
-      "id",
-      "arg" to peerID, "peerid-base" to peerIDBase
+        "id",
+        "arg" to peerID, "peerid-base" to peerIDBase
     )
 
   }
@@ -651,10 +664,10 @@ class API {
   object PubSub {
 
     data class Message(
-      val from: String,
-      val data: String,
-      val seqno: String,
-      val topicIDs: Array<String>
+        val from: String,
+        val data: String,
+        val seqno: String,
+        val topicIDs: Array<String>,
     ) {
       val sequenceID: Long
         get() = seqno.decodeBase64()!!.asByteBuffer().long
@@ -671,12 +684,12 @@ class API {
     @JvmOverloads
     @JvmStatic
     fun subscribe(topic: String, discover: Boolean? = true) = apiCall<Message>(
-      "pubsub/sub", "arg" to topic, "discover" to discover
+        "pubsub/sub", "arg" to topic, "discover" to discover
     )
 
     @JvmStatic
     fun publish(topic: String, data: String) = ApiCall(
-      "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data), ResponseProcessors.raw()
+        "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data), ResponseProcessors.raw()
     )
 
   }
@@ -684,12 +697,12 @@ class API {
   object Repo {
 
     data class GcResponse(
-      @SerializedName("Key")
-      val key: GcError
+        @SerializedName("Key")
+        val key: GcError,
     ) {
       data class GcError(
-        @SerializedName("/")
-        val cid: String
+          @SerializedName("/")
+          val cid: String,
       )
     }
 
@@ -700,20 +713,20 @@ class API {
      */
     @JvmOverloads
     fun gc(streamErrors: Boolean? = null, quiet: Boolean? = null) =
-      apiCall<GcResponse>("repo/gc", "stream-errors" to streamErrors, "quiet" to quiet)
+        apiCall<GcResponse>("repo/gc", "stream-errors" to streamErrors, "quiet" to quiet)
 
 
     data class StatResponse(
-      @SerializedName("NumObjects")
-      val numObjects: Long,
-      @SerializedName("RepoPath")
-      val repoPath: String,
-      @SerializedName("Version")
-      val version: String,
-      @SerializedName("RepoSize")
-      val repoSize: Long,
-      @SerializedName("StorageMax")
-      val storageMax: Long
+        @SerializedName("NumObjects")
+        val numObjects: Long,
+        @SerializedName("RepoPath")
+        val repoPath: String,
+        @SerializedName("Version")
+        val version: String,
+        @SerializedName("RepoSize")
+        val repoSize: Long,
+        @SerializedName("StorageMax")
+        val storageMax: Long,
     )
 
     /**
@@ -723,15 +736,15 @@ class API {
      */
     @JvmOverloads
     fun stat(sizeOnly: Boolean? = null, human: Boolean? = null) = apiCall<StatResponse>(
-      "repo/stat",
-      "size-only" to sizeOnly, "human" to human
+        "repo/stat",
+        "size-only" to sizeOnly, "human" to human
     )
 
     data class VerifyResponse(
-      @SerializedName("Msg")
-      val msg: String,
-      @SerializedName("Progress")
-      val progress: Int
+        @SerializedName("Msg")
+        val msg: String,
+        @SerializedName("Progress")
+        val progress: Int,
     )
 
     /**
@@ -748,7 +761,7 @@ class API {
      **/
 
     fun version(quiet: Boolean? = null) = apiCall<VersionResponse>(
-      "repo/version", "quiet" to quiet
+        "repo/version", "quiet" to quiet
     )
   }
 
@@ -756,14 +769,14 @@ class API {
   object Stats {
 
     data class BandwidthResponse(
-      @SerializedName("TotalIn")
-      val totalIn: Long,
-      @SerializedName("TotalOut")
-      val totalOut: Long,
-      @SerializedName("RateIn")
-      val rateIn: Double,
-      @SerializedName("RateOut")
-      val rateOut: Double
+        @SerializedName("TotalIn")
+        val totalIn: Long,
+        @SerializedName("TotalOut")
+        val totalOut: Long,
+        @SerializedName("RateIn")
+        val rateIn: Double,
+        @SerializedName("RateOut")
+        val rateOut: Double,
     )
 
     @JvmStatic
