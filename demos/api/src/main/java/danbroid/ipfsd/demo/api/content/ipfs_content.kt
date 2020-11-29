@@ -17,7 +17,7 @@ fun MenuItemBuilder.ipfsDir(
 
     onClick = {
       children?.clear()
-      api.basic.ls(path).get(ipfsModel.callExecutor).value.objects.forEach { obj ->
+      api.basic.ls(path).get().value.objects.forEach { obj ->
         obj.links.forEach { link ->
           menu {
             id = "ipfsd://ipfs/${link.hash}"

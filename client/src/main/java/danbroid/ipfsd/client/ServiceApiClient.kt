@@ -1,9 +1,9 @@
 package danbroid.ipfsd.client
 
-import OkHttpCallExecutor
 import android.content.Context
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
 import kotlinx.coroutines.CoroutineScope

@@ -27,10 +27,9 @@ const val URI_CONTENT_ROOT = "ipfsdemo://content"
 const val DIR_XCCD = "/ipfs/QmdmQXB2mzChmMeKY47C43LxUdg1NDJ5MWcKMKxDu7RgQm"
 const val dir_kitty = "/ipfs/QmaknW7EzautwWKE1q4rpR4tPnP1XuxMKGr8KiyRZKqC5T"
 
-val log = LoggerFactory.getLogger("danbroid.ipfsd.demo.content")
+private object Content
 
-val Fragment.executor: CallExecutor
-  get() = ipfsModel.callExecutor
+val log = LoggerFactory.getLogger(Content::class.java)
 
 val Fragment.api: API
   get() = ipfsModel.api
@@ -184,8 +183,6 @@ fun MenuItemBuilder.commands() = menu {
       false
     }
   }
-
-
 
 
   pubSubCommands()

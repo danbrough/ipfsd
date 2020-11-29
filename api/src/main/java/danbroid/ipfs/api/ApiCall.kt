@@ -1,7 +1,6 @@
 package danbroid.ipfs.api
 
 import com.google.gson.JsonElement
-import danbroid.ipfs.api.utils.addUrlArgs
 import danbroid.ipfs.api.utils.parseJson
 import danbroid.ipfs.api.utils.toJson
 import kotlinx.coroutines.flow.*
@@ -18,8 +17,6 @@ import java.io.Reader
  */
 
 typealias  ResponseProcessor<T> = (response: ApiCall.ApiResponse<T>) -> Flow<ApiCall.ApiResponse<T>>
-
-
 
 
 open class ApiCall<T>(
@@ -54,9 +51,10 @@ open class ApiCall<T>(
   )
 
   override fun toString() = "ApiCall<$path:${hashCode()}>"
+  fun flow() = executor.exec(this)
 
   suspend fun get(): ApiResponse<T> = flow().first()
-  fun flow() = executor.exec(this)
+  suspend fun collect(collector: suspend (ApiResponse<T>) -> Unit) = flow().collect(collector)
 
   interface JavaResultCallback<T> {
     fun onStart() = Unit

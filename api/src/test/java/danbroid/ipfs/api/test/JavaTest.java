@@ -6,17 +6,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import danbroid.ipfs.api.API;
-import danbroid.ipfs.api.IPFSAPI;
 
 
 public class JavaTest {
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JavaTest.class);
-  IPFSAPI ipfs;
+  API ipfs;
 
   @Before
   public void onSetup() {
     log.warn("onSetup()");
-    ipfs = new IPFSAPI();
+    ipfs = new API();
   }
 
   @After

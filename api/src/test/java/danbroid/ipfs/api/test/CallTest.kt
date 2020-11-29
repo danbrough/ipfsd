@@ -1,6 +1,5 @@
 package danbroid.ipfs.api.test
 
-import OkHttpCallExecutor
 import danbroid.ipfs.api.API
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.PartContainer
@@ -26,7 +25,7 @@ abstract class CallTest {
     @BeforeClass
     @JvmStatic
     fun beforeClass() {
-      _ipfs = API(OkHttpCallExecutor())
+      _ipfs = API()
     }
 
     @AfterClass
