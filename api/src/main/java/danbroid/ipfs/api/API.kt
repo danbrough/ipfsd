@@ -2,13 +2,11 @@ package danbroid.ipfs.api
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
+import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfs.api.utils.Base58
 import danbroid.ipfs.api.utils.addUrlArgs
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import okio.ByteString.Companion.decodeBase64
 import java.io.File
 
@@ -29,19 +27,23 @@ inline fun <reified T> apiCall(
   vararg args: Pair<String, Any?>,
 ) = ApiCall(executor, path.addUrlArgs(*args), T::class.java)
 
+
 /**
  * API for calls to an IPFS node
  */
-class API(val executor: CallExecutor) {
+open class API(val executor: CallExecutor) {
+  constructor() : this(OkHttpCallExecutor())
+
   protected val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-  operator suspend fun invoke(block: suspend API.() -> Unit): Job {
-    return coroutineScope.launch {
+  operator suspend fun invoke(block: suspend API.() -> Unit): Job = coroutineScope.launch {
+    launch {
       block.invoke(this@API)
     }
   }
 
-  class Basic(val executor: CallExecutor) {
+
+  class Basic(val api: API) {
     data class Object(
       @SerializedName("Hash")
       val hash: String,
@@ -74,7 +76,7 @@ class API(val executor: CallExecutor) {
 
     @JvmOverloads
     fun ls(path: String, stream: Boolean = false) =
-      apiCall<LsResponse>(executor, "ls", "arg" to path, "stream" to stream)
+      apiCall<LsResponse>(api.executor, "ls", "arg" to path, "stream" to stream)
 
     data class FileResponse(
       @SerializedName("Bytes")
@@ -110,6 +112,7 @@ class API(val executor: CallExecutor) {
       wrapWithDirectory: Boolean? = null,
       chunker: String? = null,
       pin: Boolean = true,
+      progress: Boolean? = false,
       onlyHash: Boolean? = null,
       trickle: Boolean? = null,
       rawLeaves: Boolean? = null,
@@ -119,8 +122,9 @@ class API(val executor: CallExecutor) {
       noCopy: Boolean? = null,
     ): ApiCall<FileResponse> =
       apiCall<FileResponse>(
-        executor,
+        api.executor,
         "add",
+        "progress" to progress,
         "wrap-with-directory" to wrapWithDirectory,
         "pin" to pin,
         "only-hash" to onlyHash,
@@ -155,13 +159,13 @@ class API(val executor: CallExecutor) {
       val system: String,
     )
 
-    fun version() = apiCall<VersionResponse>(executor, "version")
+    fun version() = apiCall<VersionResponse>(api.executor, "version")
   }
 
   @JvmField
-  val basic = Basic(executor)
+  val basic = Basic(this)
 
-  class Block(val executor: CallExecutor) {
+  class Block(val api: API) {
     /**
      * /api/v0/block/get
      * Get a raw IPFS block.
@@ -173,7 +177,7 @@ class API(val executor: CallExecutor) {
 
     fun get(cid: String): ApiCall<Void> =
       ApiCall(
-        executor,
+        api.executor,
         "block/get".addUrlArgs("arg" to cid), ResponseProcessors.raw()
       )
 
@@ -206,7 +210,7 @@ class API(val executor: CallExecutor) {
       mhLen: Int? = null,
       pin: Boolean? = null,
     ) = apiCall<PutResponse>(
-      executor,
+      api.executor,
       "block/put",
       "format" to format,
       "mhtype" to mhType,
@@ -219,11 +223,11 @@ class API(val executor: CallExecutor) {
   }
 
   @JvmField
-  val block = Block(executor)
+  val block = Block(this)
 
-  class Config(val executor: CallExecutor) {
+  class Config(val api: API) {
 
-    class Profile(val executor: CallExecutor) {
+    class Profile(val api: API) {
 
       data class ApplyResponse(
         @SerializedName("NewCfg")
@@ -238,7 +242,7 @@ class API(val executor: CallExecutor) {
        */
       @JvmOverloads
       fun apply(profile: String, dryRun: Boolean? = null) = apiCall<ApplyResponse>(
-        executor,
+        api.executor,
         "config/profile/apply",
         "arg" to profile,
         "dry-run" to dryRun
@@ -246,14 +250,15 @@ class API(val executor: CallExecutor) {
     }
 
     @JvmField
-    val profile = Profile(executor)
+    val profile = Profile(api)
 
   }
 
   @JvmField
-  val config = Config(executor)
+  val config = Config(this)
 
-  class Dag(val executor: CallExecutor) {
+  class Dag(val api: API) {
+
     data class CID(@SerializedName("/") val cid: String)
 
     /**
@@ -265,7 +270,7 @@ class API(val executor: CallExecutor) {
 
 
     fun get(arg: String) =
-      ApiCall(executor, "dag/get".addUrlArgs("arg" to arg), ResponseProcessors.raw())
+      ApiCall(api.executor, "dag/get".addUrlArgs("arg" to arg), ResponseProcessors.raw())
 
     /*data class DagImportResponse(
       @SerializedName("Root") val root: Root,
@@ -296,14 +301,21 @@ class API(val executor: CallExecutor) {
       inputEnc: String? = null,
       pin: Boolean? = null,
       hashFunc: String? = null,
+      data: Any? = null,
+      dataPath: String? = null
     ) = apiCall<PutResponse>(
-      executor,
+      api.executor,
       "dag/put",
       "format" to format,
       "input-enc" to inputEnc,
       "pin" to pin,
       "hash" to hashFunc
-    )
+    ).also { call ->
+      data?.also {
+        val json = createDagGson(api, it).toJson(it)
+        call.addData(json.toByteArray(), dataPath ?: "")
+      }
+    }
 
     data class ResolveResponse(
       @SerializedName("Cid") val cid: CID,
@@ -322,7 +334,7 @@ class API(val executor: CallExecutor) {
 
 
     fun resolve(path: String): ApiCall<ResolveResponse> =
-      apiCall(executor, "dag/resolve", "arg" to path)
+      apiCall(api.executor, "dag/resolve", "arg" to path)
 
     data class StatResponse(
       @SerializedName("NumBlocks") val numBlocks: Long,
@@ -342,15 +354,15 @@ class API(val executor: CallExecutor) {
 
     @JvmOverloads
     fun stat(cid: String, progress: Boolean? = null): ApiCall<StatResponse> =
-      apiCall(executor, "dag/stat", "arg" to cid, "progress" to progress)
+      apiCall(api.executor, "dag/stat", "arg" to cid, "progress" to progress)
 
   }
 
   @JvmField
-  val dag = Dag(executor)
+  val dag = Dag(this)
 
 
-  class Files(val executor: CallExecutor) {
+  class Files(val api: API) {
 
     /**
      *   ipfs files cp <source> <dest> - Copy any IPFS files and directories into MFS
@@ -366,7 +378,7 @@ class API(val executor: CallExecutor) {
 
     fun cp(source: String, dest: String) =
       ApiCall(
-        executor,
+        api.executor,
         "files/cp".addUrlArgs(
           "arg" to source,
           "arg" to dest
@@ -417,7 +429,7 @@ class API(val executor: CallExecutor) {
     @JvmOverloads
     fun ls(path: String, longListing: Boolean = true, directoryOrder: Boolean = true) =
       apiCall<LsResponse>(
-        executor,
+        api.executor,
         "files/ls",
         "arg" to path,
         "long" to longListing,
@@ -448,7 +460,7 @@ class API(val executor: CallExecutor) {
       count: Long? = null,
     ): ApiCall<Void> =
       ApiCall(
-        executor,
+        api.executor,
         "files/read".addUrlArgs(
           "arg" to path,
           "offset" to offset,
@@ -492,7 +504,7 @@ class API(val executor: CallExecutor) {
       size: Boolean? = null,
       withLocal: Boolean? = null,
     ): ApiCall<StatResponse> = apiCall(
-      executor,
+      api.executor,
       "files/stat",
       "arg" to path,
       "format" to format,
@@ -536,7 +548,7 @@ class API(val executor: CallExecutor) {
       cidVersion: String? = null,
       hash: String? = null,
     ) = ApiCall(
-      executor,
+      api.executor,
       "files/write".addUrlArgs(
         "arg" to path,
         "offset" to offset,
@@ -552,10 +564,10 @@ class API(val executor: CallExecutor) {
   }
 
   @JvmField
-  val files = Files(executor)
+  val files = Files(this)
 
 
-  class Key(val executor: CallExecutor) {
+  class Key(val api: API) {
 
     data class GenResponse(
       @SerializedName("Id") val id: String,
@@ -589,7 +601,7 @@ class API(val executor: CallExecutor) {
       ipnsBase: String? = null,
     ): ApiCall<GenResponse> =
       apiCall(
-        executor,
+        api.executor,
         "key/gen".addUrlArgs(
           "arg" to name,
           "type" to type,
@@ -617,14 +629,14 @@ class API(val executor: CallExecutor) {
 
     @JvmOverloads
     fun ls(ipnsBase: String? = null, extraInfo: Boolean? = null): ApiCall<LsResponse> =
-      apiCall(executor, "key/list", "ipns-base" to ipnsBase, "l" to extraInfo)
+      apiCall(api.executor, "key/list", "ipns-base" to ipnsBase, "l" to extraInfo)
 
   }
 
   @JvmField
-  val key = Key(executor)
+  val key = Key(this)
 
-  class Name(val executor: CallExecutor) {
+  class Name(val api: API) {
 
     data class PublishResponse(
       @SerializedName("Name")
@@ -654,7 +666,7 @@ class API(val executor: CallExecutor) {
       lifetime: String? = null,
       key: String? = null,
     ) = apiCall<PublishResponse>(
-      executor,
+      api.executor,
       "name/publish",
       "arg" to path,
       "resolve" to resolve,
@@ -665,10 +677,10 @@ class API(val executor: CallExecutor) {
   }
 
   @JvmField
-  val name = Name(executor)
+  val name = Name(this)
 
 
-  class Network(val executor: CallExecutor) {
+  class Network(val api: API) {
 
     data class ID(
       @SerializedName("ID")
@@ -701,7 +713,7 @@ class API(val executor: CallExecutor) {
 
     @JvmOverloads
     fun id(peerID: String? = null, peerIDBase: String? = null) = apiCall<ID>(
-      executor,
+      api.executor,
       "id",
       "arg" to peerID, "peerid-base" to peerIDBase
     )
@@ -709,10 +721,10 @@ class API(val executor: CallExecutor) {
   }
 
   @JvmField
-  val network = Network(executor)
+  val network = Network(this)
 
 
-  class PubSub(val executor: CallExecutor) {
+  class PubSub(val api: API) {
 
     data class Message(
       val from: String,
@@ -735,22 +747,22 @@ class API(val executor: CallExecutor) {
     @JvmOverloads
 
     fun subscribe(topic: String, discover: Boolean? = true) = apiCall<Message>(
-      executor,
+      api.executor,
       "pubsub/sub", "arg" to topic, "discover" to discover
     )
 
 
     fun publish(topic: String, data: String) = ApiCall(
-      executor,
+      api.executor,
       "pubsub/pub".addUrlArgs("arg" to topic, "arg" to data), ResponseProcessors.raw()
     )
 
   }
 
   @JvmField
-  val pubSub = PubSub(executor)
+  val pubSub = PubSub(this)
 
-  class Repo(val executor: CallExecutor) {
+  class Repo(val api: API) {
 
     data class GcResponse(
       @SerializedName("Key")
@@ -769,7 +781,12 @@ class API(val executor: CallExecutor) {
      */
     @JvmOverloads
     fun gc(streamErrors: Boolean? = null, quiet: Boolean? = null) =
-      apiCall<GcResponse>(executor, "repo/gc", "stream-errors" to streamErrors, "quiet" to quiet)
+      apiCall<GcResponse>(
+        api.executor,
+        "repo/gc",
+        "stream-errors" to streamErrors,
+        "quiet" to quiet
+      )
 
 
     data class StatResponse(
@@ -792,7 +809,7 @@ class API(val executor: CallExecutor) {
      */
     @JvmOverloads
     fun stat(sizeOnly: Boolean? = null, human: Boolean? = null) = apiCall<StatResponse>(
-      executor,
+      api.executor,
       "repo/stat",
       "size-only" to sizeOnly, "human" to human
     )
@@ -807,7 +824,7 @@ class API(val executor: CallExecutor) {
     /**
      * Verify all blocks in repo are not corrupted.
      */
-    fun verify() = apiCall<VerifyResponse>(executor, "repo/verify")
+    fun verify() = apiCall<VerifyResponse>(api.executor, "repo/verify")
 
     data class VersionResponse(@SerializedName("Version") val version: String)
 
@@ -818,15 +835,15 @@ class API(val executor: CallExecutor) {
      **/
 
     fun version(quiet: Boolean? = null) = apiCall<VersionResponse>(
-      executor,
+      api.executor,
       "repo/version", "quiet" to quiet
     )
   }
 
   @JvmField
-  val repo = Repo(executor)
+  val repo = Repo(this)
 
-  class Stats(val executor: CallExecutor) {
+  class Stats(val api: API) {
 
     data class BandwidthResponse(
       @SerializedName("TotalIn")
@@ -839,11 +856,11 @@ class API(val executor: CallExecutor) {
       val rateOut: Double,
     )
 
-    fun bw() = apiCall<BandwidthResponse>(executor, "stats/bw")
+    fun bw() = apiCall<BandwidthResponse>(api.executor, "stats/bw")
   }
 
   @JvmField
-  val stats = Stats(executor)
+  val stats = Stats(this)
 
   object Swarm {
 

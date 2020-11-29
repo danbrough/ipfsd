@@ -16,19 +16,16 @@ import java.util.*
 
 const val IPFSD_APP_PREF_PREFIX = "/ipfsd/apps"
 
-open class IPFSApp {
+open class IPFSApp : Dag {
 
-  @Dag
   data class AppDescription(
-    @Transient
-    val clazz: Class<*>,
-    val type: String = clazz.name,
+    val type: String,
     var id: String = UUID.randomUUID().toString(),
     var cid: String? = null,
     val created: Long = System.currentTimeMillis()
-  )
+  ) : Dag
 
-  val description = AppDescription(javaClass)
+  val description = AppDescription(javaClass.name)
 
   override fun toString() = description.toString()
 }
@@ -60,18 +57,21 @@ class AppRegistry(val context: Context) {
         return@withContext app
       }
       val keyPrefix = "$IPFSD_APP_PREF_PREFIX/${type.name}"
+      log.trace("keyPrefix: $keyPrefix")
 
       val cid = prefs.all.filter { it.key.startsWith(keyPrefix) }.map {
         prefs.getString(it.key, null)
       }.firstOrNull()
 
       if (cid != null) {
-        log.debug("loading $cid")
+        log.warn("loading $cid")
         return@withContext ipfs.dag.get(cid).get().parseJson(type).also {
           it.description.cid = cid
+          writeDag(ipfs, it)
         }
       }
 
+      log.warn("creating new app")
       save(type.newInstance(), prefs)
     }
 

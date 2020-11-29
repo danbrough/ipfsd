@@ -3,11 +3,10 @@ package danbroid.ipfsd.demo.app.shopping
 import danbroid.ipfsd.demo.app.Dag
 import danbroid.ipfsd.demo.app.IPFSApp
 
-class ShoppingList : IPFSApp() {
+class ShoppingList : IPFSApp(), Dag {
   var title: String = "Shopping List: ${description.id}"
 
-  @Dag
-  data class Thang(val count: Int, val msg: String)
+  data class Thang(val count: Int, val msg: String) : Dag
 
 
   val thang1 = Thang(12, "a thang")

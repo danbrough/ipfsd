@@ -5,10 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.ServiceApiClient
-import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.demo.app.appRegistry
 import danbroid.ipfsd.demo.app.shopping.ShoppingList
-import danbroid.ipfsd.demo.app.walkDag
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
@@ -39,11 +37,11 @@ class IPFSTest {
   @Test
   fun test1() {
     log.info("test1()")
-    context.ipfsClient.isServiceInstalled()
     runBlocking {
-      val app = context.appRegistry.get(ShoppingList::class.java)
+      val app = ShoppingList()
+      val registry = context.appRegistry
+      registry.save(app)
       log.debug("got app:$app")
-      walkDag(app)
     }
 
   }

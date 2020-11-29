@@ -1,3 +1,6 @@
+package danbroid.ipfs.api.okhttp
+
+
 import danbroid.ipfs.api.*
 import danbroid.ipfs.api.utils.uriEncode
 import kotlinx.coroutines.CoroutineScope
@@ -15,10 +18,9 @@ import java.io.InputStream
 import java.io.Reader
 import java.util.concurrent.TimeUnit
 
-open class OkHttpCallExecutor(val urlBase: String) :
+open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v0") :
   CallExecutor {
 
-  constructor() : this("http://localhost:5001/api/v0")
 
   override val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -137,5 +139,4 @@ open class OkHttpCallExecutor(val urlBase: String) :
 
 }
 
-//No idea why we need to do this for java. Compiler bug perhaps
-class JavaOkCallExecutor : OkHttpCallExecutor()
+class JavaOkHttpCallExecutor : OkHttpCallExecutor()

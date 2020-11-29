@@ -1,7 +1,5 @@
 package danbroid.ipfs.api
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -46,15 +44,10 @@ open class PartContainer<T>(call: ApiCall<T>?, name: String = "") : DirectoryPar
     _parts.add(part)
   }
 
-  fun exec(executor: CallExecutor): Flow<ApiCall.ApiResponse<T>> = executor.exec(call)
-
-  suspend fun get(executor: CallExecutor): ApiCall.ApiResponse<T> = exec(executor).first()
-
   override fun iterator(): Iterator<Part> = _parts.iterator()
 }
 
 private fun removeBasePath(fileName: String, basePath: String): String {
-  log.error("removeBasePath: $fileName : $basePath")
   if (fileName.startsWith(basePath)) return fileName.substring(basePath.length).let {
     if (it.startsWith('/')) it.substring(1) else it
   }
@@ -76,4 +69,4 @@ internal class FileDirectoryPart<T>(val file: File, val basePath: String = file.
 
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(Part::class.java)
+//private val log = org.slf4j.LoggerFactory.getLogger(Part::class.java)

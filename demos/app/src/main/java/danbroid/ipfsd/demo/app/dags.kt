@@ -8,19 +8,8 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import danbroid.ipfs.api.API
-import danbroid.ipfs.api.ApiCall
-import danbroid.ipfs.api.CallExecutor
-import danbroid.ipfs.api.parseDAG
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.hasAnnotation
-import kotlin.reflect.jvm.javaField
 
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FIELD)
-@MustBeDocumented
-annotation class Dag
-
+interface Dag
 
 object DagSupport
 
@@ -38,11 +27,39 @@ class DagTypeAdapter<Any> : TypeAdapter<Any>() {
   }
 }
 
-fun createGson(): GsonBuilder {
+fun createGson(api: API, dag: Any): Gson {
+  val dags = mutableMapOf<Any, String>()
   return GsonBuilder()
     .registerTypeAdapterFactory(object : TypeAdapterFactory {
       override fun <T : Any?> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
-        if (type.rawType.isAnnotationPresent(Dag::class.java)) {
+        log.debug("type: $type dag:${Dag::class.java.isAssignableFrom(type.rawType)}")
+        val delegate = gson.getDelegateAdapter(this, type)
+        if (type.rawType.interfaces.contains(Dag::class.java)) {
+          log.warn("type: $type is dag")
+          return object : TypeAdapter<T>() {
+            override fun write(out: JsonWriter, value: T) {
+              if (value == null) {
+                out.nullValue()
+              } else if (dags.containsKey(value)) {
+                out.value(dags[value])
+              } else if (value == dag) {
+                delegate.write(out, value)
+              } else {
+                val json = delegate.toJson(value)
+                val cid =
+                  api.dag.put().apply { addData(json.toByteArray()) }.getBlocking().value.cid.cid
+                dags[value] = cid
+                log.info("wrote $value as $cid")
+                out.value(cid)
+              }
+            }
+
+            override fun read(`in`: JsonReader?): T {
+              TODO("Not yet implemented")
+            }
+          }
+        }
+        /*if (type.rawType.isAnnotationPresent(Dag::class.java)) {
           return object : TypeAdapter<T>() {
             override fun write(out: JsonWriter, value: T) {
               out.value("CID:${cid++}")
@@ -52,14 +69,21 @@ fun createGson(): GsonBuilder {
               TODO("Not yet implemented")
             }
           }
-        }
+        }*/
         return null
       }
-    })
+    }).create()
 }
 
 
 
+fun <T> writeDag(api: API, dag: T): String {
+  return createGson(api, dag as Any).toJson(dag)
+}
+
+
+
+/*
 fun walkDag2(o: Any, cids: MutableMap<Any, String> = mutableMapOf(), dag: Boolean = false) {
 
 
@@ -88,4 +112,4 @@ fun walkDag(o: Any) {
     log.info("JSON:$it")
   }
 
-}
+}*/

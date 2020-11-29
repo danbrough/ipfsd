@@ -4,9 +4,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import danbroid.ipfs.api.API
 import danbroid.ipfsd.IPFSD
-import danbroid.ipfsd.client.model.ipfsModel
+import danbroid.ipfsd.client.model.ipfs
 import danbroid.ipfsd.ui.snackBar
 import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
@@ -22,7 +21,7 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
     title = "ID"
     icon = iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
     onClick = {
-      API.Network.id().get(ipfsModel.callExecutor).also {
+      ipfs.network.id().get().also {
         log.warn("GOT RESULT: $it")
         requireActivity().snackBar("result: $it")
       }
@@ -62,4 +61,4 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
 }
 
 
-private val log = LoggerFactory.getLogger("danbroid.ipfsd.app")
+private val log = LoggerFactory.getLogger("danbroid.ipfsd.service")

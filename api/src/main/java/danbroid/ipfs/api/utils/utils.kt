@@ -4,27 +4,30 @@ package danbroid.ipfs.api.utils
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import java.io.StringReader
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.util.*
 
 fun CharSequence.uriEncode(): String = URLEncoder.encode(toString(), "UTF-8")
 fun CharSequence.uriDecode(): String = URLDecoder.decode(toString(), "UTF-8")
 
-fun String.addUrlArgs(vararg keywords: Pair<String, Any?>): String {
-  var url: String = this
+fun String.addUrlArgs(vararg keywords: Pair<String, Any?>): String = StringBuilder(this).apply {
   var firstArg = true
   keywords.forEach { arg ->
     if (arg.second == null) return@forEach
-    url += if (firstArg) '?' else '&'
+    append(if (firstArg) '?' else '&')
     firstArg = false
-    url += "${arg.first}=${arg.second!!.toString().uriEncode()}"
+    append("${arg.first}=${arg.second!!.toString().uriEncode()}")
   }
-  return url
-}
+}.toString()
+
 
 inline fun <reified T> CharSequence.parseJson() =
-  GsonBuilder().create().fromJson(StringReader(this.toString()), T::class.java)
+  createGsonBuilder().create().fromJson(StringReader(this.toString()), T::class.java)
 
 fun <T> CharSequence.parseJson(type: Class<T>) =
   GsonBuilder().create().fromJson(StringReader(this.toString()), type)
@@ -32,4 +35,16 @@ fun <T> CharSequence.parseJson(type: Class<T>) =
 fun CharSequence.toJson(): JsonElement =
   JsonParser.parseString(this.toString())
 
-fun Any.toJson(): String = GsonBuilder().create().toJson(this)
+fun createGsonBuilder() =
+  GsonBuilder().registerTypeAdapter(Date::class.java, object : TypeAdapter<Date>() {
+    override fun write(out: JsonWriter, value: Date) {
+      out.value(value.time)
+    }
+
+    override fun read(`in`: JsonReader): Date {
+      return Date(`in`.nextLong())
+    }
+
+  }.nullSafe()).serializeNulls()
+
+fun Any.toJson(): String = createGsonBuilder().create().toJson(this)

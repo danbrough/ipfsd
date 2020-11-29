@@ -16,7 +16,7 @@ object Theme {
     }
 
   object icons {
-    val create_new = createIcon(GoogleMaterial.Icon.gmd_add)
+    val create_new = createIcon(FontAwesome.Icon.faw_list)
     val shopping_cart = createIcon(GoogleMaterial.Icon.gmd_shopping_cart)
     val shopping_cart2 = createIcon(FontAwesome.Icon.faw_shopping_bag)
 

@@ -1,5 +1,6 @@
 package danbroid.ipfs.api.test
 
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
@@ -16,7 +17,7 @@ class AddTest : CallTest() {
     log.debug("test1()")
     runBlocking {
       ipfs {
-        log.info("ID: ${network.id()}")
+        log.info("ID: ${network.id().get()}")
       }
     }
   }
@@ -64,28 +65,36 @@ class AddTest : CallTest() {
 
     var cid: String? = null
     runBlocking {
-      ipfs {
-        cid = basic.add(file = testDir.toFile(), recurseDirectory = true, onlyHash = true).get()
-          .valueOrThrow().hash
-      }
-    }
+      ipfs.basic.add(file = testDir.toFile(), recurseDirectory = true, onlyHash = false).flow()
+        .collectLatest {
+          log.debug("got $it")
+          cid = it.valueOrThrow().hash
+        }
 
-    Assert.assertEquals("Invalid CID", test_dir_cid, cid)
+
+      log.info("finished collect: cid: $cid")
+      Assert.assertEquals("Invalid CID", test_dir_cid, cid)
+      deleteDir(testPath)
+    }
   }
 
   @Test
   fun addDirectory2() {
     runBlocking {
-      ipfs {
-        basic.add(onlyHash = true).apply {
-          addDirectory("a").apply {
-            addData(msg1.toByteArray(), "message.txt")
-            addDirectory("b").addData(msg2.toByteArray(), "message.txt")
-          }
-        }.get().also {
-          log.info("RESULT: $it")
+      var cid: String? = null
+
+      log.debug("doing add..")
+      ipfs.basic.add(onlyHash = true).apply {
+        addDirectory("a").apply {
+          addData(msg1.toByteArray(), "message.txt")
+          addDirectory("b").addData(msg2.toByteArray(), "message.txt")
         }
+      }.collect {
+        log.info("RESULT: $it")
+        cid = it.valueOrThrow().hash
       }
+      log.info("finished collect: cid: $cid")
+      Assert.assertEquals("Invalid CID", test_dir_cid, cid)
     }
   }
 }
