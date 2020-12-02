@@ -1,7 +1,5 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.API
-import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 class RepoTest : CallTest() {

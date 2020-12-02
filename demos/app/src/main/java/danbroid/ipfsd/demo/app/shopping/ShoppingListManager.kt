@@ -1,8 +1,6 @@
 package danbroid.ipfsd.demo.app.shopping
 
-import android.app.Activity
 import android.content.Context
-import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.demo.app.appRegistry
 import danbroid.util.misc.SingletonHolder
 import kotlinx.coroutines.CoroutineScope
@@ -15,7 +13,7 @@ class ShoppingListManager(val context: Context) {
   companion object : SingletonHolder<ShoppingListManager, Context>(::ShoppingListManager) {
   }
 
-  val executor = (context as Activity).ipfsModel.callExecutor
+  val appRegistry = context.appRegistry
   val coroutineScope = CoroutineScope(Dispatchers.IO)
 
 
@@ -26,9 +24,11 @@ class ShoppingListManager(val context: Context) {
 
 
   suspend fun test() {
-    val app = context.appRegistry.get(ShoppingList::class.java)
+    val app = appRegistry.get(ShoppingList::class.java)
     log.debug("test() $app")
+    app.thang1.count++
 
+    appRegistry.save(app)
 
   }
 

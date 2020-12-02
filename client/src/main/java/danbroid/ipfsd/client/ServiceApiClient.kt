@@ -3,21 +3,20 @@ package danbroid.ipfsd.client
 import android.content.Context
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.CallExecutor
+import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 
-class ServiceApiClient(
+class ServiceApiClient private constructor(
   val serviceClient: ServiceClient,
   private val executor: CallExecutor,
 ) : CallExecutor {
 
-  override val coroutineScope = CoroutineScope(Dispatchers.IO)
+  override val ipfs = IPFS(this)
 
   init {
     if (!serviceClient.isServiceInstalled()) {
@@ -48,6 +47,8 @@ class ServiceApiClient(
   }
 }
 
+val Context.ipfs: IPFS
+  get() = ServiceApiClient.getInstance(this).ipfs
 
 private val log = org.slf4j.LoggerFactory.getLogger(ServiceApiClient::class.java)
 

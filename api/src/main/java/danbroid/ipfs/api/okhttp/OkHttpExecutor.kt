@@ -22,8 +22,6 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
   CallExecutor {
 
 
-  override val coroutineScope = CoroutineScope(Dispatchers.IO)
-
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpCallExecutor::class.java)
     val MEDIA_TYPE_APPLICATION = "application/octet-stream".toMediaType()
@@ -125,6 +123,8 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
       response.close()
     }
   }
+
+  override val ipfs = IPFS(this)
 
   override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
     @Suppress("BlockingMethodInNonBlockingContext")

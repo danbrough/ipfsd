@@ -4,6 +4,7 @@ class Test {
   @org.junit.Test
   fun test() {
     log.warn("test1()")
+
   }
 }
 

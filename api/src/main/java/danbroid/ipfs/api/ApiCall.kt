@@ -3,8 +3,8 @@ package danbroid.ipfs.api
 import com.google.gson.JsonElement
 import danbroid.ipfs.api.utils.parseJson
 import danbroid.ipfs.api.utils.toJson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.Closeable
 import java.io.IOException
@@ -42,6 +42,7 @@ open class ApiCall<T>(
     fun toJson(): JsonElement = bodyText!!.toJson()
     fun valueOrThrow(): T =
       if (isSuccessful) value else throw IOException("Failure: $responseCode:$responseMessage")
+    
   }
 
   constructor(executor: CallExecutor, path: String, type: Class<T>) : this(
@@ -63,7 +64,7 @@ open class ApiCall<T>(
   }
 
   fun exec(callback: JavaResultCallback<T>) {
-    executor.coroutineScope.launch {
+    runBlocking(Dispatchers.IO) {
       flow().onStart {
         callback.onStart()
       }.catch {
@@ -75,7 +76,7 @@ open class ApiCall<T>(
   }
 
   fun get(callback: JavaResultCallback<T>) {
-    executor.coroutineScope.launch {
+    runBlocking(Dispatchers.IO) {
       flow().onStart {
         callback.onStart()
       }.catch {

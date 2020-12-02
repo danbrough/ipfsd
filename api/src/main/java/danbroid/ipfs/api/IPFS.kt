@@ -11,12 +11,12 @@ import okio.ByteString.Companion.decodeBase64
 import java.io.File
 
 
-interface ResultHandler<T> {
+/*interface ResultHandler<T> {
   fun onResult(result: Result<T>)
-}
+}*/
 
 interface CallExecutor {
-  val coroutineScope: CoroutineScope
+  val ipfs: IPFS
 
   fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>>
 }
@@ -31,19 +31,17 @@ inline fun <reified T> apiCall(
 /**
  * API for calls to an IPFS node
  */
-open class API(val executor: CallExecutor) {
+open class IPFS(val executor: CallExecutor) {
   constructor() : this(OkHttpCallExecutor())
 
   protected val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-  operator suspend fun invoke(block: suspend API.() -> Unit): Job = coroutineScope.launch {
-    launch {
-      block.invoke(this@API)
-    }
+  operator fun invoke(block: suspend IPFS.() -> Unit) = runBlocking {
+    block.invoke(this@IPFS)
   }
 
 
-  class Basic(val api: API) {
+  class Basic(val api: IPFS) {
     data class Object(
       @SerializedName("Hash")
       val hash: String,
@@ -165,7 +163,7 @@ open class API(val executor: CallExecutor) {
   @JvmField
   val basic = Basic(this)
 
-  class Block(val api: API) {
+  class Block(val api: IPFS) {
     /**
      * /api/v0/block/get
      * Get a raw IPFS block.
@@ -225,9 +223,9 @@ open class API(val executor: CallExecutor) {
   @JvmField
   val block = Block(this)
 
-  class Config(val api: API) {
+  class Config(val api: IPFS) {
 
-    class Profile(val api: API) {
+    class Profile(val api: IPFS) {
 
       data class ApplyResponse(
         @SerializedName("NewCfg")
@@ -257,7 +255,7 @@ open class API(val executor: CallExecutor) {
   @JvmField
   val config = Config(this)
 
-  class Dag(val api: API) {
+  class Dag(val api: IPFS) {
 
     data class CID(@SerializedName("/") val cid: String)
 
@@ -362,7 +360,7 @@ open class API(val executor: CallExecutor) {
   val dag = Dag(this)
 
 
-  class Files(val api: API) {
+  class Files(val api: IPFS) {
 
     /**
      *   ipfs files cp <source> <dest> - Copy any IPFS files and directories into MFS
@@ -567,7 +565,7 @@ open class API(val executor: CallExecutor) {
   val files = Files(this)
 
 
-  class Key(val api: API) {
+  class Key(val api: IPFS) {
 
     data class GenResponse(
       @SerializedName("Id") val id: String,
@@ -636,7 +634,7 @@ open class API(val executor: CallExecutor) {
   @JvmField
   val key = Key(this)
 
-  class Name(val api: API) {
+  class Name(val api: IPFS) {
 
     data class PublishResponse(
       @SerializedName("Name")
@@ -680,7 +678,7 @@ open class API(val executor: CallExecutor) {
   val name = Name(this)
 
 
-  class Network(val api: API) {
+  class Network(val api: IPFS) {
 
     data class ID(
       @SerializedName("ID")
@@ -724,7 +722,7 @@ open class API(val executor: CallExecutor) {
   val network = Network(this)
 
 
-  class PubSub(val api: API) {
+  class PubSub(val api: IPFS) {
 
     data class Message(
       val from: String,
@@ -762,7 +760,7 @@ open class API(val executor: CallExecutor) {
   @JvmField
   val pubSub = PubSub(this)
 
-  class Repo(val api: API) {
+  class Repo(val api: IPFS) {
 
     data class GcResponse(
       @SerializedName("Key")
@@ -843,7 +841,7 @@ open class API(val executor: CallExecutor) {
   @JvmField
   val repo = Repo(this)
 
-  class Stats(val api: API) {
+  class Stats(val api: IPFS) {
 
     data class BandwidthResponse(
       @SerializedName("TotalIn")

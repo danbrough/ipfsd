@@ -6,9 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import danbroid.ipfs.api.API
+import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.ApiCall
-import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.demo.api.R
@@ -31,7 +30,7 @@ private object Content
 
 val log = LoggerFactory.getLogger(Content::class.java)
 
-val Fragment.api: API
+val Fragment.api: IPFS
   get() = ipfsModel.api
 
 open class MenuTheme {

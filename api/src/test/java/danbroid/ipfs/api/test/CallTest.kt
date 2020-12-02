@@ -1,6 +1,6 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.API
+import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.PartContainer
 import kotlinx.coroutines.flow.collect
@@ -16,16 +16,16 @@ abstract class CallTest {
   }
 
 
-  protected val ipfs: API
+  protected val ipfs: IPFS
     get() = _ipfs!!
 
   companion object {
-    private var _ipfs: API? = null
+    private var _ipfs: IPFS? = null
 
     @BeforeClass
     @JvmStatic
     fun beforeClass() {
-      _ipfs = API()
+      _ipfs = IPFS()
     }
 
     @AfterClass

@@ -5,17 +5,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import danbroid.ipfs.api.API;
+import danbroid.ipfs.api.IPFS;
 
 
 public class JavaTest {
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JavaTest.class);
-  API ipfs;
+  IPFS ipfs;
 
   @Before
   public void onSetup() {
     log.warn("onSetup()");
-    ipfs = new API();
+    ipfs = new IPFS();
   }
 
   @After
@@ -25,7 +25,7 @@ public class JavaTest {
 
   @Test
   public void test() {
-    API.Basic.VersionResponse versionResponse = ipfs.basic.version().getBlocking().valueOrThrow();
+    IPFS.Basic.VersionResponse versionResponse = ipfs.basic.version().getBlocking().valueOrThrow();
     log.info("Version: " + versionResponse);
   }
 }

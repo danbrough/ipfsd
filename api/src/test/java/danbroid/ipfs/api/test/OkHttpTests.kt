@@ -2,7 +2,7 @@ package danbroid.ipfs.api.test
 
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonStreamParser
-import danbroid.ipfs.api.API
+import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.utils.addUrlArgs
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -63,7 +63,7 @@ class OkHttpTests {
     while (parser.hasNext()) {
       val e = parser.next()
       println("e: ${gson.toJson(e)}")
-      val data = gson.fromJson(e, API.Files::class.java)
+      val data = gson.fromJson(e, IPFS.Files::class.java)
       log.debug("data: $data")
     }
 
