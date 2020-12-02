@@ -1,18 +1,20 @@
 package danbroid.ipfsd.demo.app.shopping
 
-import danbroid.ipfsd.demo.app.Dag
+import danbroid.ipfs.api.Dag
 import danbroid.ipfsd.demo.app.IPFSApp
 
-class ShoppingList : IPFSApp(), Dag {
+class ShoppingList : IPFSApp() {
   var title: String = "Shopping List: ${description.id}"
 
-  data class Thang(val count: Int, val msg: String) : Dag
+  data class Thang(var count: Int, val msg: String) : Dag
 
 
   val thang1 = Thang(12, "a thang")
 
 
   val thang2 = Thang(2, "Thang 2")
+
+  override fun toString() = "${super.toString()}:$title:$thang1:$thang2"
 
 
 }

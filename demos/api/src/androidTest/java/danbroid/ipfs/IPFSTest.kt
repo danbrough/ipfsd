@@ -3,9 +3,7 @@ package danbroid.ipfs
 import OkHttpCallExecutor
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import danbroid.ipfs.api.API
 import danbroid.ipfs.api.ApiCall
-import danbroid.ipfsd.service.IPFS
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.AfterClass
@@ -55,12 +53,12 @@ class IPFSTest {
     log.debug("publishing something to poiqwe098123")
     runBlocking {
       log.debug("calling id")
-      callTest(API.Network.id())
+      callTest(IPFS.Network.id())
 
       log.debug("calling publish")
-      callTest(API.PubSub.publish("poiqwe098123", "Hello World"))
+      callTest(IPFS.PubSub.publish("poiqwe098123", "Hello World"))
       log.debug("calling repo/stat")
-      callTest(API.Repo.stat())
+      callTest(IPFS.Repo.stat())
 
     }
   }
