@@ -1,5 +1,6 @@
 package danbroid.ipfs.api
 
+import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonStreamParser
 import kotlinx.coroutines.flow.flow
@@ -27,7 +28,8 @@ object ResponseProcessors {
         val parser = JsonStreamParser(reader)
 
         while (parser.hasNext()) {
-          val t = GsonBuilder().create().fromJson(parser.next(), jsonType)
+          val t = GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create()
+            .fromJson(parser.next(), jsonType)
           // log.warn("PARSED: ${t}")
           emit(response.copy(t))
         }

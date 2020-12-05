@@ -3,7 +3,7 @@ plugins {
 
   `java-library`
   `maven-publish`
- // kotlin("plugin.serialization")
+  kotlin("plugin.serialization")
   id("org.jetbrains.dokka")
 }
 
@@ -17,7 +17,7 @@ java {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
   kotlinOptions {
     jvmTarget = "1.8"
-   // freeCompilerArgs = listOf("-Xjvm-default=enable")
+    // freeCompilerArgs = listOf("-Xjvm-default=enable")
   }
 }
 

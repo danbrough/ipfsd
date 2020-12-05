@@ -16,14 +16,13 @@ class ServiceApiClient private constructor(
   private val executor: CallExecutor,
 ) : CallExecutor {
 
-  override val ipfs = IPFS(this)
-
   init {
     if (!serviceClient.isServiceInstalled()) {
       log.error("Package ${IPFSD.SERVICE_PKG} is not installed")
       showIPFSDNotInstalledDialog(serviceClient.context)
     }
   }
+
 
   override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
     serviceClient.waitTillStarted()
@@ -39,16 +38,21 @@ class ServiceApiClient private constructor(
     fun getInstance(context: Context, urlBase: String = DEFAULT_API_URL): ServiceApiClient =
       getInstance(Pair(ServiceClient.getInstance(context), OkHttpCallExecutor(urlBase)))
 
-    fun getInstance(ipfsdClient: ServiceClient, executor: CallExecutor): ServiceApiClient =
+/*    fun getInstance(ipfsdClient: ServiceClient, executor: CallExecutor): ServiceApiClient =
       getInstance(Pair(ipfsdClient, executor))
 
     fun getInstance(context: Context, executor: CallExecutor): ServiceApiClient =
-      getInstance(Pair(ServiceClient.getInstance(context), executor))
+      getInstance(Pair(ServiceClient.getInstance(context), executor))*/
   }
 }
 
+private class AndroidIPFS(context: Context) :
+  IPFS() {
+  companion object : SingletonHolder<AndroidIPFS, Context>(::AndroidIPFS)
+}
+
 val Context.ipfs: IPFS
-  get() = ServiceApiClient.getInstance(this).ipfs
+  get() = AndroidIPFS.getInstance(this)
 
 private val log = org.slf4j.LoggerFactory.getLogger(ServiceApiClient::class.java)
 

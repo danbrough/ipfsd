@@ -124,8 +124,6 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
     }
   }
 
-  override val ipfs = IPFS(this)
-
   override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
     @Suppress("BlockingMethodInNonBlockingContext")
     createRequest(call).execute().also {

@@ -1,19 +1,6 @@
 package danbroid.ipfsd.demo.app
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import danbroid.ipfs.api.Dag
-import danbroid.ipfs.api.IPFS
-import danbroid.ipfs.api.dag
-import danbroid.ipfsd.client.ipfs
-import danbroid.ipfsd.demo.app.shopping.ShoppingList
-import danbroid.util.misc.SingletonHolder
-import danbroid.util.prefs.Prefs
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
 import java.util.*
 
 const val IPFSD_APP_ID_PREFIX = "/ipfsd/apps"
@@ -32,13 +19,14 @@ open class IPFSApp : Dag {
   val description = AppDescription(javaClass.name)
 
   override fun toString() = description.toString()
+
+  suspend fun save(){
+
+  }
 }
 
-data class DagID(val id: String, val cid: String)
 
-class PrefsDagStore(val prefs: SharedPreferences) : AppRegistry.DagStore {
-
-}
+/*
 
 class AppRegistry(private val ipfs: IPFS, val context: Context) {
 
@@ -46,11 +34,6 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
   companion object : SingletonHolder<AppRegistry, Pair<IPFS, Context>>({
     AppRegistry(it.first, it.second)
   })
-
-  interface DagStore {
-
-  }
-
 
 
   private val defaultPrefs: Prefs
@@ -136,5 +119,7 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
 
 val Context.appRegistry: AppRegistry
   get() = AppRegistry.getInstance(Pair(this.ipfs, this))
+  private val log = org.slf4j.LoggerFactory.getLogger(AppRegistry::class.java)
+*/
 
-private val log = org.slf4j.LoggerFactory.getLogger(AppRegistry::class.java)
+
