@@ -16,8 +16,6 @@ import java.io.File
 }*/
 
 interface CallExecutor {
-  val ipfs: IPFS
-
   fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>>
 }
 
@@ -31,34 +29,27 @@ inline fun <reified T> apiCall(
 /**
  * API for calls to an IPFS node
  */
-open class IPFS(val executor: CallExecutor) {
+open class IPFS(val executor: CallExecutor, val cidMap: String? = null) {
   constructor() : this(OkHttpCallExecutor())
 
-  protected val coroutineScope = CoroutineScope(Dispatchers.IO)
+  //protected val coroutineScope = CoroutineScope(Dispatchers.IO)
+  data class NamedCID(val id: String, val cid: String)
 
   operator fun invoke(block: suspend IPFS.() -> Unit) = runBlocking {
     block.invoke(this@IPFS)
   }
 
-
   class Basic(val api: IPFS) {
     data class Object(
-      @SerializedName("Hash")
       val hash: String,
-      @SerializedName("Links")
       val links: Array<Link>,
     ) {
 
       data class Link(
-        @SerializedName("Hash")
         val hash: String,
-        @SerializedName("Name")
         val name: String,
-        @SerializedName("Size")
         val size: Long,
-        @SerializedName("Target")
         val target: String,
-        @SerializedName("Type")
         val type: Int,
       ) {
         val isDirectory = type == 1
@@ -67,7 +58,6 @@ open class IPFS(val executor: CallExecutor) {
     }
 
     data class LsResponse(
-      @SerializedName("Objects")
       val objects: Array<Object>,
     )
 
@@ -77,13 +67,9 @@ open class IPFS(val executor: CallExecutor) {
       apiCall<LsResponse>(api.executor, "ls", "arg" to path, "stream" to stream)
 
     data class FileResponse(
-      @SerializedName("Bytes")
       val bytes: Long,
-      @SerializedName("Hash")
       val hash: String,
-      @SerializedName("Name")
       val name: String,
-      @SerializedName("Size")
       val size: Long,
     )
 
@@ -145,15 +131,10 @@ open class IPFS(val executor: CallExecutor) {
 
 
     data class VersionResponse(
-      @SerializedName("Commit")
       val commit: String,
-      @SerializedName("Golang")
       val goLang: String,
-      @SerializedName("Repo")
       val repo: String,
-      @SerializedName("Version")
       val version: String,
-      @SerializedName("System")
       val system: String,
     )
 
@@ -181,8 +162,8 @@ open class IPFS(val executor: CallExecutor) {
 
 
     data class PutResponse(
-      @SerializedName("Key") val key: String,
-      @SerializedName("Size") val size: Int,
+      val key: String,
+      val size: Int,
     )
 
     /**
@@ -228,10 +209,8 @@ open class IPFS(val executor: CallExecutor) {
     class Profile(val api: IPFS) {
 
       data class ApplyResponse(
-        @SerializedName("NewCfg")
-        val newConfig: JsonObject,
-        @SerializedName("OldCfg")
-        val oldConfig: JsonObject,
+        val newCfg: JsonObject,
+        val oldCfg: JsonObject,
       )
 
       /**
@@ -278,7 +257,7 @@ open class IPFS(val executor: CallExecutor) {
     }*/
 
 
-    data class PutResponse(@SerializedName("Cid") val cid: CID)
+    data class PutResponse(val cid: CID)
 
     /**
      * /api/v0/dag/put
@@ -316,8 +295,8 @@ open class IPFS(val executor: CallExecutor) {
     }
 
     data class ResolveResponse(
-      @SerializedName("Cid") val cid: CID,
-      @SerializedName("RemPath") val remPath: String,
+      val cid: CID,
+      val remPath: String,
     )
 
     /**
@@ -335,8 +314,8 @@ open class IPFS(val executor: CallExecutor) {
       apiCall(api.executor, "dag/resolve", "arg" to path)
 
     data class StatResponse(
-      @SerializedName("NumBlocks") val numBlocks: Long,
-      @SerializedName("Size") val size: Long,
+      val numBlocks: Long,
+      val size: Long,
     )
 
     /**
@@ -386,14 +365,13 @@ open class IPFS(val executor: CallExecutor) {
 
 
     data class LsResponse(
-      @SerializedName("Entries")
       val entries: Array<Entry>,
     ) {
       data class Entry(
-        @SerializedName("Hash") val hash: String,
-        @SerializedName("Name") val name: String,
-        @SerializedName("Size") val size: Long,
-        @SerializedName("Type") val type: Int,
+        val hash: String,
+        val name: String,
+        val size: Long,
+        val type: Int,
       )
 
       override fun equals(other: Any?): Boolean {
@@ -469,14 +447,14 @@ open class IPFS(val executor: CallExecutor) {
 
 
     data class StatResponse(
-      @SerializedName("Blocks") val blocks: Int,
-      @SerializedName("CumulativeSize") val cumulativeSize: Long,
-      @SerializedName("Hash") val hash: String,
-      @SerializedName("Local") val local: Boolean,
-      @SerializedName("Size") val size: Long,
-      @SerializedName("SizeLocal") val sizeLocal: Long,
-      @SerializedName("Type") val type: String,
-      @SerializedName("WithLocaltity") val withLocality: Boolean,
+      val blocks: Int,
+      val cumulativeSize: Long,
+      val hash: String,
+      val local: Boolean,
+      val size: Long,
+      val sizeLocal: Long,
+      val type: String,
+      val withLocality: Boolean,
     )
 
     /**
@@ -568,8 +546,8 @@ open class IPFS(val executor: CallExecutor) {
   class Key(val api: IPFS) {
 
     data class GenResponse(
-      @SerializedName("Id") val id: String,
-      @SerializedName("Name") val name: String,
+      val id: String,
+      val name: String,
     )
 
     /**
@@ -610,13 +588,13 @@ open class IPFS(val executor: CallExecutor) {
 
 
     data class Key(
-      @SerializedName("Name")
+
       val name: String,
-      @SerializedName("Id")
+
       val id: String,
     )
 
-    data class LsResponse(@SerializedName("Keys") val keys: Array<Key>)
+    data class LsResponse(val keys: Array<Key>)
 
 
     /**
@@ -637,9 +615,7 @@ open class IPFS(val executor: CallExecutor) {
   class Name(val api: IPFS) {
 
     data class PublishResponse(
-      @SerializedName("Name")
       val name: String,
-      @SerializedName("Value")
       val value: String,
     )
 
@@ -683,15 +659,10 @@ open class IPFS(val executor: CallExecutor) {
     data class ID(
       @SerializedName("ID")
       val id: String,
-      @SerializedName("AgentVersion")
       val agentVersion: String,
-      @SerializedName("ProtocolVersion")
       val protocolVersion: String,
-      @SerializedName("PublicKey")
       val publicKey: String,
-      @SerializedName("Protocols")
       val protocols: Array<String>,
-      @SerializedName("Addresses")
       val addresses: Array<String>,
     )
 
@@ -721,6 +692,106 @@ open class IPFS(val executor: CallExecutor) {
   @JvmField
   val network = Network(this)
 
+  class Object(val api: IPFS) {
+    data class Link(
+      val hash: String,
+      val name: String,
+      val size: Long
+    )
+
+    data class Object(
+      val hash: String,
+      val links: Array<Link>,
+      val data: String
+    )
+
+    /**
+     *
+     * /api/v0/object/get
+     * Get and serialize the DAG node named by <key>.
+     *   'ipfs object get' is a plumbing command for retrieving DAG nodes.
+     *   It serializes the DAG node to the format specified by the "--encoding" flag.
+     *   It outputs to stdout, and <key> is a base58 encoded multihash.
+     *
+     * The encoding of the object's data field can be specified by using the
+     * --data-encoding flag
+     * Supported values are:
+     * "text" (default),"base64"
+
+     * @param arg  Key of the object to retrieve, in base58-encoded multihash format. Required: yes.
+     * @param dataEncoding  Encoding type of the data field, either "text" or "base64". Default: text. Required: no.
+     */
+    fun get(arg: String, dataEncoding: String? = null) =
+      apiCall<Object>(api.executor, "object/get", "arg" to arg, "data-encoding" to dataEncoding)
+
+    /**
+     * /api/v0/object/put
+     * Store input as a DAG object, print its key.
+     *
+     * pin [bool]: Pin this object when adding. Required: no.
+     *
+     */
+    fun put(data: Any? = null, pin: Boolean = true) =
+      apiCall<Object>(api.executor, "object/put", "pin" to pin).also {
+        TODO("implement this")
+      }
+
+    class Patch(val api: IPFS) {
+      /**
+       * /api/v0/object/patch/add-link
+       * Add a link to a given object.
+      arg [string]: The hash of the node to modify. Required: yes.
+      arg [string]: Name of link to create. Required: yes.
+      arg [string]: IPFS object to add link to. Required: yes.
+      create [bool]: Create intermediary nodes. Required: no.
+      #
+       */
+      fun addLink(objectHash: String, linkHash: String, linkName: String) =
+        apiCall<Object>(
+          api.executor,
+          "object/patch/add-link",
+          "arg" to objectHash,
+          "arg" to linkHash,
+          "arg" to linkName
+        )
+
+      /**
+       * /api/v0/object/patch/set-data
+       * Set the data field of an IPFS object.
+       * @param hash The hash of the node to modify
+       * @param data Data to add
+       */
+      fun setData(hash: String, data: ByteArray? = null) =
+        apiCall<Object>(api.executor, "object/patch/set-data", "arg" to hash).also {
+          if (data != null) it.addData(data)
+        }
+
+      /**
+       * /api/v0/object/patch/set-data
+       * Set the data field of an IPFS object.
+       * @param hash The hash of the node to modify
+       * @param data Data to add
+       */
+      fun setData(hash: String, data: String) = setData(hash, data.toByteArray())
+
+      /**
+       * /api/v0/object/patch/set-data
+       * Set the data field of an IPFS object.
+       * @param hash The hash of the node to modify
+       * @param data Data to add
+       */
+      fun setData(hash: String, data: File) = setData(hash).apply {
+        add(data)
+      }
+    }
+
+    @JvmField
+    val patch = Patch(api)
+  }
+
+  @JvmField
+  val `object` = Object(this)
+
 
   class PubSub(val api: IPFS) {
 
@@ -743,7 +814,6 @@ open class IPFS(val executor: CallExecutor) {
     }
 
     @JvmOverloads
-
     fun subscribe(topic: String, discover: Boolean? = true) = apiCall<Message>(
       api.executor,
       "pubsub/sub", "arg" to topic, "discover" to discover
@@ -763,7 +833,6 @@ open class IPFS(val executor: CallExecutor) {
   class Repo(val api: IPFS) {
 
     data class GcResponse(
-      @SerializedName("Key")
       val key: GcError,
     ) {
       data class GcError(
@@ -788,15 +857,10 @@ open class IPFS(val executor: CallExecutor) {
 
 
     data class StatResponse(
-      @SerializedName("NumObjects")
       val numObjects: Long,
-      @SerializedName("RepoPath")
       val repoPath: String,
-      @SerializedName("Version")
       val version: String,
-      @SerializedName("RepoSize")
       val repoSize: Long,
-      @SerializedName("StorageMax")
       val storageMax: Long,
     )
 
@@ -813,9 +877,7 @@ open class IPFS(val executor: CallExecutor) {
     )
 
     data class VerifyResponse(
-      @SerializedName("Msg")
       val msg: String,
-      @SerializedName("Progress")
       val progress: Int,
     )
 
@@ -824,7 +886,7 @@ open class IPFS(val executor: CallExecutor) {
      */
     fun verify() = apiCall<VerifyResponse>(api.executor, "repo/verify")
 
-    data class VersionResponse(@SerializedName("Version") val version: String)
+    data class VersionResponse(val version: String)
 
     /**
      * Show the repo version.
@@ -844,13 +906,9 @@ open class IPFS(val executor: CallExecutor) {
   class Stats(val api: IPFS) {
 
     data class BandwidthResponse(
-      @SerializedName("TotalIn")
       val totalIn: Long,
-      @SerializedName("TotalOut")
       val totalOut: Long,
-      @SerializedName("RateIn")
       val rateIn: Double,
-      @SerializedName("RateOut")
       val rateOut: Double,
     )
 

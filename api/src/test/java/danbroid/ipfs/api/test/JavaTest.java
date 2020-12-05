@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import danbroid.ipfs.api.IPFS;
 
+import static danbroid.ipfs.api.test.ObjectStoreTestKt.school;
+
 
 public class JavaTest {
   private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(JavaTest.class);
@@ -27,5 +29,10 @@ public class JavaTest {
   public void test() {
     IPFS.Basic.VersionResponse versionResponse = ipfs.basic.version().getBlocking().valueOrThrow();
     log.info("Version: " + versionResponse);
+    School school = school();
+    school.getStudents().add(new Student("Peter", 11));
+    new ObjectStoreTest().save(school);
+
+
   }
 }

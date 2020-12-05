@@ -17,6 +17,7 @@ class ShoppingList : IPFSApp() {
   override fun toString() = "${super.toString()}:$title:$thang1:$thang2"
 
 
+
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(ShoppingList::class.java)
