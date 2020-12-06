@@ -1,5 +1,7 @@
 package danbroid.ipfs.api.utils;
 
+import kotlin.jvm.JvmClassMappingKt;
+
 public class Base58 {
 
   private static final char[] ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
@@ -16,6 +18,7 @@ public class Base58 {
     for (int i = 0; i < ALPHABET.length; i++) {
       INDEXES[ALPHABET[i]] = i;
     }
+
   }
 
 

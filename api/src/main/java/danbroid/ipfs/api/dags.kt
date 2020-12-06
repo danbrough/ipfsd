@@ -30,9 +30,27 @@ suspend fun <T> IPFS.dag(cid: String, type: Class<in T>): ApiCall.ApiResponse<T>
 }
 
 
+class DagObjectRef<T>(
+  private val ipfs: IPFS,
+  val hash: String,
+  val type: Class<T>
+) {
+  suspend fun get(): T {
+    return ipfs {
+      dag(hash, type).valueOrThrow()
+    }
+  }
+}
+
+inline suspend fun <reified T> IPFS.dag(hash: String) =
+  DagObjectRef(this, hash, T::class.java).get()
+
+
+/*
 @Suppress("UNCHECKED_CAST")
-suspend inline fun <reified T> IPFS.dag(cid: String): ApiCall.ApiResponse<T> =
-  dag(cid, T::class.java)
+suspend inline fun <reified T> IPFS.dag(cid: String): T =
+  dag(cid, T::class.java).valueOrThrow()
+*/
 
 
 interface Dag

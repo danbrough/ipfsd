@@ -30,7 +30,6 @@ public class JavaTest {
     IPFS.Basic.VersionResponse versionResponse = ipfs.basic.version().getBlocking().valueOrThrow();
     log.info("Version: " + versionResponse);
     School school = school();
-    school.getStudents().add(new Student("Peter", 11));
     new ObjectStoreTest().save(school);
 
 

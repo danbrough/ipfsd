@@ -11,22 +11,23 @@ import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
 import org.junit.Test
 import java.awt.Color
 import kotlin.jvm.internal.Reflection
 import kotlin.reflect.KClass
 
-interface Person {
-  var name: String
-  var age: Int
-}
+
+interface IPFSObject
+
 
 @Suppress("UNCHECKED_CAST")
 @InternalSerializationApi
 
-class IPFSObjectSerializer<T : Any>(val ipfs: IPFS, val type: KClass<T>) : KSerializer<T> {
+class IPFSObjectSerializer<T : Any>(val ipfs: IPFS, val type: KClass<T>) :
+  KSerializer<T> {
   override val descriptor: SerialDescriptor =
-    PrimitiveSerialDescriptor("IPFSObject", PrimitiveKind.STRING)
+    PrimitiveSerialDescriptor("Hash", PrimitiveKind.STRING)
 
   override fun deserialize(decoder: Decoder): T {
     log.debug("deserialize()")
@@ -52,20 +53,129 @@ class IPFSObjectSerializer<T : Any>(val ipfs: IPFS, val type: KClass<T>) : KSeri
 
 }
 
+@Serializable
+@SerialName("School")
+class School(
+  val name: String, val year: Int,
+  @Contextual
+  val student: Student
+) : IPFSObject
+
 
 @Serializable
-data class Student(override var name: String, override var age: Int) : Person
+@SerialName("Student")
+class Student(var name: String, var age: Int) : IPFSObject {
 
-
-@Serializable
-data class School(val name: String, val year: Int) {
-  val students = mutableSetOf<Student>()
 }
 
-fun school() = School("Newtown Primary", 1880).also {
-  it.students.add(Student("Dan Brough", 10))
-  it.students.add(Student("Steve", 11))
+
+@InternalSerializationApi
+private fun module(ipfs: IPFS) = SerializersModule {
+  contextual(Student::class, IPFSObjectSerializer(ipfs, Student::class))
+  contextual(School::class, IPFSObjectSerializer(ipfs, School::class))
+
 }
+
+@InternalSerializationApi
+fun format(ipfs: IPFS) = Json {
+  serializersModule = module(ipfs)
+}
+
+fun school() = School("Newtown Primary", 1880, Student("Dan Brough", 11))
+
+
+@InternalSerializationApi
+class ObjectStoreTest : CallTest() {
+
+  companion object {
+    val school = school()
+  }
+
+  fun save(school: School) {
+
+
+    format(ipfs).encodeToString(school).also {
+      log.info("SCHOOL: $it")
+    }
+
+  }
+
+  @Test
+  fun test() {
+    log.info("test()")
+
+    save(school)
+/*    val serializer = IPFSObjectSerializer(ipfs, Student::class)
+    school.students.forEach { student ->
+      Json.encodeToString(serializer, student).also {
+        log.info("student: $student => $it")
+        val student2 = Json.decodeFromString(serializer, it)
+        log.debug("student2: $student2")
+        require(student == student2) {
+          log.warn("Invalid student match")
+        }
+      }
+    }*/
+  }
+
+  @Test
+  fun test2() {
+    log.info("test2()")
+    val school = school()
+    Json.encodeToString(school).also {
+      log.info("JSON: $it")
+    }
+  }
+}
+
+class DataTypeAdapterFactory(val ipfs: IPFS) : TypeAdapterFactory {
+  val cache = mutableMapOf<Any, IPFS.Object.Object>()
+
+  @InternalSerializationApi
+  override fun <T : Any?> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
+    val dataFactory = this
+    val isData = Reflection.createKotlinClass(type.rawType).isData
+    log.debug("type: $type isData: ${isData}")
+    if (!isData) return null
+    return object : TypeAdapter<T>() {
+      override fun write(out: JsonWriter, value: T) {
+        log.trace("write: $value")
+        val json = gson.getDelegateAdapter(dataFactory, type).toJson(value)
+        log.trace("json: $json")
+        cache.get(value)?.also {
+
+        }
+        ipfs {
+          val o = `object`.patch.setData(CID_EMPTY_OBJECT, json).get().valueOrThrow()
+          log.debug("object: $o")
+          out.value(o.hash)
+        }
+      }
+
+      override fun read(input: JsonReader): T {
+        TODO("Not yet implemented")
+      }
+    }
+  }
+}
+
+@InternalSerializationApi
+suspend fun IPFS.store(o: Any?, type: Class<*>): String {
+  val gson = GsonBuilder()
+    .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+    .registerTypeAdapterFactory(DataTypeAdapterFactory(this))
+    .create()
+
+  val data = gson.toJson(o, type)
+  log.debug("data: $data")
+  return ""
+}
+
+@InternalSerializationApi
+inline suspend fun <reified T> IPFS.store(o: T) = store(o, T::class.java)
+
+@InternalSerializationApi
+private val log = org.slf4j.LoggerFactory.getLogger(ObjectStoreTest::class.java)
 
 class ColorAsObjectSerializer : KSerializer<Color> {
   override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Color") {
@@ -99,93 +209,3 @@ class ColorAsObjectSerializer : KSerializer<Color> {
       encodeIntElement(descriptor, 2, value.rgb and 0xff)
     }
 }
-
-class ObjectStoreTest : CallTest() {
-
-  companion object {
-    val school = school()
-  }
-
-  fun save(school: School) {
-    log.info("DESCRIPTOR: ${School.serializer().descriptor}")
-    Json.encodeToString(school).also {
-      log.info("JSON: $it")
-
-    }
-  }
-
-  @InternalSerializationApi
-  @Test
-  fun test() {
-    log.info("test()")
-
-    save(school)
-    val serializer = IPFSObjectSerializer(ipfs, Student::class)
-    school.students.forEach { student ->
-      Json.encodeToString(serializer, student).also {
-        log.info("student: $student => $it")
-        val student2 = Json.decodeFromString(serializer, it)
-        log.debug("student2: $student2")
-        require(student == student2) {
-          log.warn("Invalid student match")
-        }
-      }
-    }
-
-
-  }
-
-  @Test
-  fun test2() {
-    log.info("test2()")
-    val school = school()
-    Json.encodeToString(school).also {
-      log.info("JSON: $it")
-    }
-  }
-}
-
-class DataTypeAdapterFactory(val ipfs: IPFS) : TypeAdapterFactory {
-  val cache = mutableMapOf<Any, IPFS.Object.Object>()
-
-  override fun <T : Any?> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
-    val dataFactory = this
-    val isData = Reflection.createKotlinClass(type.rawType).isData
-    log.debug("type: $type isData: ${isData}")
-    if (!isData) return null
-    return object : TypeAdapter<T>() {
-      override fun write(out: JsonWriter, value: T) {
-        log.trace("write: $value")
-        val json = gson.getDelegateAdapter(dataFactory, type).toJson(value)
-        log.trace("json: $json")
-        cache.get(value)?.also {
-
-        }
-        ipfs {
-          val o = `object`.patch.setData(CID_EMPTY_OBJECT, json).get().valueOrThrow()
-          log.debug("object: $o")
-          out.value(o.hash)
-        }
-      }
-
-      override fun read(input: JsonReader): T {
-        TODO("Not yet implemented")
-      }
-    }
-  }
-}
-
-suspend fun IPFS.store(o: Any?, type: Class<*>): String {
-  val gson = GsonBuilder()
-    .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-    .registerTypeAdapterFactory(DataTypeAdapterFactory(this))
-    .create()
-
-  val data = gson.toJson(o, type)
-  log.debug("data: $data")
-  return ""
-}
-
-inline suspend fun <reified T> IPFS.store(o: T) = store(o, T::class.java)
-
-private val log = org.slf4j.LoggerFactory.getLogger(ObjectStoreTest::class.java)

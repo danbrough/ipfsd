@@ -17,10 +17,17 @@ java {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
   kotlinOptions {
     jvmTarget = "1.8"
+    languageVersion = "1.4"
     // freeCompilerArgs = listOf("-Xjvm-default=enable")
+    freeCompilerArgs += "-Xopt-in=kotlin.serialization.InternalSerializationApi"
   }
 }
-
+//languageSettings.useExperimentalAnnotation("org.mylibrary.OptInAnnotation")
+/*
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+  kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.serialization.InternalSerializationApi"
+}
+*/
 
 tasks.withType<Test> {
   useJUnit()
