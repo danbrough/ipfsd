@@ -32,10 +32,11 @@ inline fun <reified T> apiCall(
 open class IPFS(val executor: CallExecutor, val cidMap: String? = null) {
   constructor() : this(OkHttpCallExecutor())
 
+
   //protected val coroutineScope = CoroutineScope(Dispatchers.IO)
   data class NamedCID(val id: String, val cid: String)
 
-  operator fun invoke(block: suspend IPFS.() -> Unit) = runBlocking {
+  operator fun <T> invoke(block: suspend IPFS.() -> T) = runBlocking {
     block.invoke(this@IPFS)
   }
 
@@ -925,6 +926,5 @@ open class IPFS(val executor: CallExecutor, val cidMap: String? = null) {
 //private val log = org.slf4j.LoggerFactory.getLogger(API::class.java)
 
 }
-
 
 

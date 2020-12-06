@@ -40,7 +40,7 @@ class DagTest : CallTest() {
       val msg = "Hello World"
       val cid = dag.put(data = msg).get().value.cid.cid
       log.info("DAG: $cid")
-      dag<String>(cid).value.also {
+      dag<String>(cid).also {
         log.info("msg is $it")
         Assert.assertEquals("Message is incorrect", msg, it)
       }
@@ -48,7 +48,7 @@ class DagTest : CallTest() {
       log.info("thang1: $thang1")
       val cid2 = dag.put(data = thang1).get().value.cid.cid
       log.info("added dag: $cid2")
-      val thang2 = dag<Thang>(cid2).valueOrThrow()
+      val thang2 = dag<Thang>(cid2)
       log.info("thang2: $thang2")
       Assert.assertEquals("Dag objects are different", true, thang1 == thang2)
     }
