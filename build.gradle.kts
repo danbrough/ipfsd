@@ -6,15 +6,14 @@ plugins {
 
 buildscript {
 
-  val kotlin_version by extra("1.4.10")
   repositories {
     google()
     jcenter()
   }
 
   dependencies {
-    //classpath("com.android.tools.build:gradle:4.1.0")
-    classpath("com.android.tools.build:gradle:4.2.0-alpha16")
+    //classpath("com.android.tools.build:gradle:4.2.0-beta01")
+    classpath("com.android.tools.build:gradle:7.0.0-alpha02")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
     classpath("org.jetbrains.dokka:dokka-gradle-plugin:_")
 
