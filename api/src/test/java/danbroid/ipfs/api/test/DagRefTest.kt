@@ -10,11 +10,17 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Test
 import java.lang.reflect.ParameterizedType
 
+@Target(AnnotationTarget.FIELD, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class IpfsLink
+
 @Serializable
-@IpfsObject
+@IpfsLink
 data class UNI(var name: String, var year: Int, @IpfsLink var departments: Set<Department>) {
 
 
@@ -22,7 +28,7 @@ data class UNI(var name: String, var year: Int, @IpfsLink var departments: Set<D
   data class Address(var street: String, var suburb: String, var postcode: Int, var city: String)
 
   @Serializable
-  @IpfsObject
+  @IpfsLink
   data class Department(var name: String)
 
   @Contextual
@@ -32,7 +38,7 @@ data class UNI(var name: String, var year: Int, @IpfsLink var departments: Set<D
 
 }
 
-@IpfsObject
+@IpfsLink
 class SomethingWithAUni(val name: String, val cid: String) {
   suspend fun uni(ipfs: IPFS) = cid.dag<UNI>(ipfs)
 }
@@ -71,7 +77,7 @@ class DagRefTest {
 
         override fun shouldSkipClass(clazz: Class<*>): Boolean {
           log.trace("shouldSkipClass: $clazz")
-          if (clazz.isAnnotationPresent(IpfsObject::class.java)) {
+          if (clazz.isAnnotationPresent(IpfsLink::class.java)) {
             log.warn("IPFS OBJECT: $clazz ")
             isLink = true
           }
@@ -82,19 +88,19 @@ class DagRefTest {
       })
       .registerTypeAdapter(DagObjectRef::class.java, object : TypeAdapter<DagObjectRef<*>>() {
         override fun write(out: JsonWriter, value: DagObjectRef<*>) {
-          out.beginArray()
+          out.beginObject()
+          out.name("/")
           out.value(value.hash)
-          out.value(value.type.name)
-          out.endArray()
+          out.endObject()
         }
 
         override fun read(input: JsonReader): DagObjectRef<*> {
-          input.beginArray()
+          input.beginObject()
+          input.nextName()
           val cid = input.nextString()
-          val clazz = input.nextString()
-          input.endArray()
+          input.endObject()
 
-          return DagObjectRef(ipfs, cid, Class.forName(clazz))
+          return DagObjectRef(ipfs, cid, Any::class.java)
         }
 
       })
@@ -118,7 +124,7 @@ class DagRefTest {
                   dag.put(pin = true).apply { addData(json.toByteArray()) }.get()
                     .valueOrThrow().cid.cid
                 log.debug("hash: $hash ")
-                out.value(hash)
+                out.beginObject().name("/").value(hash).endObject()
               }
             }
 
@@ -131,10 +137,10 @@ class DagRefTest {
 
     val json = gson.setPrettyPrinting().create().toJson(uni)
     log.info("JSON: ${json}")
-    val cid = Json.decodeFromString<String>(json)
+    val cid = Json.parseToJsonElement(json).jsonObject["/"]!!.jsonPrimitive.content
     ipfs {
       log.info("DAG ${dag.get(cid).get().bodyText}")
-      val correct_cid = "bafyreidfuhxrvbplh6362xzrzuc7jventfu6prjjstobsf5ljbiwh7hgri"
+      val correct_cid = "bafyreidmxvzkrjfeapyl6fr5u4l3prwj5rctnmmwketysoe6la5kbmvc2q"
       require(cid == correct_cid) {
         "CID should be $correct_cid not $cid"
       }
@@ -155,7 +161,6 @@ class DagRefTest {
       val something = SomethingWithAUni("Something", correct_cid)
       val json = gson.setPrettyPrinting().create().toJson(something)
       log.debug("something json: $json")
-      log.debug("something uni: ${something.uni(this)}")
     }
 
   }
