@@ -23,22 +23,31 @@ inline fun <reified T> apiCall(
   executor: CallExecutor,
   path: String,
   vararg args: Pair<String, Any?>,
-) = ApiCall(executor, path.addUrlArgs(*args), T::class.java)
+) = ApiCall(executor, path.addUrlArgs(*args), ResponseProcessors.jsonParser(T::class.java))
 
 
 /**
  * API for calls to an IPFS node
  */
-open class IPFS(val executor: CallExecutor, val cidMap: String? = null) {
+open class IPFS(val executor: CallExecutor) {
   constructor() : this(OkHttpCallExecutor())
 
+  init {
+    org.slf4j.LoggerFactory.getLogger("danbroid.ipfs.api").error("CREATING IPFS")
+  }
 
-  //protected val coroutineScope = CoroutineScope(Dispatchers.IO)
-  data class NamedCID(val id: String, val cid: String)
+  val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-  operator fun <T> invoke(block: suspend IPFS.() -> T) = runBlocking {
+
+  operator fun <T> invoke(block: suspend IPFS.() -> T): Deferred<T> = coroutineScope.async {
     block.invoke(this@IPFS)
   }
+
+  fun <T> blocking(block: suspend IPFS.() -> T): T =
+    runBlocking {
+      block.invoke(this@IPFS)
+    }
+
 
   class Basic(val api: IPFS) {
     data class Object(
@@ -247,9 +256,18 @@ open class IPFS(val executor: CallExecutor, val cidMap: String? = null) {
      */
 
 
-    fun get(arg: String) =
-      ApiCall(api.executor, "dag/get".addUrlArgs("arg" to arg), ResponseProcessors.raw())
+    inline fun <reified T> get(arg: String) =
+      apiCall<T>(
+        api.executor,
+        "dag/get".addUrlArgs("arg" to arg)
+      )
 
+    fun <T> get(arg: String, type: Class<T>) =
+      ApiCall(
+        api.executor,
+        "dag/get".addUrlArgs("arg" to arg),
+        responseProcessor = ResponseProcessors.jsonParser(type)
+      )
     /*data class DagImportResponse(
       @SerializedName("Root") val root: Root,
       @SerializedName("PinErrorMsg") val pinErrorMsg: String?

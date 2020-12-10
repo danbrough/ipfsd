@@ -42,14 +42,8 @@ open class ApiCall<T>(
     fun toJson(): JsonElement = bodyText!!.toJson()
     fun valueOrThrow(): T =
       if (isSuccessful) value else throw IOException("Failure: $responseCode:$responseMessage")
-    
-  }
 
-  constructor(executor: CallExecutor, path: String, type: Class<T>) : this(
-    executor,
-    path,
-    ResponseProcessors.jsonParser(type)
-  )
+  }
 
   override fun toString() = "ApiCall<$path:${hashCode()}>"
   fun flow() = executor.exec(this)

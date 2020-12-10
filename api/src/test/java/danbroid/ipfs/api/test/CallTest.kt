@@ -1,13 +1,10 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.PartContainer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
-import org.junit.AfterClass
 import org.junit.Before
-import org.junit.BeforeClass
 
 abstract class CallTest {
 
@@ -15,25 +12,6 @@ abstract class CallTest {
     var cid: String? = null
   }
 
-
-  protected val ipfs: IPFS
-    get() = _ipfs!!
-
-  companion object {
-    private var _ipfs: IPFS? = null
-
-    @BeforeClass
-    @JvmStatic
-    fun beforeClass() {
-      _ipfs = IPFS()
-    }
-
-    @AfterClass
-    @JvmStatic
-    fun afterClass() {
-      _ipfs = null
-    }
-  }
 
   open fun <T> callTest(call: PartContainer<T>, handler: suspend (ApiCall.ApiResponse<T>) -> Unit) =
     runBlocking {

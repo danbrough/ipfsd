@@ -7,9 +7,8 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
 import danbroid.ipfs.api.utils.createGsonBuilder
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Deferred
+import kotlinx.serialization.Serializable
 import java.io.Reader
 
 
@@ -20,30 +19,35 @@ private fun <T> parseDAG(api: IPFS, reader: Reader, type: Class<T>): T {
 }
 
 
-@Suppress("UNCHECKED_CAST")
-suspend fun <T> IPFS.dag(cid: String, type: Class<in T>): ApiCall.ApiResponse<T> {
-  return dag.get(cid).flow().map {
-    if (it.isSuccessful) (it as ApiCall.ApiResponse<T>).value =
-      parseDAG(this, it.getReader(), type) as T
-    it as ApiCall.ApiResponse<T>
-  }.first()
-}
-
-
+@Serializable
 class DagObjectRef<T>(
-  private val ipfs: IPFS,
   val hash: String,
-  val type: Class<T>
+  @kotlinx.serialization.Transient
+  val ipfs: IPFS = IPFS()
 ) {
-  suspend fun get(): T {
-    return ipfs {
-      dag(hash, type).valueOrThrow()
+
+  @Suppress("UNCHECKED_CAST")
+  inline fun <reified T> get(): Deferred<T> =
+    ipfs {
+      dag.get<T>(hash).get().valueOrThrow()
     }
-  }
+
+  inline fun <reified T> getBlocking(): T =
+    ipfs.blocking { dag.get(hash, T::class.java).get().valueOrThrow() }
+
+  suspend inline fun <reified T> await(): T = get<T>().await()
+
 }
 
-inline suspend fun <reified T> IPFS.dag(hash: String) =
-  DagObjectRef(this, hash, T::class.java).get()
+@Serializable
+class DagRef2<T>(val hash: String) {
+
+  fun get(ipfs: IPFS):T = ipfs.dag.get<Any>(hash)
+
+}
+
+suspend inline fun <reified T> IPFS.dag(hash: String): T = dag.get<T>(hash).get().valueOrThrow()
+//fun <T> IPFS.dag(hash: String): T = dag.get<T>(hash).get().valueOrThrow()
 
 
 /*
@@ -80,7 +84,7 @@ class DagTypeAdapterFactory(val api: IPFS, val dag: Any?) : TypeAdapterFactory {
           } else {
             val json = delegate.toJson(value)
             val cid =
-              api.dag.put().apply { addData(json.toByteArray()) }.getBlocking().value.cid.cid
+              api.blocking { dag.put().apply { addData(json.toByteArray()) }.get().value.cid.cid }
             dags[value] = cid
             //log.info("wrote $value as $cid")
             out.beginObject().name("/").value(cid).endObject()
@@ -103,8 +107,8 @@ class DagTypeAdapterFactory(val api: IPFS, val dag: Any?) : TypeAdapterFactory {
           val cid = input.nextString()
           input.endObject()
           log.trace("reading cid: $cid type: $type")
-          return runBlocking {
-            api.dag<T>(cid, type.rawType).valueOrThrow()
+          return api.blocking {
+            dag.get(cid, type.rawType as Class<T>).get().valueOrThrow()
           }
         }
       }

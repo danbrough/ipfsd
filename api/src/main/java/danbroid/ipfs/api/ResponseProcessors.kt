@@ -31,7 +31,7 @@ object ResponseProcessors {
           val t = GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create()
             .fromJson(parser.next(), jsonType)
           // log.warn("PARSED: ${t}")
-          emit(response.copy(t))
+          emit(response.copy(t as T))
         }
       }
     }
