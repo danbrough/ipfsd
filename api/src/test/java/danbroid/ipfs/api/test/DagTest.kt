@@ -36,7 +36,7 @@ class DagTest : CallTest() {
   @Test
   fun test() {
     log.info("test()")
-    ipfs {
+    ipfs.blocking {
       val msg = "Hello World"
       val cid = dag.put(data = msg).get().value.cid.cid
       log.info("DAG: $cid")

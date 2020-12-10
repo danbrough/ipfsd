@@ -14,23 +14,17 @@ class AddTest : CallTest() {
 
   @Test
   fun idTest() {
-    log.debug("test1()")
-    runBlocking {
-      ipfs {
-        log.info("ID: ${network.id().get()}")
-      }
-    }
+    log.info("ID: ${ipfs.blocking { network.id().get().valueOrThrow() }}")
   }
 
   @Test
   fun addMessage() {
     log.info("addTest()")
     val msg = "${javaClass.simpleName} addMessage at ${Date()}\n"
-    runBlocking {
-      ipfs {
-        SharedData.cid = basic.add(msg, fileName = "test_message.txt").get().valueOrThrow().hash
-      }
+    ipfs.blocking {
+      SharedData.cid = basic.add(msg, fileName = "test_message.txt").get().valueOrThrow().hash
     }
+
   }
 
   val msg1 = "message.txt in directory a\n"
