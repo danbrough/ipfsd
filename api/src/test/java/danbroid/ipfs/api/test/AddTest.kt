@@ -14,7 +14,7 @@ class AddTest : CallTest() {
 
   @Test
   fun idTest() {
-    log.info("ID: ${ipfs.blocking { network.id().get().valueOrThrow() }}")
+    log.info("ID: ${ipfs.blocking { network.id().reader.readText() }}")
   }
 
   @Test

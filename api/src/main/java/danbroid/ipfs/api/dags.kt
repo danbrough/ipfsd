@@ -42,7 +42,6 @@ class DagObjectRef<T>(
 @Serializable
 class DagRef2<T>(val hash: String) {
 
-  fun get(ipfs: IPFS):T = ipfs.dag.get<Any>(hash)
 
 }
 

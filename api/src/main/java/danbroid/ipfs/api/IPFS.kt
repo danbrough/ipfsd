@@ -17,6 +17,8 @@ import java.io.File
 
 interface CallExecutor {
   fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>>
+
+  fun exec2(call: ApiCall2): ApiCall2.ApiResponse2
 }
 
 inline fun <reified T> apiCall(
@@ -700,10 +702,12 @@ open class IPFS(val executor: CallExecutor) {
      */
 
     @JvmOverloads
-    fun id(peerID: String? = null, peerIDBase: String? = null) = apiCall<ID>(
-      api.executor,
-      "id",
-      "arg" to peerID, "peerid-base" to peerIDBase
+    fun id(peerID: String? = null, peerIDBase: String? = null) = api.executor.exec2(
+      ApiCall2(
+        "id".addUrlArgs(
+          "arg" to peerID, "peerid-base" to peerIDBase,
+        )
+      )
     )
 
   }

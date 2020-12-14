@@ -3,7 +3,7 @@ package danbroid.ipfs.api.test
 import org.junit.Test
 import java.util.*
 
-class BlockTest : CallTest() {
+class BlockTest {
 
   @Test
   fun blockTest() {
@@ -11,17 +11,12 @@ class BlockTest : CallTest() {
 
     val msg = "BlockTest put message at ${Date()}"
 
-    callTest(ipfs.block.put(data = msg)) {
-      log.debug("response: $it")
-
-
-      /* callTest(API.Block.get(key)) {
-         log.debug("response: $it")
-       }*/
+    ipfs.blocking {
+      block.put(data = msg).get().valueOrThrow().also {
+        log.debug("result: $it")
+      }
     }
   }
-
-
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(AddTest::class.java)
