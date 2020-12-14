@@ -6,11 +6,12 @@ class FilesTest : CallTest() {
 
   @Test
   fun listFiles() {
-    callTest(ipfs.files.ls("/")) {
-      log.debug("RESULT: $it")
+    ipfs.blocking {
+      files.ls("/").get().valueOrThrow().also {
+        log.debug("RESULT: $it")
+      }
     }
   }
-
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(KeyTests::class.java)

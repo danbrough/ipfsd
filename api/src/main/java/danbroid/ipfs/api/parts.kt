@@ -17,20 +17,21 @@ abstract internal class DataPart(
 }
 
 
-abstract class DirectoryPart<T>(name: String) : Part(name), Iterable<Part>
+abstract class DirectoryPart(name: String) : Part(name), Iterable<Part>
 
-open class PartContainer<T>(call: ApiCall<T>?, name: String = "") : DirectoryPart<T>(name) {
+open class PartContainer(name: String = "") : DirectoryPart(name) {
 
-  val call: ApiCall<T> = call ?: this as ApiCall<T>
 
   private var _parts = mutableListOf<Part>()
 
-  fun addDirectory(path: String): PartContainer<T> {
-    return PartContainer(call, if (name == "") path else name + '/' + path).also { addPart(it) }
+  fun addDirectory(path: String): PartContainer {
+    return PartContainer(if (name == "") path else name + '/' + path).also {
+      addPart(it)
+    }
   }
 
   fun add(file: File) = apply {
-    addPart(if (file.isDirectory) FileDirectoryPart<T>(file) else FilePart(file))
+    addPart(if (file.isDirectory) FileDirectoryPart(file) else FilePart(file))
   }
 
   fun addData(data: ByteArray, path: String = "") = apply {
@@ -60,10 +61,10 @@ internal class FilePart(val file: File, val basePath: String = file.parent) :
   override fun read() = FileInputStream(file)
 }
 
-internal class FileDirectoryPart<T>(val file: File, val basePath: String = file.parent) :
-  DirectoryPart<T>(removeBasePath(file.absolutePath, basePath)) {
+internal class FileDirectoryPart(val file: File, val basePath: String = file.parent) :
+  DirectoryPart(removeBasePath(file.absolutePath, basePath)) {
   override fun iterator() = file.listFiles()?.asSequence()?.map {
-    if (it.isFile) FilePart(it, basePath) else FileDirectoryPart<T>(it, basePath)
+    if (it.isFile) FilePart(it, basePath) else FileDirectoryPart(it, basePath)
   }?.iterator() ?: emptyList<Part>().iterator()
 
 

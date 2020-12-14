@@ -3,7 +3,6 @@ package danbroid.ipfs.api.test
 import danbroid.ipfs.api.ApiCall
 import danbroid.ipfs.api.PartContainer
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.runBlocking
 import org.junit.Before
 
 abstract class CallTest {
@@ -13,12 +12,9 @@ abstract class CallTest {
   }
 
 
-  open fun <T> callTest(call: PartContainer<T>, handler: suspend (ApiCall.ApiResponse<T>) -> Unit) =
-    runBlocking {
-      ipfs {
-        executor.exec(call as ApiCall<T>).collect(handler)
-      }
-
+  open fun <T> callTest(call: PartContainer, handler: suspend (ApiCall.ApiResponse<T>) -> Unit) =
+    ipfs.blocking {
+      executor.exec(call as ApiCall<T>).collect(handler)
     }
 
 

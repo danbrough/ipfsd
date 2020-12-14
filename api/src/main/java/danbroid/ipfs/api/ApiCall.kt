@@ -23,7 +23,7 @@ open class ApiCall<T>(
   val executor: CallExecutor,
   val path: String,
   val responseProcessor: ResponseProcessor<T>,
-) : PartContainer<T>(null) {
+) : PartContainer(path) {
 
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(ApiCall::class.java)
@@ -45,8 +45,8 @@ open class ApiCall<T>(
 
   }
 
-  override fun toString() = "ApiCall<$path:${hashCode()}>"
-  fun flow() = executor.exec(this)
+
+  fun flow(): Flow<ApiResponse<T>> = executor.exec(this)
 
   suspend fun get(): ApiResponse<T> = flow().first()
   suspend fun collect(collector: suspend (ApiResponse<T>) -> Unit) = flow().collect(collector)
@@ -87,3 +87,23 @@ open class ApiCall<T>(
 
 }
 
+open class ApiCall2(val path: String) : PartContainer() {
+
+  companion object {
+    private val log = org.slf4j.LoggerFactory.getLogger(ApiCall2::class.java)
+  }
+
+  interface ApiResponse2 : Closeable {
+    val isSuccessful: Boolean
+    val errorMessage: String
+    val stream: InputStream
+    val reader: Reader
+  }
+
+}
+
+fun ApiCall2.ApiResponse2.success() =
+  if (!isSuccessful) throw IOException(errorMessage) else this
+
+fun <T> ApiCall2.ApiResponse2.success(then: ApiCall2.ApiResponse2.() -> T) =
+  if (!isSuccessful) throw IOException(errorMessage) else then()

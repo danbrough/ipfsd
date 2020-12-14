@@ -3,7 +3,6 @@ package danbroid.ipfs.api.okhttp
 
 import danbroid.ipfs.api.*
 import danbroid.ipfs.api.utils.uriEncode
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -47,10 +46,22 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
         }.build()
   }
 
+  protected fun createRequestBody(call: ApiCall2): RequestBody {
+    val parts = call.iterator()
+    return if (!parts.hasNext()) "".toRequestBody()
+    else
+      MultipartBody.Builder()
+        .setType(MultipartBody.FORM)
+        .also { builder ->
+          parts.forEach {
+            builder.addPart(it)
+          }
+        }.build()
+  }
 
   private fun MultipartBody.Builder.addPart(part: Part): MultipartBody.Builder = apply {
     addPart(part.toOkHttpPart())
-    if (part is DirectoryPart<*>)
+    if (part is DirectoryPart)
       part.forEach {
         addPart(it)
       }
@@ -60,7 +71,7 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
     MultipartBody.Part.createFormData("file", name.uriEncode(), toRequestBody())
 
   private fun Part.toRequestBody(): RequestBody =
-    if (this is DirectoryPart<*>) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else let {
+    if (this is DirectoryPart) "".toRequestBody(MEDIA_TYPE_DIRECTORY) else let {
       this as DataPart
       object : RequestBody() {
         override fun contentLength() = length()
@@ -83,6 +94,14 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
 
 
   protected fun createRequest(call: ApiCall<*>): Call =
+    Request.Builder()
+      .url("${urlBase}/${call.path}")
+      .post(createRequestBody(call))
+      .build().let {
+        httpClient.newCall(it)
+      }
+
+  protected fun createRequest2(call: ApiCall2): Call =
     Request.Builder()
       .url("${urlBase}/${call.path}")
       .post(createRequestBody(call))
@@ -124,6 +143,26 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
     }
   }
 
+  class HttpResponse2(val response: Response) : ApiCall2.ApiResponse2 {
+
+    override val isSuccessful = response.isSuccessful
+
+    override val errorMessage: String
+      get() = "Code:${response.code}:${response.message}"
+
+    override val stream: InputStream
+      get() = response.body?.byteStream() ?: throw Exception(errorMessage)
+
+    override val reader: Reader
+      get() = response.body?.charStream() ?: throw Exception(errorMessage)
+
+    override fun toString() =
+      "HttpResponse2<${response.code}:${response.message}>]"
+
+    override fun close() = response.close()
+
+  }
+
   override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
     @Suppress("BlockingMethodInNonBlockingContext")
     createRequest(call).execute().also {
@@ -133,6 +172,10 @@ open class OkHttpCallExecutor(val urlBase: String = "http://localhost:5001/api/v
       } else emitAll(call.responseProcessor.invoke(HttpResponse(it)))
     }
   }.flowOn(Dispatchers.IO)
+
+  override fun exec2(call: ApiCall2): ApiCall2.ApiResponse2 = createRequest2(call).execute().let {
+    HttpResponse2(it)
+  }
 
 
 }
