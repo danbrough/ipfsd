@@ -8,10 +8,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
 
-class JsonResponse<T : Any>(val request: Request<T>, val serializer: KSerializer<T>) : Call<List<T>> {
-  override fun invoke(): List<T> = request.invoke().use {
-    it.reader.readText().parseJsonList(serializer)
+class JsonResponse<T : Any>(val request: Request<T>, val serializer: KSerializer<T>) : Call<T> {
+  fun invoke(block: (T) -> Unit): Unit = request.invoke().use {
+    it.reader.readText().parseJsonList(serializer).forEach(block)
   }
+
+  override fun invoke(): T = request.invoke().reader.readText().parseJson(serializer)
+
 }
 
 private class ListSerializer<T>(val serializer: KSerializer<T>) : KSerializer<List<T>> {
@@ -48,3 +51,10 @@ fun <T : Any> Request<T>.parseJson(serializer: KSerializer<T>): JsonResponse<T> 
 
 inline fun <reified T : Any> Request<T>.parseJson(): JsonResponse<T> =
   parseJson(T::class.serializer())
+
+//inline fun <reified T : Any> IPFS.ApiResponse.json(block:(T)->Unit):
+
+inline fun <reified T : Any> IPFS.ApiResponse<T>.json(block: (T) -> Unit): Unit =
+  reader.readText().parseJsonList<T>().forEach(block)
+
+

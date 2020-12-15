@@ -1,8 +1,7 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.Types
 import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.parseJsonList
+import danbroid.ipfs.api.json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -24,13 +23,9 @@ class DagTest {
         dag.put().apply {
           add(it)
           add(json1)
-
-        }.invoke {
-          it.reader.readText().parseJsonList<Types.CID>().forEach {
-            log.info("cid: $it")
-          }
+        }.invoke().json {
+          log.debug("file: $it")
         }
-
       }
     }
   }
