@@ -150,9 +150,13 @@ class DataPart(val data: ByteArray, name: String) : Part(name, false) {
   override fun getInput() = ByteArrayInputStream(data)
 }
 
-class FilePart(val file: File) : Part(file.name, file.isDirectory) {
+class FilePart(val file: File, name: String = file.name) : Part(name, file.isDirectory) {
+
   override fun iterator(): Iterator<Part> =
-    file.listFiles()?.map { FilePart(it) }?.iterator() ?: emptyList<Part>().iterator()
+    file.listFiles()?.map {
+      val fileName = if (name != "") name + "/" + it.name else it.name
+      FilePart(it, fileName)
+    }?.iterator() ?: emptyList<Part>().iterator()
 
   override fun length(): Long = file.length()
   override fun getInput() = FileInputStream(file)
@@ -160,14 +164,14 @@ class FilePart(val file: File) : Part(file.name, file.isDirectory) {
 
 class DirectoryPart(name: String = "") : Part(name, true)
 
-open class Part(val name: String = "", val isDirectory: Boolean) : PartList {
+open class Part(var name: String = "", val isDirectory: Boolean) : PartList {
 
   protected val parts = mutableListOf<Part>()
 
   override fun add(part: Part) {
+    if (name != "") part.name = name + "/" + part.name
     parts.add(part)
   }
-
 
   override fun iterator(): Iterator<Part> = parts.iterator()
 
