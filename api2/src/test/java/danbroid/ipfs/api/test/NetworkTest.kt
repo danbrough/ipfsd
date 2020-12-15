@@ -1,6 +1,7 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
+import danbroid.ipfs.api.json
 import org.junit.Test
 
 class NetworkTest {
@@ -9,8 +10,8 @@ class NetworkTest {
     log.info(
       "ID: ${
         ipfs.blocking {
-          network.id().invoke().also {
-            log.info("RESULT: $it")
+          network.id().invoke().json().first().also { 
+            log.debug("ID: $it")
           }
         }
       }"
