@@ -78,8 +78,16 @@ class AddTest {
         }
       }
     }
+  }
 
-
+  @Test
+  fun test4() {
+    log.info("test4() adding test dir: ${TestData.TestDirectory.testPath}")
+    ipfs.blocking {
+      basic.add(file = TestData.TestDirectory.testPath.toFile(),recurseDirectory = true).invoke {
+        log.info("response: ${it.reader.readText()}")
+      }
+    }
   }
 }
 
