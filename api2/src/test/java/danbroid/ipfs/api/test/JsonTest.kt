@@ -1,10 +1,11 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.parseJsonList
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.junit.Test
 
 class JsonTest {
-
 
   @Test
   fun test1() {
@@ -18,18 +19,12 @@ class JsonTest {
     }
   }
 
-/*  public final fun <T> decodeFromString(
-    deserializer: DeserializationStrategy<T>,
-    string: String
-  ): T {
-    val reader = JsonReader(string)
-    val input = StreamingJsonDecoder(this, WriteMode.OBJ, reader)
-    val result = input.decodeSerializableValue(deserializer)
-    if (!reader.isDone) {
-      error("Reader has not consumed the whole input: $reader")
-    }
-    return result
-  }*/
+  @Test
+  fun test2() {
+
+
+  }
+
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(JsonTest::class.java)

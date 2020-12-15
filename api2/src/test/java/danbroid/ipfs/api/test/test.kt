@@ -2,6 +2,7 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.okhttp.OkHttpExecutor
+import kotlinx.serialization.Serializable
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
@@ -11,13 +12,24 @@ val ipfs = IPFS(IPFS.CallContext(OkHttpExecutor()))
 
 
 object TestData {
+  object DagTest {
 
+    @Serializable
+    data class Person(val name: String, val age: Int)
+
+    val dan = Person("Dan", 12)
+
+
+
+  }
 
   object HelloWorld {
     const val cid = "QmWATWQ7fVPP2EFGu71UkfnqhYXDYH566qy47CnJDgvs8u"
     const val cid_with_directory = "QmStcF58DBTXnJDEWeobXbCeTGiM6NxfLmcz9S95HJ5Br7"
     const val data = "Hello World\n"
     const val name = "hello_world.txt"
+    const val dag_cid = "bafyreictpomgsgsseyyvxq7vagj5womjfc3rjbczb2rj4tbjybe3t3s7xa"
+
   }
 
 

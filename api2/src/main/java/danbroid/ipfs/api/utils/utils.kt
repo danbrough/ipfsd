@@ -1,10 +1,5 @@
 package danbroid.ipfs.api.utils
 
-
-import com.google.gson.GsonBuilder
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
@@ -24,23 +19,6 @@ fun String.addUrlArgs(vararg keywords: Pair<String, Any?>): String = StringBuild
     append("${arg.first}=${arg.second!!.toString().uriEncode()}")
   }
 }.toString()
-
-
-
-
-
-
-fun createGsonBuilder() =
-  GsonBuilder().registerTypeAdapter(Date::class.java, object : TypeAdapter<Date>() {
-    override fun write(out: JsonWriter, value: Date) {
-      out.value(value.time)
-    }
-
-    override fun read(`in`: JsonReader): Date {
-      return Date(`in`.nextLong())
-    }
-
-  }.nullSafe()).serializeNulls()
 
 
 open class SingletonHolder<out T : Any, in A>(creator: (A) -> T) {
