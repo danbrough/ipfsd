@@ -5,12 +5,13 @@ import danbroid.ipfs.api.utils.addUrlArgs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.io.*
 
 class IPFS(callContext: CallContext) {
 
-  interface ApiResponse : Closeable {
+  interface ApiResponse<T> : Closeable {
     val isSuccessful: Boolean
     val errorMessage: String
     val stream: InputStream
@@ -20,7 +21,7 @@ class IPFS(callContext: CallContext) {
   companion object : SingletonHolder<IPFS, CallContext>(::IPFS)
 
   interface Executor {
-    operator fun invoke(request: Request): ApiResponse
+    operator fun <T> invoke(request: Request<T>): ApiResponse<T>
 
   }
 
@@ -65,7 +66,7 @@ class IPFS(callContext: CallContext) {
       fsCache: Boolean? = null,
       noCopy: Boolean? = null,
     ) =
-      DirectoryRequest(
+      DirectoryRequest<Types.CID>(
         callContext,
         "add",
         "progress" to progress,
@@ -95,14 +96,55 @@ class IPFS(callContext: CallContext) {
   val basic = Basic(callContext)
 
 
-  /*operator fun <T> invoke(block: suspend IPFS.() -> T): Deferred<T> = coroutineScope.async {
-  block.invoke(this@IPFS)
-}*/
+  class Dag(val callContext: CallContext) {
+
+    /**
+     * /api/v0/dag/put
+     * Add a dag node to ipfs.
+     *
+     * @param format  Format that the object will be added as. Default: cbor. Required: no.
+     * @param inputEnc Format that the input object will be. Default: json. Required: no.
+     * @param pin Pin this object when adding. Required: no.
+     * @param hashFunc Hash function to use. Default: . Required: no.
+     *
+     * <h3>cURL Example</h3>
+     * <pre>curl -X POST -F file=@myfile http://127.0.0.1:5001/api/v0/dag/put?format=cbor&input-enc=json&pin=<value>&hash=<value></pre>
+     */
+
+
+    fun put(
+      format: String? = null,
+      inputEnc: String? = null,
+      pin: Boolean? = null,
+      hashFunc: String? = null,
+      data: Any? = null,
+      dataPath: String? = null
+    ) = DirectoryRequest<Types.File>(
+      callContext,
+      "dag/put",
+      "format" to format,
+      "input-enc" to inputEnc,
+      "pin" to pin,
+      "hash" to hashFunc
+    )
+
+
+    /**
+     * api/v0/dag/get
+     * Get a dag node from ipfs.
+     **/
+
+    fun get(arg: String) = Request<Any>(callContext, "dag/get", "arg" to arg)
+
+  }
+
+  @JvmField
+  val dag = Dag(callContext)
 
 
   class Network(val callContext: CallContext) {
     fun id(peerID: String? = null, peerIDBase: String? = null) =
-      Request(
+      Request<Types.ID>(
         callContext, "id",
         "arg" to peerID,
         "peerid-base" to peerIDBase
@@ -119,17 +161,17 @@ interface Call<T> {
   fun invoke(): T
 }
 
-open class Request(
+open class Request<T>(
   val callContext: IPFS.CallContext,
   path: String,
   vararg args: Pair<String, Any?>
 ) :
-  Call<IPFS.ApiResponse> {
+  Call<IPFS.ApiResponse<T>> {
   val path = path.addUrlArgs(*args)
 
   override fun invoke() = callContext.executor(this)
 
-  inline fun <T> invoke(block: (IPFS.ApiResponse) -> T): T = invoke().use(block)
+  inline fun <U> invoke(block: (IPFS.ApiResponse<T>) -> U): U = invoke().use(block)
 
 }
 
@@ -141,8 +183,8 @@ interface PartList : Iterable<Part> {
     add(it)
   }
 
-  fun add(data: String, name: String) = add(data.toByteArray(), name)
-  fun add(data: ByteArray, name: String) = add(DataPart(data, name))
+  fun add(data: String, name: String = "") = add(data.toByteArray(), name)
+  fun add(data: ByteArray, name: String = "") = add(DataPart(data, name))
 }
 
 class DataPart(val data: ByteArray, name: String) : Part(name, false) {
@@ -179,11 +221,11 @@ open class Part(var name: String = "", val isDirectory: Boolean) : PartList {
   open fun getInput(): InputStream = throw Exception("Not implemented")
 }
 
-class DirectoryRequest(
+class DirectoryRequest<T : Any>(
   callContext: IPFS.CallContext,
   path: String,
   vararg args: Pair<String, Any?>
-) : Request(callContext, path, *args), PartList {
+) : Request<T>(callContext, path, *args), PartList {
 
   private var root = Part("", true)
 
@@ -214,6 +256,12 @@ class Types {
     val Hash: String,
     val Size: Long,
   )
+
+  @Serializable
+  data class Link(@SerialName("/") val link: String)
+
+  @Serializable
+  data class CID(val Cid: Link)
 }
 
 private object api

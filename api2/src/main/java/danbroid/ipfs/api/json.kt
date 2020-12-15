@@ -8,7 +8,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
 
-class JsonResponse<T : Any>(val request: Request, val serializer: KSerializer<T>) : Call<List<T>> {
+class JsonResponse<T : Any>(val request: Request<T>, val serializer: KSerializer<T>) : Call<List<T>> {
   override fun invoke(): List<T> = request.invoke().use {
     it.reader.readText().parseJsonList(serializer)
   }
@@ -43,8 +43,8 @@ fun <T : Any> String.parseJson(serializer: KSerializer<T>): T =
 
 inline fun <reified T : Any> String.parseJson(): T = parseJson(T::class.serializer())
 
-fun <T : Any> Request.parseJson(serializer: KSerializer<T>): JsonResponse<T> =
+fun <T : Any> Request<T>.parseJson(serializer: KSerializer<T>): JsonResponse<T> =
   JsonResponse(this, serializer)
 
-inline fun <reified T : Any> Request.parseJson(): JsonResponse<T> =
+inline fun <reified T : Any> Request<T>.parseJson(): JsonResponse<T> =
   parseJson(T::class.serializer())

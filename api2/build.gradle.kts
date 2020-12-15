@@ -56,7 +56,7 @@ dependencies {
   implementation(KotlinX.coroutines.jdk8)
   implementation("org.jetbrains.kotlin:kotlin-reflect:_")
 
-  implementation("com.google.code.gson:gson:_")
+  //implementation("com.google.code.gson:gson:_")
   implementation(Square.okHttp3.okHttp)
 
   //implementation(KotlinX.serialization.runtimeCommon)

@@ -45,7 +45,7 @@ class OkHttpExecutor(
       .build()
   }
 
-  class HttpResponse(val response: Response) : IPFS.ApiResponse {
+  class HttpResponse<T>(val response: Response) : IPFS.ApiResponse<T> {
 
     override val isSuccessful = response.isSuccessful
     override val errorMessage = "Code:${response.code}: ${response.message}"
@@ -58,7 +58,7 @@ class OkHttpExecutor(
     override fun close() = response.close()
   }
 
-  override fun invoke(request: Request): IPFS.ApiResponse =
+  override fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> =
     okhttp3.Request.Builder().url("$urlBase/${request.path}")
       .post(requestBody(request))
       .build().let {
@@ -67,7 +67,7 @@ class OkHttpExecutor(
         }
       }
 
-  protected fun requestBody(request: Request): RequestBody {
+  protected fun <T> requestBody(request: Request<T>): RequestBody {
     log.debug("requestBody() $request")
     if (request !is DirectoryRequest) return "".toRequestBody()
 
