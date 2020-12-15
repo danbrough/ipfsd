@@ -8,15 +8,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 
 
-class JsonResponse<T : Any>(val request: Request<T>, val serializer: KSerializer<T>) : Call<T> {
-  fun invoke(block: (T) -> Unit): Unit = request.invoke().use {
-    it.reader.readText().parseJsonList(serializer).forEach(block)
-  }
-
-  override fun invoke(): T = request.invoke().reader.readText().parseJson(serializer)
-
-}
-
 private class ListSerializer<T>(val serializer: KSerializer<T>) : KSerializer<List<T>> {
   override val descriptor: SerialDescriptor
     get() = TODO("Not yet implemented")
@@ -46,15 +37,18 @@ fun <T : Any> String.parseJson(serializer: KSerializer<T>): T =
 
 inline fun <reified T : Any> String.parseJson(): T = parseJson(T::class.serializer())
 
-fun <T : Any> Request<T>.parseJson(serializer: KSerializer<T>): JsonResponse<T> =
-  JsonResponse(this, serializer)
-
-inline fun <reified T : Any> Request<T>.parseJson(): JsonResponse<T> =
-  parseJson(T::class.serializer())
 
 //inline fun <reified T : Any> IPFS.ApiResponse.json(block:(T)->Unit):
 
 inline fun <reified T : Any> IPFS.ApiResponse<T>.json(block: (T) -> Unit): Unit =
   reader.readText().parseJsonList<T>().forEach(block)
+
+
+inline fun <reified T : Any> IPFS.ApiResponse<T>.json(): List<T> =
+  reader.readText().parseJsonList()
+
+inline fun <reified T : Any> Request<T>.json(block: (T) -> Unit) =
+  invoke().json(block)
+
 
 

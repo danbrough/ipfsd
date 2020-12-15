@@ -4,7 +4,8 @@ import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.put
 import org.junit.Test
 
@@ -12,22 +13,23 @@ class DagTest {
   @Test
   fun test1() {
     log.info("test1()")
-    val json1 = Json.encodeToString(buildJsonObject {
-      put("message", "Hello World")
-      put("count", 123)
-    })
-
-    ipfs.blocking {
-      Json.encodeToString(TestData.HelloWorld.data).also {
-        log.debug("json: $it")
-        dag.put().apply {
-          add(it)
-          add(json1)
-        }.invoke().json {
-          log.debug("file: $it")
-        }
+    val people = buildJsonArray {
+      addJsonObject {
+        put("name", "Dan")
+        put("age", 49)
+      }
+      addJsonObject {
+        put("name", "Fred")
+        put("age", 12)
       }
     }
+    val json = Json.encodeToString(people)
+    ipfs.blocking {
+      dag.put(json).json {
+        log.debug("cid: $it")
+      }
+    }
+
   }
 }
 

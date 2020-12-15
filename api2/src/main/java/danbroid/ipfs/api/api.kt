@@ -2,11 +2,7 @@ package danbroid.ipfs.api
 
 import danbroid.ipfs.api.utils.SingletonHolder
 import danbroid.ipfs.api.utils.addUrlArgs
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import java.io.*
 
 class IPFS(callContext: CallContext) {
@@ -22,12 +18,11 @@ class IPFS(callContext: CallContext) {
 
   interface Executor {
     operator fun <T> invoke(request: Request<T>): ApiResponse<T>
-
   }
 
   class CallContext(
     val executor: Executor,
-    val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    // val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
   )
 
 
@@ -90,6 +85,29 @@ class IPFS(callContext: CallContext) {
         }
       }
 
+
+    /**
+     * /api/v0/ls
+     * List directory contents for Unix filesystem objects.
+     *
+     * @param path The path to the IPFS object(s) to list links from. Required: yes.
+     * @param resolveType Resolve linked objects to find out their types. Default: true. Required: no.
+     * @param resolveSize Resolve linked objects to find out their file size. Default: true. Required: no.
+     * @param stream Enable experimental streaming of directory entries as they are traversed. Required: no.
+     */
+
+    @JvmOverloads
+    fun ls(
+      path: String,
+      stream: Boolean = false,
+      resolveType: Boolean? = null,
+      resolveSize: Boolean? = null
+    ) =
+      Request<Types.Object.ObjectArray>(
+        callContext, "ls", "arg" to path, "stream" to stream,
+        "resolve-type" to resolveType, "size" to resolveSize
+      )
+
   }
 
   @JvmField
@@ -113,12 +131,11 @@ class IPFS(callContext: CallContext) {
 
 
     fun put(
+      data: String? = null,
       format: String? = null,
       inputEnc: String? = null,
       pin: Boolean? = null,
       hashFunc: String? = null,
-      data: Any? = null,
-      dataPath: String? = null
     ) = DirectoryRequest<Types.CID>(
       callContext,
       "dag/put",
@@ -126,8 +143,9 @@ class IPFS(callContext: CallContext) {
       "input-enc" to inputEnc,
       "pin" to pin,
       "hash" to hashFunc
-    )
-
+    ).also {
+      if (data != null) it.add(data)
+    }
 
     /**
      * api/v0/dag/get
@@ -148,7 +166,7 @@ class IPFS(callContext: CallContext) {
         callContext, "id",
         "arg" to peerID,
         "peerid-base" to peerIDBase
-      ).parseJson<Types.ID>()
+      )
   }
 
   @JvmField
@@ -172,7 +190,6 @@ open class Request<T>(
   override fun invoke() = callContext.executor(this)
 
   inline fun <U> invoke(block: (IPFS.ApiResponse<T>) -> U): U = invoke().use(block)
-
 
 }
 
@@ -237,33 +254,6 @@ class DirectoryRequest<T : Any>(
   override fun iterator() = root.iterator()
 }
 
-
-class Types {
-
-  @Serializable
-  data class ID(
-    val ID: String,
-    val AgentVersion: String,
-    val ProtocolVersion: String,
-    val PublicKey: String,
-    val Protocols: Array<String>,
-    val Addresses: Array<String>,
-  )
-
-
-  @Serializable
-  data class File(
-    val Name: String,
-    val Hash: String,
-    val Size: Long,
-  )
-
-  @Serializable
-  data class Link(@SerialName("/") val link: String)
-
-  @Serializable
-  data class CID(val Cid: Link)
-}
 
 private object api
 
