@@ -1,8 +1,13 @@
 package danbroid.ipfs.api.utils
 
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
+
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import java.io.StringReader
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.*
@@ -19,6 +24,28 @@ fun String.addUrlArgs(vararg keywords: Pair<String, Any?>): String = StringBuild
     append("${arg.first}=${arg.second!!.toString().uriEncode()}")
   }
 }.toString()
+
+
+inline fun <reified T> CharSequence.parseJson() =
+  createGsonBuilder().create().fromJson(StringReader(this.toString()), T::class.java)
+
+fun <T> CharSequence.parseJson(type: Class<T>) =
+  GsonBuilder().create().fromJson(StringReader(this.toString()), type)
+
+fun CharSequence.toJson(): JsonElement =
+  JsonParser.parseString(this.toString())
+
+fun createGsonBuilder() =
+  GsonBuilder().registerTypeAdapter(Date::class.java, object : TypeAdapter<Date>() {
+    override fun write(out: JsonWriter, value: Date) {
+      out.value(value.time)
+    }
+
+    override fun read(`in`: JsonReader): Date {
+      return Date(`in`.nextLong())
+    }
+
+  }.nullSafe()).serializeNulls()
 
 
 open class SingletonHolder<out T : Any, in A>(creator: (A) -> T) {

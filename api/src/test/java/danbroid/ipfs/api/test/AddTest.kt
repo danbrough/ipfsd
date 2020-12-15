@@ -1,94 +1,92 @@
 package danbroid.ipfs.api.test
 
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert
+import danbroid.ipfs.api.Types
+import danbroid.ipfs.api.blocking
+import danbroid.ipfs.api.parseJson
+import danbroid.ipfs.api.parseJsonList
+import org.junit.Before
 import org.junit.Test
-import java.nio.file.Files
-import java.nio.file.LinkOption
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.*
 
-class AddTest : CallTest() {
+class AddTest {
 
-  @Test
-  fun idTest() {
-    log.info("ID: ${ipfs.blocking { network.id().reader.readText() }}")
+  @Before
+  fun setup() {
+    TestData.TestDirectory.createTestDir()
   }
 
   @Test
-  fun addMessage() {
-    log.info("addTest()")
-    val msg = "${javaClass.simpleName} addMessage at ${Date()}\n"
+  fun test1() {
+    log.debug("test1() adding hello world message..")
     ipfs.blocking {
-      SharedData.cid = basic.add(msg, fileName = "test_message.txt").get().valueOrThrow().hash
-    }
-
-  }
-
-  val msg1 = "message.txt in directory a\n"
-  val msg2 = "message.txt in directory a/b\n"
-  val test_dir_cid = "QmZ5GtGGqYdcFm3GA5dWfiWjuvdBnQJtkSTVsNeRuFRQoL"
-
-  val testPath =
-    Paths.get(System.getProperty("java.io.tmpdir")).resolve("ipfsd_test").resolve("a")
-
-  @Test
-  fun addDirectory() {
-    log.info("addDirectory()")
-
-    fun deleteDir(path: Path) {
-      if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-        Files.newDirectoryStream(path).forEach {
-          deleteDir(it)
+      basic.add(
+        data = TestData.HelloWorld.data,
+        fileName = TestData.HelloWorld.name,
+        wrapWithDirectory = false
+      ).invoke {
+        val data: String = it.reader.readText()
+        log.debug("data: <${data}>")
+        val file = data.parseJson<Types.File>()
+        log.debug("file: $file")
+        require(file.Hash == TestData.HelloWorld.cid) {
+          "file.Hash != TestData.HelloWorld.cid"
+        }
+        require(file.Name == TestData.HelloWorld.name) {
+          "file.Name != TestData.HelloWorld.name"
         }
       }
-      Files.deleteIfExists(path)
-    }
-
-    deleteDir(testPath)
-    val testDir = Files.createDirectories(testPath)
-
-    Files.write(testDir.resolve("message.txt"), msg1.toByteArray())
-
-    Files.write(
-      Files.createDirectory(testDir.resolve("b")).resolve("message.txt"),
-      msg2.toByteArray()
-    )
-
-    var cid: String? = null
-    runBlocking {
-      ipfs.basic.add(file = testDir.toFile(), recurseDirectory = true, onlyHash = false).flow()
-        .collectLatest {
-          log.debug("got $it")
-          cid = it.valueOrThrow().hash
-        }
-
-
-      log.info("finished collect: cid: $cid")
-      Assert.assertEquals("Invalid CID", test_dir_cid, cid)
-      deleteDir(testPath)
     }
   }
 
   @Test
-  fun addDirectory2() {
-    runBlocking {
-      var cid: String? = null
+  fun test2() {
+    log.debug("test2() adding hello world message in directory..")
+    ipfs.blocking {
+      basic.add(
+        data = TestData.HelloWorld.data,
+        fileName = TestData.HelloWorld.name,
+        wrapWithDirectory = true
+      ).invoke {
+        it.reader.readText().parseJsonList<Types.File>().also {
+          require(it.size == 2) { "invalid size: ${it.size}" }
+          val file = it[0]
+          require(file.Hash == TestData.HelloWorld.cid) {
+            "file.Hash != TestData.HelloWorld.cid"
+          }
+          require(file.Name == TestData.HelloWorld.name) {
+            "file.Name != TestData.HelloWorld.name"
+          }
+          require(it[1].Hash == TestData.HelloWorld.cid_with_directory) {
+            "Invalid cid ${it[1].Hash} expecting ${TestData.HelloWorld.cid_with_directory}"
+          }
+        }
+      }
+    }
+  }
 
-      log.debug("doing add..")
-      ipfs.basic.add(onlyHash = true).apply {
+  @Test
+  fun test3() {
+    log.debug("test3() directory test")
+    ipfs.blocking {
+      basic.add().apply {
         addDirectory("a").apply {
-          addData(msg1.toByteArray(), "message.txt")
-          addDirectory("b").addData(msg2.toByteArray(), "message.txt")
+          add(TestData.TestDirectory.msg1, "message.txt")
+          addDirectory("b").add(TestData.TestDirectory.msg2, "message.txt")
         }
-      }.collect {
-        log.info("RESULT: $it")
-        cid = it.valueOrThrow().hash
+      }.invoke {
+        it.reader.readText().parseJsonList<Types.File>().forEach {
+          log.debug("file: $it")
+        }
       }
-      log.info("finished collect: cid: $cid")
-      Assert.assertEquals("Invalid CID", test_dir_cid, cid)
+    }
+  }
+
+  @Test
+  fun test4() {
+    log.info("test4() adding test dir: ${TestData.TestDirectory.testPath}")
+    ipfs.blocking {
+      basic.add(file = TestData.TestDirectory.testPath.toFile(),recurseDirectory = true).invoke {
+        log.info("response: ${it.reader.readText()}")
+      }
     }
   }
 }
