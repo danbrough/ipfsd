@@ -11,8 +11,8 @@ class Types {
     val AgentVersion: String,
     val ProtocolVersion: String,
     val PublicKey: String,
-    val Protocols: Array<String>,
-    val Addresses: Array<String>,
+    val Protocols: List<String>,
+    val Addresses: List<String>,
   )
 
 
