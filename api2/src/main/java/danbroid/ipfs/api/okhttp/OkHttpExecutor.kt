@@ -75,7 +75,7 @@ class OkHttpExecutor(
       .setType(MultipartBody.FORM).apply {
         //.addPart(toOkHttpPart(request.part))
         request.forEach {
-          addPart(toOkHttpPart(it))
+          addParts(this, it)
         }
       }
 
@@ -83,8 +83,13 @@ class OkHttpExecutor(
   }
 
 
-  protected fun toOkHttpPart(part: Part): MultipartBody.Part {
-    return MultipartBody.Part.createFormData("file", part.name.uriEncode(), requestBody(part))
+  protected fun addParts(builder: MultipartBody.Builder, part: Part) {
+    val okHttpPart =
+      MultipartBody.Part.createFormData("file", part.name.uriEncode(), requestBody(part))
+    builder.addPart(okHttpPart)
+    part.forEach {
+      addParts(builder, it)
+    }
   }
 
   protected fun requestBody(part: Part): RequestBody {

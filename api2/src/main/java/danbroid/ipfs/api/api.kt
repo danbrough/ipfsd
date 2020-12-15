@@ -128,11 +128,20 @@ open class Request(
   val path = path.addUrlArgs(*args)
 
   override fun invoke() = callContext.executor(this)
+
+  inline fun <T> invoke(block: (IPFS.ApiResponse) -> T): T =
+    invoke().use(block)
+
 }
 
 interface PartList : Iterable<Part> {
   fun add(part: Part)
   fun add(file: File) = add(FilePart(file))
+
+  fun addDirectory(name: String) = DirectoryPart(name).also {
+    add(it)
+  }
+
   fun add(data: String, name: String) = add(data.toByteArray(), name)
   fun add(data: ByteArray, name: String) = add(DataPart(data, name))
 }
@@ -150,13 +159,16 @@ class FilePart(val file: File) : Part(file.name, file.isDirectory) {
   override fun getInput() = FileInputStream(file)
 }
 
+class DirectoryPart(name: String = "") : Part(name, true)
 
 open class Part(val name: String = "", val isDirectory: Boolean) : PartList {
 
   protected val parts = mutableListOf<Part>()
+
   override fun add(part: Part) {
     parts.add(part)
   }
+
 
   override fun iterator(): Iterator<Part> = parts.iterator()
 
@@ -172,7 +184,9 @@ class DirectoryRequest(
 
   private var root = Part("", true)
 
-  override fun add(part: Part) = root.add(part)
+  override fun add(part: Part) {
+    root.add(part)
+  }
 
   override fun iterator() = root.iterator()
 }
