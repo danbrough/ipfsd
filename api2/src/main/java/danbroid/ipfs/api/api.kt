@@ -129,8 +129,7 @@ open class Request(
 
   override fun invoke() = callContext.executor(this)
 
-  inline fun <T> invoke(block: (IPFS.ApiResponse) -> T): T =
-    invoke().use(block)
+  inline fun <T> invoke(block: (IPFS.ApiResponse) -> T): T = invoke().use(block)
 
 }
 

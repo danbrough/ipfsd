@@ -9,7 +9,7 @@ import kotlinx.serialization.serializer
 
 
 class JsonResponse<T : Any>(val request: Request, val serializer: KSerializer<T>) : Call<List<T>> {
-  override fun invoke(): List<T> = request.invoke {
+  override fun invoke(): List<T> = request.invoke().use {
     it.reader.readText().parseJsonList(serializer)
   }
 }
