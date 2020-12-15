@@ -119,7 +119,7 @@ class IPFS(callContext: CallContext) {
       hashFunc: String? = null,
       data: Any? = null,
       dataPath: String? = null
-    ) = DirectoryRequest<Types.File>(
+    ) = DirectoryRequest<Types.CID>(
       callContext,
       "dag/put",
       "format" to format,
@@ -172,6 +172,7 @@ open class Request<T>(
   override fun invoke() = callContext.executor(this)
 
   inline fun <U> invoke(block: (IPFS.ApiResponse<T>) -> U): U = invoke().use(block)
+
 
 }
 
