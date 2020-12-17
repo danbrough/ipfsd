@@ -2,8 +2,8 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.Types
 import danbroid.ipfs.api.blocking
+import danbroid.ipfs.api.jsonSequence
 import danbroid.ipfs.api.parseJson
-import danbroid.ipfs.api.parseJsonList
 import org.junit.Before
 import org.junit.Test
 
@@ -20,8 +20,7 @@ class AddTest {
     ipfs.blocking {
       basic.add(
         data = TestData.HelloWorld.data,
-        fileName = TestData.HelloWorld.name,
-        wrapWithDirectory = false
+        fileName = TestData.HelloWorld.name
       ).invoke {
         val data: String = it.reader.readText()
         log.debug("data: <${data}>")
@@ -46,7 +45,7 @@ class AddTest {
         fileName = TestData.HelloWorld.name,
         wrapWithDirectory = true
       ).invoke {
-        it.reader.readText().parseJsonList<Types.File>().also {
+        it.reader.readText().jsonSequence<Types.File>().also {
           require(it.size == 2) { "invalid size: ${it.size}" }
           val file = it[0]
           require(file.Hash == TestData.HelloWorld.cid) {
@@ -72,10 +71,8 @@ class AddTest {
           add(TestData.TestDirectory.msg1, "message.txt")
           addDirectory("b").add(TestData.TestDirectory.msg2, "message.txt")
         }
-      }.invoke {
-        it.reader.readText().parseJsonList<Types.File>().forEach {
-          log.debug("file: $it")
-        }
+      }.invoke().jsonSequence {
+        log.info("FILE: $it")
       }
     }
   }
@@ -84,11 +81,13 @@ class AddTest {
   fun test4() {
     log.info("test4() adding test dir: ${TestData.TestDirectory.testPath}")
     ipfs.blocking {
-      basic.add(file = TestData.TestDirectory.testPath.toFile(),recurseDirectory = true).invoke {
+      basic.add(file = TestData.TestDirectory.testPath.toFile(), recurseDirectory = true).invoke {
         log.info("response: ${it.reader.readText()}")
       }
     }
   }
+
+
 }
 
 

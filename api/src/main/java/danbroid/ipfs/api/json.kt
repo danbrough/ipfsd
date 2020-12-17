@@ -1,14 +1,22 @@
 package danbroid.ipfs.api
 
+import com.google.gson.JsonStreamParser
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.serializer
+import org.slf4j.LoggerFactory
+import java.io.Reader
+import kotlin.reflect.KClass
 
 
-private class ListSerializer<T>(val serializer: KSerializer<T>) : KSerializer<List<T>> {
+private class SeriesSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<List<T>> {
   override val descriptor: SerialDescriptor
     get() = TODO("Not yet implemented")
 
@@ -27,28 +35,45 @@ private class ListSerializer<T>(val serializer: KSerializer<T>) : KSerializer<Li
   }
 }
 
+
 fun <T : Any> String.parseJsonList(serializer: KSerializer<T>): List<T> =
-  Json.decodeFromString(ListSerializer(serializer), this)
+  Json.decodeFromString(SeriesSerializer(serializer), this)
 
-inline fun <reified T : Any> String.parseJsonList(): List<T> = parseJsonList(T::class.serializer())
+fun <T : Any> String.parseJsonList(type: KClass<T>): List<T> =
+  Json.decodeFromString(SeriesSerializer(type.serializer()), this)
 
-fun <T : Any> String.parseJson(serializer: KSerializer<T>): T =
-  Json.decodeFromString(serializer, this)
+private object _log
 
-inline fun <reified T : Any> String.parseJson(): T = parseJson(T::class.serializer())
+val log = LoggerFactory.getLogger(_log::class.java)
 
+inline fun <reified T : Any> String.jsonSequence(): List<T> = parseJsonList(T::class)
 
-//inline fun <reified T : Any> IPFS.ApiResponse.json(block:(T)->Unit):
+inline fun <reified T : Any> String.parseJson(): T = Json.decodeFromString(this)
 
-inline fun <reified T : Any> IPFS.ApiResponse<T>.json(block: (T) -> Unit): Unit =
-  reader.readText().parseJsonList<T>().forEach(block)
+inline fun <reified T : Any> IPFS.ApiResponse<T>.jsonSequence(block: (T) -> Unit): Unit =
+  reader.readText().jsonSequence<T>().forEach(block)
 
+inline fun <reified T : Any> IPFS.ApiResponse<T>.jsonSequence(): List<T> =
+  reader.readText().jsonSequence()
 
-inline fun <reified T : Any> IPFS.ApiResponse<T>.json(): List<T> =
-  reader.readText().parseJsonList()
+inline fun <reified T : Any> IPFS.ApiResponse<T>.json(): T =
+  reader.readText().parseJson()
 
-inline fun <reified T : Any> Request<T>.json(block: (T) -> Unit) =
-  invoke().json(block)
+inline suspend fun <reified T : Any> Request<T>.jsonSequence(block: (T) -> Unit) =
+  invoke().jsonSequence(block)
 
+fun Reader.jsonSequence(): Sequence<JsonElement> = sequence {
+  JsonStreamParser(this@jsonSequence).forEach {
+    val json = it.toString()
+    log.debug("yielding $json")
+    yield(Json.parseToJsonElement(json))
+  }
+}
 
-
+fun Reader.flow(): Flow<JsonElement> = flow {
+  JsonStreamParser(this@flow).forEach {
+    val json = it.toString()
+    log.debug("emitting: $json")
+    emit(Json.parseToJsonElement(json))
+  }
+}

@@ -10,7 +10,7 @@ class NetworkTest {
     log.info(
       "ID: ${
         ipfs.blocking {
-          network.id().invoke().json().first().also { 
+          network.id().invoke().json().also {
             log.debug("ID: $it")
           }
         }
