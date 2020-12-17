@@ -21,7 +21,7 @@ class OkHttpExecutor(
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpExecutor::class.java)
     val MEDIA_TYPE_APPLICATION = "application/octet-stream".toMediaType()
     val MEDIA_TYPE_DIRECTORY = "application/x-directory".toMediaType()
-    var DEBUG_HTTP = true
+    var DEBUG_HTTP = false
   }
 
   private val httpClient by lazy {
@@ -70,7 +70,6 @@ class OkHttpExecutor(
   protected fun <T> requestBody(request: Request<T>): RequestBody {
     log.debug("requestBody() $request")
     if (request !is DirectoryRequest) return "".toRequestBody()
-
     return MultipartBody.Builder()
       .setType(MultipartBody.FORM).apply {
         //.addPart(toOkHttpPart(request.part))
@@ -78,7 +77,6 @@ class OkHttpExecutor(
           addParts(this, it)
         }
       }
-
       .build()
   }
 

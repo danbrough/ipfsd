@@ -1,7 +1,9 @@
 package danbroid.ipfs.api
 
+import danbroid.ipfs.api.utils.Base58
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import okio.ByteString.Companion.decodeBase64
 
 class Types {
 
@@ -24,10 +26,30 @@ class Types {
   )
 
   @Serializable
-  data class Link(@SerialName("/") val link: String)
+  data class Link(@SerialName("/") val path: String)
 
   @Serializable
   data class CID(val Cid: Link)
+
+  @Serializable
+  data class Message(
+    val from: String,
+    val data: String? = null,
+    val seqno: String,
+    val topicIDs: Array<String>,
+  ) {
+    val sequenceID: Long
+      get() = seqno.decodeBase64()!!.asByteBuffer().long
+
+    val dataString: String
+      get() = data?.decodeBase64()?.string(Charsets.UTF_8) ?: ""
+
+    val fromID: String
+      get() = Base58.encode(from.decodeBase64()!!.toByteArray())
+
+    override fun toString() = "Message[from=$fromID,sequenceID:$sequenceID]"
+  }
+
 
   @Serializable
   data class Object(

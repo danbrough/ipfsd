@@ -1,20 +1,16 @@
 package danbroid.ipfsd.client
 
 import android.content.Context
-import danbroid.ipfs.api.ApiCall
-import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfs.api.IPFS
-import danbroid.ipfs.api.okhttp.OkHttpCallExecutor
+import danbroid.ipfs.api.Request
+import danbroid.ipfs.api.okhttp.OkHttpExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 
 class ServiceApiClient private constructor(
   val serviceClient: ServiceClient,
-  private val executor: CallExecutor,
-) : CallExecutor {
+  private val executor: IPFS.Executor,
+) : IPFS.Executor {
 
   init {
     if (!serviceClient.isServiceInstalled()) {
@@ -23,20 +19,24 @@ class ServiceApiClient private constructor(
     }
   }
 
-
-  override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
+  override suspend fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> {
     serviceClient.waitTillStarted()
-    emitAll(executor.exec(call))
+    return executor.invoke(request)
   }
 
-  companion object : SingletonHolder<ServiceApiClient, Pair<ServiceClient, CallExecutor>>({
+  /*TODO override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
+    serviceClient.waitTillStarted()
+    emitAll(executor.exec(call))
+  }*/
+
+  companion object : SingletonHolder<ServiceApiClient, Pair<ServiceClient, IPFS.Executor>>({
     ServiceApiClient(it.first, it.second)
   }) {
     const val DEFAULT_PORT = 5001
     const val DEFAULT_API_URL = "http://localhost:$DEFAULT_PORT/api/v0"
 
     fun getInstance(context: Context, urlBase: String = DEFAULT_API_URL): ServiceApiClient =
-      getInstance(Pair(ServiceClient.getInstance(context), OkHttpCallExecutor(urlBase)))
+      getInstance(Pair(ServiceClient.getInstance(context), OkHttpExecutor(urlBase)))
 
 /*    fun getInstance(ipfsdClient: ServiceClient, executor: CallExecutor): ServiceApiClient =
       getInstance(Pair(ipfsdClient, executor))
@@ -44,10 +44,12 @@ class ServiceApiClient private constructor(
     fun getInstance(context: Context, executor: CallExecutor): ServiceApiClient =
       getInstance(Pair(ServiceClient.getInstance(context), executor))*/
   }
+
+
 }
 
 private class AndroidIPFS(context: Context) :
-  IPFS() {
+  IPFS(CallContext(ServiceApiClient.getInstance(context))) {
   companion object : SingletonHolder<AndroidIPFS, Context>(::AndroidIPFS)
 }
 

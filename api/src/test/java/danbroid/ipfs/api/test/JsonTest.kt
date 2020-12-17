@@ -1,5 +1,6 @@
 package danbroid.ipfs.api.test
 
+import danbroid.ipfs.api.jsonSequence
 import danbroid.ipfs.api.parseJsonList
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -14,7 +15,7 @@ class JsonTest {
     """
     log.debug("data: $data")
 
-    data.parseJsonList<String>().forEach {
+    data.jsonSequence<String>().forEach {
       log.debug("string: $it")
     }
   }

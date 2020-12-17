@@ -1,33 +1,36 @@
 package danbroid.ipfs.api
 
 import danbroid.ipfs.api.utils.SingletonHolder
-import danbroid.ipfs.api.utils.addUrlArgs
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.io.*
 
-class IPFS(callContext: CallContext) {
+open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.coroutineScope {
 
   interface ApiResponse<T> : Closeable {
     val isSuccessful: Boolean
     val errorMessage: String
     val stream: InputStream
     val reader: Reader
+    val text: String
+      get() = if (isSuccessful) reader.readText() else throw Exception(errorMessage)
   }
 
   companion object : SingletonHolder<IPFS, CallContext>(::IPFS)
 
   interface Executor {
-    operator fun <T> invoke(request: Request<T>): ApiResponse<T>
+    fun <T> invoke(request: Request<T>): ApiResponse<T>
   }
 
   class CallContext(
     val executor: Executor,
-    // val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-  )
+    val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+  ) : Executor {
+    override fun <T> invoke(request: Request<T>): ApiResponse<T> = executor.invoke(request)
+
+  }
 
 
   class Basic(val callContext: CallContext) {
-
 
     /**
      * Add data to ipfs.
@@ -61,7 +64,7 @@ class IPFS(callContext: CallContext) {
       fsCache: Boolean? = null,
       noCopy: Boolean? = null,
     ) =
-      DirectoryRequest<Types.CID>(
+      DirectoryRequest<Types.File>(
         callContext,
         "add",
         "progress" to progress,
@@ -152,7 +155,7 @@ class IPFS(callContext: CallContext) {
      * Get a dag node from ipfs.
      **/
 
-    fun get(arg: String) = Request<Any>(callContext, "dag/get", "arg" to arg)
+    fun <T> get(arg: String) = Request<T>(callContext, "dag/get", "arg" to arg)
 
   }
 
@@ -173,85 +176,31 @@ class IPFS(callContext: CallContext) {
   val network = Network(callContext)
 
 
-}
+  class PubSub(val callContext: CallContext) {
 
-interface Call<T> {
-  fun invoke(): T
-}
+    /**
+     * /api/v0/pubsub/sub
+     * Subscribe to messages on a given topic.
+     * @param arg name of topic to subscribe to. Required: yes.
+     *
+     */
 
-open class Request<T>(
-  val callContext: IPFS.CallContext,
-  path: String,
-  vararg args: Pair<String, Any?>
-) :
-  Call<IPFS.ApiResponse<T>> {
-  val path = path.addUrlArgs(*args)
+    fun sub(arg: String) = Request<Types.Message>(
+      callContext,
+      "pubsub/sub", "arg" to arg
+    )
 
-  override fun invoke() = callContext.executor(this)
+    fun pub(topic: String, data: String) = Request<Any>(
+      callContext,
+      "pubsub/pub", "arg" to topic, "arg" to data
+    )
 
-  inline fun <U> invoke(block: (IPFS.ApiResponse<T>) -> U): U = invoke().use(block)
-
-}
-
-interface PartList : Iterable<Part> {
-  fun add(part: Part)
-  fun add(file: File) = add(FilePart(file))
-
-  fun addDirectory(name: String) = DirectoryPart(name).also {
-    add(it)
   }
 
-  fun add(data: String, name: String = "") = add(data.toByteArray(), name)
-  fun add(data: ByteArray, name: String = "") = add(DataPart(data, name))
-}
+  @JvmField
+  val pubsub = PubSub(callContext)
 
-class DataPart(val data: ByteArray, name: String) : Part(name, false) {
-  override fun length() = data.size.toLong()
-  override fun getInput() = ByteArrayInputStream(data)
-}
 
-class FilePart(val file: File, name: String = file.name) : Part(name, file.isDirectory) {
-
-  override fun iterator(): Iterator<Part> =
-    file.listFiles()?.map {
-      val fileName = if (name != "") name + "/" + it.name else it.name
-      FilePart(it, fileName)
-    }?.iterator() ?: emptyList<Part>().iterator()
-
-  override fun length(): Long = file.length()
-  override fun getInput() = FileInputStream(file)
-}
-
-class DirectoryPart(name: String = "") : Part(name, true)
-
-open class Part(var name: String = "", val isDirectory: Boolean) : PartList {
-
-  protected val parts = mutableListOf<Part>()
-
-  override fun add(part: Part) {
-    if (name != "") part.name = name + "/" + part.name
-    parts.add(part)
-  }
-
-  override fun iterator(): Iterator<Part> = parts.iterator()
-
-  open fun length(): Long = throw Exception("Not implemented")
-  open fun getInput(): InputStream = throw Exception("Not implemented")
-}
-
-class DirectoryRequest<T : Any>(
-  callContext: IPFS.CallContext,
-  path: String,
-  vararg args: Pair<String, Any?>
-) : Request<T>(callContext, path, *args), PartList {
-
-  private var root = Part("", true)
-
-  override fun add(part: Part) {
-    root.add(part)
-  }
-
-  override fun iterator() = root.iterator()
 }
 
 
