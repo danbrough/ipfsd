@@ -19,15 +19,17 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
 
   interface Executor {
     fun <T> invoke(request: Request<T>): ApiResponse<T>
+    fun <T> invoke(request: Request<T>, callback: Callback<T>)
+    interface Callback<T> {
+      fun onError(request: Request<T>, exception: Exception)
+      fun onResponse(request: Request<T>, response: ApiResponse<T>)
+    }
   }
 
   class CallContext(
     val executor: Executor,
     val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-  ) : Executor {
-    override fun <T> invoke(request: Request<T>): ApiResponse<T> = executor.invoke(request)
-
-  }
+  ) : Executor by executor
 
 
   class Basic(val callContext: CallContext) {

@@ -4,12 +4,14 @@ import danbroid.ipfs.api.*
 import danbroid.ipfs.api.Request
 import danbroid.ipfs.api.utils.uriEncode
 import okhttp3.*
+import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.Buffer
 import okio.BufferedSink
 import okio.source
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class OkHttpExecutor(
@@ -59,13 +61,25 @@ class OkHttpExecutor(
   }
 
   override fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> =
-    okhttp3.Request.Builder().url("$urlBase/${request.path}")
-      .post(requestBody(request))
-      .build().let {
-        httpClient.newCall(it).execute().let {
-          HttpResponse(it)
-        }
-      }
+    createCall(request).execute().let {
+      HttpResponse(it)
+    }
+
+  override fun <T> invoke(request: Request<T>, callback: IPFS.Executor.Callback<T>) {
+    createCall(request).enqueue(object : Callback {
+      override fun onFailure(call: Call, e: IOException) = callback.onError(request, e)
+
+      override fun onResponse(call: Call, response: Response) =
+        callback.onResponse(request, HttpResponse(response))
+    })
+  }
+
+  fun createCall(request: Request<*>): Call =
+    httpClient.newCall(
+      okhttp3.Request.Builder().url("$urlBase/${request.path}")
+        .post(requestBody(request))
+        .build()
+    )
 
   protected fun <T> requestBody(request: Request<T>): RequestBody {
     log.debug("requestBody() $request")

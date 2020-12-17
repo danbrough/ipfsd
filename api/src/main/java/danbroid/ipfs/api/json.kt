@@ -1,9 +1,10 @@
 package danbroid.ipfs.api
 
 import com.google.gson.JsonStreamParser
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.yield
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -24,10 +25,11 @@ inline fun <reified T : Any> IPFS.ApiResponse<T>.json(): T =
 
 inline fun <reified T : Any> JsonElement.parse(): T = Json.decodeFromJsonElement(this)
 
-inline fun <reified T : Any> IPFS.ApiResponse<T>.flow(): Flow<T> = flow {
+inline fun <reified T : Any> IPFS.ApiResponse<T>.flow() = flow<T> {
   JsonStreamParser(this@flow.reader).forEach {
     emit(it.toString().parseJson())
   }
-}
+}.flowOn(Dispatchers.IO)
 
-inline fun <reified T : Any> Flow<JsonElement>.parse(): Flow<T> = map { it.parse() }
+
+
