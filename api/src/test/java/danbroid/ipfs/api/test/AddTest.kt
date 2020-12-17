@@ -2,8 +2,10 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.Types
 import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.jsonSequence
+import danbroid.ipfs.api.flow
 import danbroid.ipfs.api.parseJson
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.toList
 import org.junit.Before
 import org.junit.Test
 
@@ -44,20 +46,19 @@ class AddTest {
         data = TestData.HelloWorld.data,
         fileName = TestData.HelloWorld.name,
         wrapWithDirectory = true
-      ).invoke {
-        it.reader.readText().jsonSequence<Types.File>().also {
-          require(it.size == 2) { "invalid size: ${it.size}" }
-          val file = it[0]
-          require(file.Hash == TestData.HelloWorld.cid) {
-            "file.Hash != TestData.HelloWorld.cid"
-          }
-          require(file.Name == TestData.HelloWorld.name) {
-            "file.Name != TestData.HelloWorld.name"
-          }
-          require(it[1].Hash == TestData.HelloWorld.cid_with_directory) {
-            "Invalid cid ${it[1].Hash} expecting ${TestData.HelloWorld.cid_with_directory}"
-          }
+      ).invoke().flow().toList().also {
+        require(it.size == 2) { "invalid size: ${it.size}" }
+        val file = it[0]
+        require(file.Hash == TestData.HelloWorld.cid) {
+          "file.Hash != TestData.HelloWorld.cid"
         }
+        require(file.Name == TestData.HelloWorld.name) {
+          "file.Name != TestData.HelloWorld.name"
+        }
+        require(it[1].Hash == TestData.HelloWorld.cid_with_directory) {
+          "Invalid cid ${it[1].Hash} expecting ${TestData.HelloWorld.cid_with_directory}"
+        }
+
       }
     }
   }
@@ -71,22 +72,24 @@ class AddTest {
           add(TestData.TestDirectory.msg1, "message.txt")
           addDirectory("b").add(TestData.TestDirectory.msg2, "message.txt")
         }
-      }.invoke().jsonSequence {
-        log.info("FILE: $it")
+      }.invoke().flow().collect {
+        log.debug("file: $it")
       }
     }
   }
 
   @Test
-  fun test4() {
-    log.info("test4() adding test dir: ${TestData.TestDirectory.testPath}")
+  fun test5() {
+    log.info("test5() adding test dir: ${TestData.TestDirectory.testPath}")
     ipfs.blocking {
       basic.add(file = TestData.TestDirectory.testPath.toFile(), recurseDirectory = true).invoke {
-        log.info("response: ${it.reader.readText()}")
+        it.flow().collect {
+          log.debug("file: $it")
+        }
       }
+      Unit
     }
   }
-
 
 }
 

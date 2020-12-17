@@ -19,7 +19,10 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     jvmTarget = "1.8"
     languageVersion = "1.4"
     // freeCompilerArgs = listOf("-Xjvm-default=enable")
-    freeCompilerArgs += "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
+    freeCompilerArgs += listOf(
+      "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
+      "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi"
+    )
   }
 }
 //languageSettings.useExperimentalAnnotation("org.mylibrary.OptInAnnotation")
