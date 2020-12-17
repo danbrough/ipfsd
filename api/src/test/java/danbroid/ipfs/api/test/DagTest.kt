@@ -1,8 +1,9 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
+import danbroid.ipfs.api.flow
 import danbroid.ipfs.api.json
-import danbroid.ipfs.api.jsonSequence
+import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -39,7 +40,7 @@ class DagTest {
 
     val json = Json.encodeToString(jsonData)
     ipfs.blocking {
-      dag.put(json).jsonSequence {
+      dag.put(json).invoke().flow().collect {
         log.debug("cid: $it")
         require(it.Cid.path == people_cid) {
           "Invalid cid: ${it.Cid.path}"

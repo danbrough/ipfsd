@@ -1,11 +1,13 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.json
-import danbroid.ipfs.api.jsonSequence
+import danbroid.ipfs.api.flow
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import org.junit.Test
 
 class BasicTest {
+  @InternalCoroutinesApi
   @Test
   fun ls() {
     val path = "/ipfs/QmZh1JZaEsNjGS1CcSEPPohitG9oEVdYb9uUsmhveSAsAn"
@@ -13,14 +15,16 @@ class BasicTest {
 
     ipfs.blocking {
 
-      basic.ls(path, resolveSize = false, resolveType = true,stream = true).jsonSequence {
-        log.info("objects: $it length: ${it.Objects.size}")
-     /*   it.Objects[0].Links[0].Hash.also {
-          require(it == "QmT83ehGdr7s7oSfrVP759xJnK8kWjYNqc71HJDN7DgUu7") {
-            "Invalid hash: $it"
-          }
-        }*/
-      }
+      basic.ls(path, resolveSize = false, resolveType = true, stream = true).invoke().flow()
+        .collect {
+          // log.info("objects: $it length: ${it.Objects.size}")
+          /*   it.Objects[0].Links[0].Hash.also {
+               require(it == "QmT83ehGdr7s7oSfrVP759xJnK8kWjYNqc71HJDN7DgUu7") {
+                 "Invalid hash: $it"
+               }
+             }*/
+        }
+      Unit
     }
   }
 }

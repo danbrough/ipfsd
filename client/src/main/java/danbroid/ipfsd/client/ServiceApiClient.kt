@@ -19,8 +19,8 @@ class ServiceApiClient private constructor(
     }
   }
 
-  override suspend fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> {
-    serviceClient.waitTillStarted()
+  override fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> {
+    //TODO  serviceClient.waitTillStarted()
     return executor.invoke(request)
   }
 
