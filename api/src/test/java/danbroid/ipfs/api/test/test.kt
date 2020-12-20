@@ -12,13 +12,14 @@ val ipfs = IPFS(IPFS.CallContext(OkHttpExecutor()))
 
 
 object TestData {
+  const val CID_EMPTY_OBJECT = "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
+
   object DagTest {
 
     @Serializable
     data class Person(val name: String, val age: Int)
 
     val dan = Person("Dan", 12)
-
 
 
   }

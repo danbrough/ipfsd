@@ -32,7 +32,7 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
   ) : Executor by executor
 
 
-  class Basic(val callContext: CallContext) {
+  inner class Basic {
 
     /**
      * Add data to ipfs.
@@ -115,11 +115,8 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
 
   }
 
-  @JvmField
-  val basic = Basic(callContext)
 
-
-  class Dag(val callContext: CallContext) {
+  inner class Dag {
 
     /**
      * /api/v0/dag/put
@@ -161,11 +158,8 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
 
   }
 
-  @JvmField
-  val dag = Dag(callContext)
 
-
-  class Network(val callContext: CallContext) {
+  inner class Network {
     fun id(peerID: String? = null, peerIDBase: String? = null) =
       Request<Types.ID>(
         callContext, "id",
@@ -174,11 +168,78 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
       )
   }
 
-  @JvmField
-  val network = Network(callContext)
+
+  inner class Object {
+    /**
+     *
+     * /api/v0/object/get
+     * Get and serialize the DAG node named by <key>.
+     *   'ipfs object get' is a plumbing command for retrieving DAG nodes.
+     *   It serializes the DAG node to the format specified by the "--encoding" flag.
+     *   It outputs to stdout, and <key> is a base58 encoded multihash.
+     *
+     * The encoding of the object's data field can be specified by using the
+     * --data-encoding flag
+     * Supported values are:
+     * "text" (default),"base64"
+
+     * @param arg  Key of the object to retrieve, in base58-encoded multihash format. Required: yes.
+     * @param dataEncoding  Encoding type of the data field, either "text" or "base64". Default: text. Required: no.
+     */
+    fun get(arg: String, dataEncoding: String? = null) =
+      Request<Types.Object>(
+        callContext,
+        "object/get",
+        "arg" to arg,
+        "data-encoding" to dataEncoding
+      )
 
 
-  class PubSub(val callContext: CallContext) {
+    inner class Patch {
+      /**
+       * /api/v0/object/patch/add-link
+       * Add a link to a given object.
+       * @param objectHash IPFS object to add link to.
+       * @param arg The hash of the node to modify4
+       * @param linkName Name of link to create.
+      //create [bool]: Create intermediary nodes. Required: no.
+       */
+      fun addLink(objectHash: String, linkHash: String, linkName: String) =
+        Request<Any>(
+          callContext,
+          "object/patch/add-link",
+          "arg" to objectHash,
+          "arg" to linkHash,
+          "arg" to linkName
+        )
+
+      /**
+       * /api/v0/object/patch/set-data
+       * Set the data field of an IPFS object.
+       * @param hash The hash of the node to modify
+       * @param data Data to set
+       */
+      fun setData(hash: String, data: ByteArray? = null) =
+        DirectoryRequest<Types.Hash>(callContext, "object/patch/set-data", "arg" to hash).also {
+          if (data != null) it.add(data)
+        }
+
+      /**
+       * /api/v0/object/patch/set-data
+       * Set the data field of an IPFS object.
+       * @param hash The hash of the node to modify
+       * @param data Data to set
+       */
+      fun setData(hash: String, data: String) = setData(hash, data.toByteArray())
+
+    }
+
+    @JvmField
+    val patch = Patch()
+  }
+
+
+  inner class PubSub {
 
     /**
      * /api/v0/pubsub/sub
@@ -200,9 +261,19 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
   }
 
   @JvmField
-  val pubsub = PubSub(callContext)
+  val dag = Dag()
 
+  @JvmField
+  val obj = Object()
 
+  @JvmField
+  val pubsub = PubSub()
+
+  @JvmField
+  val basic = Basic()
+
+  @JvmField
+  val network = Network()
 }
 
 
