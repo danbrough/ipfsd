@@ -26,6 +26,11 @@ class Types {
   )
 
   @Serializable
+  data class Hash(
+    val Hash: String
+  )
+
+  @Serializable
   data class Link(@SerialName("/") val path: String)
 
   @Serializable
