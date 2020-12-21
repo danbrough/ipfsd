@@ -3,7 +3,6 @@ package danbroid.ipfs.api.test
 import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.flow
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.OkHttpClient
@@ -47,25 +46,22 @@ class PubSubTest {
     val topic = "test"
     ipfs.blocking {
 
-      val job = supervisorScope {
-        launch {
+      val job = launch {
+        supervisorScope {
+
           log.warn("starting job")
           var running = true
           while (running) {
             log.debug("subscribing to $topic")
 
-            pubsub.sub(topic).invoke().use { response ->
-              val flow = response.flow().cancellable()
+            pubsub.sub(topic).invoke { response ->
               //flow.catch { log.trace("an error happened: ${it.message}") }
-              flow.collect {
-
+              response.flow().collect {
                 log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
                 if (it.dataString == "stop") {
                   log.debug("received stop")
                   running = false
                   cancel("Received stop")
-                  delay(1)
-                  yield()
                 }
               }
               log.info("at this bit")
@@ -73,9 +69,13 @@ class PubSubTest {
           }
         }
       }
-    }
 
-    log.info("THE END")
+      job.invokeOnCompletion {
+        log.warn("job finished: ${it?.message}")
+      }
+      job.join()
+      log.info("THE END")
+    }
   }
 
 }
