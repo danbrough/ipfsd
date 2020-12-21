@@ -2,9 +2,10 @@ package danbroid.ipfs.api
 
 import com.google.gson.JsonStreamParser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.isActive
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -26,9 +27,16 @@ inline fun <reified T : Any> IPFS.ApiResponse<T>.json(): T =
 inline fun <reified T : Any> JsonElement.parse(): T = Json.decodeFromJsonElement(this)
 
 inline fun <reified T : Any> IPFS.ApiResponse<T>.flow() = flow<T> {
-  JsonStreamParser(this@flow.reader).forEach {
-    emit(it.toString().parseJson())
+  val parser = JsonStreamParser(this@flow.reader)
+  while (parser.hasNext()) {
+    val next = parser.next()
+    emit(next.toString().parseJson())
+    if (!currentCoroutineContext().isActive) {
+      log.debug("!!not active quitting flow")
+      return@flow
+    }
   }
+
 }.flowOn(Dispatchers.IO)
 
 
