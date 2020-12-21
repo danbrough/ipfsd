@@ -10,19 +10,11 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
-import org.slf4j.LoggerFactory
-
-
-private object _log
-
-val log = LoggerFactory.getLogger(_log::class.java)
 
 inline fun <reified T : Any> String.parseJson(): T = Json.decodeFromString(this)
 
-
 inline fun <reified T : Any> IPFS.ApiResponse<T>.json(): T =
   reader.readText().parseJson()
-
 
 inline fun <reified T : Any> JsonElement.parse(): T = Json.decodeFromJsonElement(this)
 
@@ -32,7 +24,6 @@ inline fun <reified T : Any> IPFS.ApiResponse<T>.flow() = flow<T> {
     val next = parser.next()
     emit(next.toString().parseJson())
     if (!currentCoroutineContext().isActive) {
-      log.debug("!!not active quitting flow")
       return@flow
     }
   }
