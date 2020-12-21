@@ -47,27 +47,27 @@ class PubSubTest {
     ipfs.blocking {
 
       val job = launch {
-        supervisorScope {
+        //supervisorScope {
 
-          log.warn("starting job")
-          var running = true
-          while (running) {
-            log.debug("subscribing to $topic")
+        log.warn("starting job")
+        var running = true
+        while (running) {
+          log.debug("subscribing to $topic")
 
-            pubsub.sub(topic).invoke { response ->
-              //flow.catch { log.trace("an error happened: ${it.message}") }
-              response.flow().collect {
-                log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
-                if (it.dataString == "stop") {
-                  log.debug("received stop")
-                  running = false
-                  cancel("Received stop")
-                }
+          pubsub.sub(topic).invoke { response ->
+            //flow.catch { log.trace("an error happened: ${it.message}") }
+            response.flow().collect {
+              log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
+              if (it.dataString == "stop") {
+                log.debug("received stop")
+                running = false
+                cancel("Received stop")
               }
-              log.info("at this bit")
             }
+            log.info("at this bit")
           }
         }
+        //}
       }
 
       job.invokeOnCompletion {
