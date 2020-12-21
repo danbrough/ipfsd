@@ -21,8 +21,7 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
     fun <T> invoke(request: Request<T>): ApiResponse<T>
     fun <T> invoke(request: Request<T>, callback: Callback<T>)
     interface Callback<T> {
-      fun onError(request: Request<T>, exception: Exception)
-      fun onResponse(request: Request<T>, response: ApiResponse<T>)
+      fun onResponse(request: Request<T>, response: ApiResponse<T>?, err: Exception? = null)
     }
   }
 

@@ -67,7 +67,7 @@ class OkHttpExecutor(
 
   override fun <T> invoke(request: Request<T>, callback: IPFS.Executor.Callback<T>) {
     createCall(request).enqueue(object : Callback {
-      override fun onFailure(call: Call, e: IOException) = callback.onError(request, e)
+      override fun onFailure(call: Call, e: IOException) = callback.onResponse(request, null, e)
 
       override fun onResponse(call: Call, response: Response) =
         callback.onResponse(request, HttpResponse(response))
