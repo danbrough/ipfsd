@@ -49,26 +49,34 @@ class PubSubTest {
       val job = launch {
         //supervisorScope {
 
-        log.warn("starting job")
+        log.warn("launched")
+
         var running = true
         while (running) {
-          log.debug("subscribing to $topic")
 
-          pubsub.sub(topic).invoke { response ->
-            //flow.catch { log.trace("an error happened: ${it.message}") }
-            response.flow().collect {
-              log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
-              if (it.dataString == "stop") {
-                log.debug("received stop")
-                running = false
-                cancel("Received stop")
+          runCatching {
+            log.debug("subscribing to $topic")
+
+            pubsub.sub(topic).invoke { response ->
+              //flow.catch { log.trace("an error happened: ${it.message}") }
+              response.flow().collect {
+                log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
+                if (it.dataString == "stop") {
+                  log.debug("received stop")
+                  running = false
+                  cancel("Received stop")
+                }
               }
+              log.info("at this bit")
             }
-            log.info("at this bit")
+          }.exceptionOrNull()?.also {
+            log.error("something bad happened: $it")
+            delay(1000)
           }
         }
-        //}
       }
+
+
 
       job.invokeOnCompletion {
         log.warn("job finished: ${it?.message}")
