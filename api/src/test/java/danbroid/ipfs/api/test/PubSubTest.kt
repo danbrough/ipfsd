@@ -3,7 +3,7 @@ package danbroid.ipfs.api.test
 import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.flow
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.OkHttpClient
@@ -21,7 +21,6 @@ class PubSubTest {
     val topic = "test"
     ipfs.blocking {
       log.warn("starting job")
-      log.warn("STARTED")
 
       pubsub.sub(topic).invoke { response ->
         val flow = response.flow().flowOn(Dispatchers.IO)
@@ -32,6 +31,7 @@ class PubSubTest {
               if (it.dataString == "stop") {
                 log.warn("received stop.. cancelling")
                 response.close()
+                cancel("Received stop message")
               }
             }
           }.invokeOnCompletion {
@@ -46,45 +46,36 @@ class PubSubTest {
   fun test2() {
     val topic = "test"
     ipfs.blocking {
-      log.warn("starting job")
 
-      val job = launch {
-        var running = true
-        while (running) {
-          runCatching {
+      val job = supervisorScope {
+        launch {
+          log.warn("starting job")
+          var running = true
+          while (running) {
             log.debug("subscribing to $topic")
+
             pubsub.sub(topic).invoke().use { response ->
-              response.flow().catch { log.trace("an error happened: ${it.message}") }.collect {
-                log.info("msg: ${it} data:${it.dataString}")
+              val flow = response.flow().cancellable()
+              //flow.catch { log.trace("an error happened: ${it.message}") }
+              flow.collect {
+
+                log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
                 if (it.dataString == "stop") {
                   log.debug("received stop")
                   running = false
                   cancel("Received stop")
+                  delay(1)
                   yield()
                 }
               }
               log.info("at this bit")
             }
-          }.exceptionOrNull()?.also {
-            if (running) {
-              log.debug("something bad happened: \"$it\" reconnecting in 1 second")
-              delay(1000)
-            }
           }
         }
       }
-
-      job.invokeOnCompletion {
-        log.debug("job done: \"${it?.message}\"")
-      }
-
-
-
-
-      log.info("waiting on job")
-      job.join()
-      log.info("THE END")
     }
+
+    log.info("THE END")
   }
 
 }

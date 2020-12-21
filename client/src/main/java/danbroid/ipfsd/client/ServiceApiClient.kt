@@ -10,7 +10,7 @@ import danbroid.util.misc.SingletonHolder
 class ServiceApiClient private constructor(
   val serviceClient: ServiceClient,
   private val executor: IPFS.Executor,
-) : IPFS.Executor {
+) : IPFS.Executor  {
 
   init {
     if (!serviceClient.isServiceInstalled()) {
@@ -23,6 +23,11 @@ class ServiceApiClient private constructor(
     //TODO  serviceClient.waitTillStarted()
     return executor.invoke(request)
   }
+
+  override fun <T> invoke(request: Request<T>, callback: IPFS.Executor.Callback<T>) {
+    TODO("Not yet implemented")
+  }
+
 
   /*TODO override fun <T> exec(call: ApiCall<T>): Flow<ApiCall.ApiResponse<T>> = flow {
     serviceClient.waitTillStarted()
