@@ -10,7 +10,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Garbage Collect"
     onClick = {
-      apiTest(api.repo.gc())
+      //TODO apiTest(api.repo.gc())
       false
     }
   }
@@ -18,7 +18,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Stat"
     onClick = {
-      apiTest(api.repo.stat(human = true))
+      //TODO apiTest(api.repo.stat(human = true))
       false
     }
   }
@@ -26,7 +26,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Version"
     onClick = {
-      apiTest(api.repo.version(quiet = false))
+      //TODO apiTest(api.repo.version(quiet = false))
       false
     }
   }
@@ -34,7 +34,7 @@ fun MenuItemBuilder.repoCommands() = menu {
   menu {
     title = "Verify"
     onClick = {
-      apiTest(api.repo.verify())
+      //TODO apiTest(api.repo.verify())
       false
     }
   }

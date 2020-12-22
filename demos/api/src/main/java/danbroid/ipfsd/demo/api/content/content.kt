@@ -7,8 +7,9 @@ import android.net.Uri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.IPFS
-import danbroid.ipfs.api.ApiCall
+import danbroid.ipfs.api.json
 import danbroid.ipfsd.client.ipfsClient
+import danbroid.ipfsd.client.model.ipfs
 import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.demo.api.R
 import danbroid.ipfsd.demo.api.activities.activityInterface
@@ -21,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.util.*
+import kotlin.time.ExperimentalTime
 
 const val URI_CONTENT_ROOT = "ipfsdemo://content"
 const val DIR_XCCD = "/ipfs/QmdmQXB2mzChmMeKY47C43LxUdg1NDJ5MWcKMKxDu7RgQm"
@@ -90,7 +92,7 @@ fun rootContent(context: Context): MenuItemBuilder =
       menu {
         title = "List kitty"
         onClick = {
-          log.debug("kitty: ${api.basic.ls(dir_kitty).get()}")
+          log.debug("kitty: ${api.basic.ls(dir_kitty).json()}")
           false
         }
       }
@@ -98,7 +100,7 @@ fun rootContent(context: Context): MenuItemBuilder =
       menu {
         title = "List kitty.danbrough.org"
         onClick = {
-          log.debug("kitty: ${api.basic.ls("/ipns/kitty.danbrough.org").get()}")
+          log.debug("kitty: ${api.basic.ls("/ipns/kitty.danbrough.org").json()}")
           false
         }
       }
@@ -140,6 +142,7 @@ fun rootContent(context: Context): MenuItemBuilder =
   }
 
 
+@ExperimentalTime
 fun MenuItemBuilder.commands() = menu {
   title = "Commands"
 
@@ -147,7 +150,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Get ID"
     onClick = {
-      apiTest(api.network.id(), "id")
+      debug(" ID: ${ipfs.network.id().json()}")
       false
     }
   }
@@ -157,7 +160,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Profile Apply"
     onClick = {
-      apiTest(api.config.profile.apply("lowpower"))
+      //TODO apiTest(api.config.profile.apply("lowpower"))
       false
     }
   }
@@ -169,7 +172,7 @@ fun MenuItemBuilder.commands() = menu {
     onClick = {
       val msg = "Hello from the ipfs demo at ${Date()}.\n"
       log.trace("adding message: $msg")
-      apiTest(api.basic.add(msg, fileName = "ipfs_test_message.txt"), "added")
+      //TODO apiTest(api.basic.add(msg, fileName = "ipfs_test_message.txt"), "added")
       false
     }
   }
@@ -178,7 +181,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Bandwidth"
     onClick = {
-      apiTest(api.stats.bw(), "bandwidth")
+      //TODO apiTest(api.stats.bw(), "bandwidth")
       false
     }
   }
@@ -189,6 +192,7 @@ fun MenuItemBuilder.commands() = menu {
 }
 
 
+/*
 inline suspend fun <T> Fragment.apiTest(
   call: ApiCall<T>,
   prompt: String = "result"
@@ -200,4 +204,4 @@ inline suspend fun <T> Fragment.apiTest(
     log.error("Failed: ${response.responseCode}:${response.responseMessage}")
 
   return response
-}
+}*/

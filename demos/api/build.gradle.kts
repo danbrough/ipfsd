@@ -46,7 +46,9 @@ android {
   kotlin.sourceSets.all {
     setOf(
       "kotlinx.coroutines.ExperimentalCoroutinesApi",
-      "kotlinx.coroutines.FlowPreview"
+      "kotlinx.coroutines.FlowPreview",
+      "kotlinx.coroutines.InternalCoroutinesApi",
+      "kotlin.time.ExperimentalTime"
     ).forEach {
       languageSettings.useExperimentalAnnotation(it)
     }

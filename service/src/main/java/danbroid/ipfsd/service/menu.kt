@@ -4,7 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
-import danbroid.ipfs.api.json
+import danbroid.ipfs.api.flow
 import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.model.ipfs
 import danbroid.ipfsd.ui.snackBar
@@ -22,7 +22,7 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
     title = "ID"
     icon = iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
     onClick = {
-      ipfs.network.id().invoke().json().also {
+      ipfs.network.id().flow().collect {
         log.warn("GOT RESULT: $it")
         requireActivity().snackBar("result: $it")
       }
