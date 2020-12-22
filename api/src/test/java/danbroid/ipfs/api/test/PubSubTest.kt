@@ -25,24 +25,18 @@ class PubSubTest {
     ipfs.blocking {
 
       val job = launch {
-        //supervisorScope {
 
         log.warn("launched")
 
         while (isActive) {
           runCatching {
             log.info("subscribing to $topic")
-
-            pubsub.sub(topic).invoke { response ->
-              response.flow().collect {
-                log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
-                if (it.dataString == "stop") {
-                  log.debug("received stop")
-                  cancel("Received stop")
-                  return@collect
-                }
+            pubsub.sub(topic).flow().collect {
+              log.info("msg: ${it} data:${it.dataString} isActive: $isActive")
+              if (it.dataString == "stop") {
+                log.debug("received stop")
+                cancel("Received stop")
               }
-              log.info("finished collecting")
             }
           }.exceptionOrNull()?.also {
             //like if you killed the ipfs daemon
@@ -53,10 +47,22 @@ class PubSubTest {
         }
       }
 
+
       job.invokeOnCompletion {
         log.warn("job finished: ${it?.message}")
       }
-      job.join()
+
+      for (n in 1..8) {
+        delay(1000)
+        if (!job.isActive) break
+      }
+
+      if (job.isActive) {
+        log.info("job.isActive .. sending stop")
+        pubsub.pub(topic, "stop").invoke()
+        job.join()
+      }
+
       log.info("THE END")
     }
   }

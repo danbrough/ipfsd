@@ -9,7 +9,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import danbroid.ipfs.api.IPFS
-import danbroid.ipfs.api.CallExecutor
 import danbroid.ipfsd.client.IPFSMessage
 import danbroid.ipfsd.client.ServiceApiClient
 
@@ -22,8 +21,8 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   private var apiClient = ServiceApiClient.getInstance(context)
   private val serviceClient = apiClient.serviceClient
 
-  val callExecutor: CallExecutor = apiClient
-  val api = IPFS(callExecutor)
+  val callExecutor: IPFS.Executor = apiClient
+  val api = IPFS(IPFS.CallContext(callExecutor))
 
   suspend fun sendMessage(msg: IPFSMessage) {
     serviceClient.sendMessage(msg)

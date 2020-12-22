@@ -58,8 +58,9 @@ class Types {
 
   @Serializable
   data class Object(
-    val Hash: String,
+    val Hash: String? = null,
     val Links: List<Link>,
+    val Data: String? = null
   ) {
 
     @Serializable

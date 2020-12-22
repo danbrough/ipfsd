@@ -204,7 +204,7 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
       //create [bool]: Create intermediary nodes. Required: no.
        */
       fun addLink(objectHash: String, linkHash: String, linkName: String) =
-        Request<Any>(
+        Request<Types.Hash>(
           callContext,
           "object/patch/add-link",
           "arg" to objectHash,
