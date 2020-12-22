@@ -46,7 +46,7 @@ class AddTest {
         data = TestData.HelloWorld.data,
         fileName = TestData.HelloWorld.name,
         wrapWithDirectory = true
-      ).invoke().flow().toList().also {
+      ).flow().toList().also {
         require(it.size == 2) { "invalid size: ${it.size}" }
         val file = it[0]
         require(file.Hash == TestData.HelloWorld.cid) {
@@ -72,22 +72,21 @@ class AddTest {
           add(TestData.TestDirectory.msg1, "message.txt")
           addDirectory("b").add(TestData.TestDirectory.msg2, "message.txt")
         }
-      }.invoke().flow().collect {
+      }.flow().collect {
         log.debug("file: $it")
       }
     }
   }
 
+
   @Test
   fun test5() {
     log.info("test5() adding test dir: ${TestData.TestDirectory.testPath}")
     ipfs.blocking {
-      basic.add(file = TestData.TestDirectory.testPath.toFile(), recurseDirectory = true).invoke {
-        it.flow().collect {
+      basic.add(file = TestData.TestDirectory.testPath.toFile(), recurseDirectory = true).flow()
+        .collect {
           log.debug("file: $it")
         }
-      }
-      Unit
     }
   }
 

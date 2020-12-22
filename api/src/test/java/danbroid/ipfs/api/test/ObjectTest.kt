@@ -14,36 +14,27 @@ class ObjectTest {
     val hello_world = "Hello World"
 
     ipfs.blocking {
-      var result = obj.patch.setData(TestData.CID_EMPTY_OBJECT, "").invoke().json()
+      var result = obj.patch.setData(TestData.CID_EMPTY_OBJECT, "").json()
       require(result.Hash == hash_empty_string) {
         "Invalid hash: ${result.Hash} expecting $hash_empty_string"
       }
-      
-      result = obj.patch.setData(TestData.CID_EMPTY_OBJECT, hello_world).invoke().json()
+
+      result = obj.patch.setData(TestData.CID_EMPTY_OBJECT, hello_world).json()
       require(result.Hash == hash_hello_world) {
         "Invalid hash: ${result.Hash} expecting $hash_hello_world"
       }
 
+      val o = obj.get(hash_hello_world).json()
+      require(o.Data == hello_world) {
+        "${o.Data} != $hello_world"
+      }
 
-/*    `object`.apply {
-
-
-      obj = get(hash_hello_world).get().valueOrThrow()
-      log.debug("got object: $obj")
-      Assert.assertEquals("Expecting $hello_world", hello_world, obj.data)
-
-
-      patch.addLink(hash_hello_world, "empty_message", hash_empty_string).get()
-        .valueOrThrow().also {
-          log.debug("hash: ${it.hash}")
-          Assert.assertEquals(
-            "Incorrect hash: ${it.hash}",
-            "QmPe2j1iNJ7TowcHWzygeyhs656RjBtcA9xrnbvA9LFPS4",
-            it.hash
-          )
+      obj.patch.addLink(hash_hello_world, "empty_message", hash_empty_string).json().also {
+        val expected_hash = "QmPe2j1iNJ7TowcHWzygeyhs656RjBtcA9xrnbvA9LFPS4"
+        require(it.Hash == expected_hash) {
+          "Hash: ${it.Hash} != $expected_hash"
         }
-    }*/
-
+      }
     }
 
 

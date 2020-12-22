@@ -15,8 +15,9 @@ class BasicTest {
 
     ipfs.blocking {
 
-      basic.ls(path, resolveSize = false, resolveType = true, stream = true).invoke().flow()
+      basic.ls(path, resolveSize = false, resolveType = true, stream = true).flow()
         .collect {
+          log.info("objects: $it length: ${it.Objects.size}")
           // log.info("objects: $it length: ${it.Objects.size}")
           /*   it.Objects[0].Links[0].Hash.also {
                require(it == "QmT83ehGdr7s7oSfrVP759xJnK8kWjYNqc71HJDN7DgUu7") {
@@ -24,7 +25,6 @@ class BasicTest {
                }
              }*/
         }
-      Unit
     }
   }
 }
