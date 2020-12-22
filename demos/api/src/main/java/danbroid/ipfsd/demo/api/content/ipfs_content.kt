@@ -1,6 +1,6 @@
 package danbroid.ipfsd.demo.api.content
 
-import danbroid.ipfsd.client.model.ipfsModel
+import danbroid.ipfs.api.json
 import danbroid.util.menu.MenuDSL
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
@@ -17,12 +17,12 @@ fun MenuItemBuilder.ipfsDir(
 
     onClick = {
       children?.clear()
-      api.basic.ls(path).get().value.objects.forEach { obj ->
-        obj.links.forEach { link ->
+      api.basic.ls(path).json().Objects.forEach { obj ->
+        obj.Links.forEach { link ->
           menu {
-            id = "ipfsd://ipfs/${link.hash}"
-            title = link.name
-            subtitle = "${link.hash} size:${link.size}"
+            id = "ipfsd://ipfs/${link.Hash}"
+            title = link.Name
+            subtitle = "${link.Hash} size:${link.Size}"
           }
         }
         menuViewModel().invalidate(this)

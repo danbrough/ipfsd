@@ -1,5 +1,6 @@
 package danbroid.ipfsd.demo.api.content
 
+import danbroid.ipfs.api.flow
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import kotlinx.coroutines.flow.collect
@@ -11,11 +12,11 @@ fun MenuItemBuilder.pubSubCommands() = menu {
   menu {
     title = "PubSub Publish"
     onClick = {
-      api.pubSub.publish(
+      api.pubsub.pub(
         "poiqwe098123",
         "Hello from the IPFS app at ${Date()}\n "
-      ).flow().collect {
-        log.info("msg: $it")
+      ).invoke().also {
+        log.info("msg: ${it.text}")
       }
       false
     }
@@ -24,7 +25,7 @@ fun MenuItemBuilder.pubSubCommands() = menu {
   menu {
     title = "Pubsub Test Subscribe"
     onClick = {
-      api.pubSub.subscribe("poiqwe098123", discover = true).get().also {
+      api.pubsub.sub("poiqwe098123").flow().collect {
         debug("result: $it")
       }
       false

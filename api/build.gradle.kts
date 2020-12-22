@@ -21,7 +21,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     // freeCompilerArgs = listOf("-Xjvm-default=enable")
     freeCompilerArgs += listOf(
       "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
-      "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi"
+      "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi",
+      "-Xopt-in=kotlin.time.ExperimentalTime"
     )
   }
 }

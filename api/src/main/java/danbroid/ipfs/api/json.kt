@@ -7,12 +7,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 inline fun <reified T : Any> String.parseJson(): T = Json.decodeFromString(this)
 
-inline suspend fun <reified T : Any> Request<T>.json(): T = invoke().text.parseJson()
+inline suspend fun <reified T : Any> Request<T>.json(): T = withContext(Dispatchers.IO) {
+  invoke().text.parseJson()
+}
 
 //inline fun <reified T : Any> JsonElement.parse(): T = Json.decodeFromJsonElement(this)
 

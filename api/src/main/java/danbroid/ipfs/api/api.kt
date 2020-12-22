@@ -18,7 +18,7 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
   companion object : SingletonHolder<IPFS, CallContext>(::IPFS)
 
   interface Executor {
-    fun <T> invoke(request: Request<T>): ApiResponse<T>
+    suspend fun <T> invoke(request: Request<T>): ApiResponse<T>
     fun <T> invoke(request: Request<T>, callback: Callback<T>)
     interface Callback<T> {
       fun onResponse(request: Request<T>, response: ApiResponse<T>?, err: Exception? = null)
@@ -275,6 +275,7 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
   val network = Network()
 }
 
+interface Dag
 
 private object api
 

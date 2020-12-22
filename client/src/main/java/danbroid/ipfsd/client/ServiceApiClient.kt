@@ -6,6 +6,7 @@ import danbroid.ipfs.api.Request
 import danbroid.ipfs.api.okhttp.OkHttpExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
+import kotlinx.coroutines.launch
 
 class ServiceApiClient private constructor(
   val serviceClient: ServiceClient,
@@ -19,14 +20,17 @@ class ServiceApiClient private constructor(
     }
   }
 
-  override fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> {
-    //TODO  serviceClient.waitTillStarted()
+  override suspend fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> {
+    serviceClient.waitTillStarted()
     return executor.invoke(request)
   }
 
 
   override fun <T> invoke(request: Request<T>, callback: IPFS.Executor.Callback<T>) {
-    TODO("Not yet implemented")
+    request.callContext.coroutineScope.launch {
+      serviceClient.waitTillStarted()
+      request.callContext.executor.invoke(request, callback)
+    }
   }
 
 

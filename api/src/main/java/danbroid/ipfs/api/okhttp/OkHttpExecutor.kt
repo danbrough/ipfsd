@@ -3,7 +3,8 @@ package danbroid.ipfs.api.okhttp
 import danbroid.ipfs.api.*
 import danbroid.ipfs.api.Request
 import danbroid.ipfs.api.utils.uriEncode
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
@@ -61,9 +62,11 @@ class OkHttpExecutor(
     override fun close() = response.close()
   }
 
-  override fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> =
-    createCall(request).execute().let {
-      HttpResponse(it)
+  override suspend fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> =
+    withContext(Dispatchers.IO) {
+      createCall(request).execute().let {
+        HttpResponse(it)
+      }
     }
 
 
@@ -84,7 +87,7 @@ class OkHttpExecutor(
     )
 
   protected fun <T> requestBody(request: Request<T>): RequestBody {
-   // log.debug("requestBody() $request")
+    // log.debug("requestBody() $request")
     if (request !is DirectoryRequest) return "".toRequestBody()
     return MultipartBody.Builder()
       .setType(MultipartBody.FORM).apply {
@@ -95,7 +98,6 @@ class OkHttpExecutor(
       }
       .build()
   }
-
 
 
   protected fun addParts(builder: MultipartBody.Builder, part: Part) {
