@@ -38,12 +38,14 @@ android {
     isExperimental = true
   }
 
+/*
   kotlinOptions {
     jvmTarget = "1.8"
     //freeCompilerArgs = listOf("-Xjsr305=strict")
   }
+*/
 
-  kotlin.sourceSets.all {
+/*  kotlin.sourceSets.all {
     setOf(
       "kotlinx.coroutines.ExperimentalCoroutinesApi",
       "kotlinx.coroutines.FlowPreview",
@@ -52,20 +54,9 @@ android {
     ).forEach {
       languageSettings.useExperimentalAnnotation(it)
     }
-  }
+  }*/
 }
 
-tasks.withType<Test> {
-  useJUnit()
-
-  testLogging {
-    events("standardOut", "started", "passed", "skipped", "failed")
-    showStandardStreams = true
-    outputs.upToDateWhen {
-      false
-    }
-  }
-}
 
 dependencies {
   implementation(project(":client"))
