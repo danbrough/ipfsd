@@ -69,6 +69,53 @@ subprojects {
         manifestPlaceholders.put("ipfsdScheme", Danbroid.IPFSD_SCHEME)
       }
 
+
+      compileOptions {
+        sourceCompatibility = ProjectVersions.JAVA_VERSION
+        targetCompatibility = ProjectVersions.JAVA_VERSION
+      }
+
+
+/*        tasks {
+          kotlin.sourceSets.all {
+            setOf(
+              "kotlinx.coroutines.ExperimentalCoroutinesApi",
+              "kotlinx.coroutines.FlowPreview",
+              "kotlinx.coroutines.InternalCoroutinesApi",
+              "kotlin.time.ExperimentalTime"
+            ).forEach {
+              languageSettings.useExperimentalAnnotation(it)
+            }
+          }
+        }*/
+
+      tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+          jvmTarget = "1.8"
+          languageVersion = "1.4"
+          // freeCompilerArgs = listOf("-Xjvm-default=enable")
+          freeCompilerArgs += listOf(
+            "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
+            "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi",
+            "-Xopt-in=kotlin.time.ExperimentalTime"
+          )
+        }
+      }
+
+
+      tasks.withType<Test> {
+        useJUnit()
+
+        testLogging {
+          events("standardOut", "started", "passed", "skipped", "failed")
+          showStandardStreams = true
+          outputs.upToDateWhen {
+            false
+          }
+        }
+      }
+
+
       if (this is com.android.build.gradle.LibraryExtension) {
 
         val publishing =

@@ -12,6 +12,7 @@ import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
+import kotlinx.coroutines.flow.collect
 import org.slf4j.LoggerFactory
 
 internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
