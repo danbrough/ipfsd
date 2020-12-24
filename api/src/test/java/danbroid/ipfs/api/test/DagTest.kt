@@ -31,7 +31,6 @@ class DagTest {
   val people_cid = "bafyreievey725uimxvlfajdov3fq5fpja6dtqjdinhqfccqjgbjwb763fi"
 
 
-  @ExperimentalStdlibApi
   @Test
   fun test1() {
     log.info("test1()")
@@ -51,6 +50,16 @@ class DagTest {
       }
     }
 
+  }
+
+  @Test
+  fun test2() {
+    log.info("test2()")
+    ipfs.blocking {
+      dag.put().apply {
+
+      }
+    }
   }
 }
 

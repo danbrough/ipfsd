@@ -7,6 +7,7 @@ import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
 
 val ipfs = IPFS(IPFS.CallContext(OkHttpExecutor()))
 
@@ -23,6 +24,17 @@ object TestData {
 
 
   }
+
+  val uni =
+    UNI(
+      "Victoria University",
+      1860,
+      setOf(UNI.Department("Maths"), UNI.Department("Music"))
+    ).also {
+      it.date = Date()
+      it.address = UNI.Address("14 Somewhere Street", "Kelburn", 6231, "Wellington")
+    }
+
 
   object HelloWorld {
     const val cid = "QmWATWQ7fVPP2EFGu71UkfnqhYXDYH566qy47CnJDgvs8u"
