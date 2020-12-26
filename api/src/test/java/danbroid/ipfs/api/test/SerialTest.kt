@@ -119,6 +119,9 @@ class SerialTest {
       log.info("box json: $it")
       val animals:List<DagLink<Animal>> = format.decodeFromString(it)
       log.debug("animals: $animals")
+      require(animals == cat){
+        "not good"
+      }
     }
 
   }
