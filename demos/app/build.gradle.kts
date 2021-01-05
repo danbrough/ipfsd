@@ -101,10 +101,10 @@ dependencies {
   //implementation(Libs.slf4j)
 
 
-  implementation("com.mikepenz:fontawesome-typeface:_")
-  implementation("com.mikepenz:google-material-typeface:_")
+//  implementation("com.mikepenz:fontawesome-typeface:_")
+  //implementation("com.mikepenz:google-material-typeface:_")
   implementation("com.mikepenz:iconics-core:_")
-
+  implementation("com.mikepenz:material-design-iconic-typeface:_@aar")
 
 
   if (Danbroid.useLocalUtils) {

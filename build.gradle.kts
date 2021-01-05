@@ -59,6 +59,20 @@ allprojects {
 
 subprojects {
   afterEvaluate {
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+      kotlinOptions {
+        jvmTarget = "1.8"
+        languageVersion = "1.4"
+        // freeCompilerArgs = listOf("-Xjvm-default=enable")
+        freeCompilerArgs += listOf(
+          "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
+          "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi",
+          "-Xopt-in=kotlin.time.ExperimentalTime",
+          "-Xopt-in=kotlin.ExperimentalStdlibApi"
+        )
+      }
+    }
+
     (extensions.findByType(com.android.build.gradle.LibraryExtension::class)
       ?: extensions.findByType(com.android.build.gradle.AppExtension::class))?.apply {
 
@@ -89,18 +103,7 @@ subprojects {
           }
         }*/
 
-      tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-          jvmTarget = "1.8"
-          languageVersion = "1.4"
-          // freeCompilerArgs = listOf("-Xjvm-default=enable")
-          freeCompilerArgs += listOf(
-            "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
-            "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi",
-            "-Xopt-in=kotlin.time.ExperimentalTime"
-          )
-        }
-      }
+
 
 
       tasks.withType<Test> {

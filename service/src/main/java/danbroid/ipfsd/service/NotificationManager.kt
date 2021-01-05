@@ -14,7 +14,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
+
 import com.mikepenz.iconics.utils.toAndroidIconCompat
 import danbroid.ipfsd.IPFSD
 import danbroid.util.intent.toPendingIntent
@@ -104,7 +105,8 @@ class NotificationManager(
       NotificationCompat.Action.Builder(
         IconicsDrawable(
           context,
-          GoogleMaterial.Icon.gmd_settings
+          //GoogleMaterial.Icon.gmd_settings
+          MaterialDesignIconic.Icon.gmi_settings
         ).toAndroidIconCompat(), context.getString(R.string.lbl_settings),
         IPFSD.deep_link.ipfsd_settings.toUri().toPendingIntent(context)
       ).build()
@@ -115,7 +117,8 @@ class NotificationManager(
       NotificationCompat.Action.Builder(
         IconicsDrawable(
           context,
-          GoogleMaterial.Icon.gmd_clear
+          //GoogleMaterial.Icon.gmd_clear
+          MaterialDesignIconic.Icon.gmi_format_clear
         ).toAndroidIconCompat(), "Reset Stats",
         IPFSD.intent.resetStatsPromptPending(context)
       ).build()

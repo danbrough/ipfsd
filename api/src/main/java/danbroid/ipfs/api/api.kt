@@ -283,3 +283,5 @@ private object api
 fun <T> IPFS.blocking(block: suspend IPFS.() -> T): T = runBlocking {
   block.invoke(this@blocking)
 }
+
+const val CID_EMPTY_OBJECT = "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
