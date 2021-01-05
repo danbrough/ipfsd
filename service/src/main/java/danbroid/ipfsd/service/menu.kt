@@ -3,7 +3,7 @@ package danbroid.ipfsd.service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
 import danbroid.ipfs.api.flow
 import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.model.ipfs
@@ -21,7 +21,8 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
 
   menu {
     title = "ID"
-    icon = iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
+    //icon = iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
+    icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_play)
     onClick = {
       ipfs.network.id().flow().collect {
         log.warn("GOT RESULT: $it")
@@ -35,7 +36,8 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
   menu {
     id = IPFSDNavGraph.deep_link.settings
     titleID = R.string.lbl_settings
-    icon = iconicsIcon(GoogleMaterial.Icon.gmd_settings)
+    //icon = iconicsIcon(GoogleMaterial.Icon.gmd_settings)
+    icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_settings)
   }
 
   menu {

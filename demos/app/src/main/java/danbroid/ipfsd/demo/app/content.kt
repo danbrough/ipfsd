@@ -2,7 +2,8 @@ package danbroid.ipfsd.demo.app
 
 
 import android.content.Context
-import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
+import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
+import danbroid.ipfs.api.json
 import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfs
 import danbroid.ipfsd.demo.app.shopping.shoppingListManager
@@ -60,10 +61,10 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
 
     menu {
       title = "Get ID"
-      icon = iconicsIcon(FontAwesome.Icon.faw_accessible_icon)
+      icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_folder_person)
       onClick = {
-        ipfs.network.id().get().also {
-          log.warn("ID: $it")
+        ipfs.network.id().json().also {
+          log.info("ID: $it")
         }
         false
       }

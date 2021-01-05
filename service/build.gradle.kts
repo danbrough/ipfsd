@@ -76,10 +76,13 @@ dependencies {
   }
 
   implementation(Danbroid.slf4j)
-  implementation("com.mikepenz:google-material-typeface:_")
-  // implementation("com.mikepenz:fontawesome-typeface:_")
+  implementation("com.mikepenz:iconics-core:_")
+  //implementation("com.mikepenz:google-material-typeface:_")
+   implementation("com.mikepenz:fontawesome-typeface:_")
+  implementation("com.mikepenz:material-design-iconic-typeface:_@aar")
 
 //
+  //implementation("com.mikepenz:library-typeface-api:5.2.4")
 
   implementation("commons-io:commons-io:_")
 

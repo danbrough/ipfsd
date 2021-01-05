@@ -2,8 +2,7 @@ package danbroid.ipfsd.demo.app
 
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
-import com.mikepenz.iconics.typeface.library.fontawesome.FontAwesome
-import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
+import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
 import danbroid.util.menu.DrawableProvider
 
 object Theme {
@@ -16,9 +15,9 @@ object Theme {
     }
 
   object icons {
-    val create_new = createIcon(FontAwesome.Icon.faw_list)
-    val shopping_cart = createIcon(GoogleMaterial.Icon.gmd_shopping_cart)
-    val shopping_cart2 = createIcon(FontAwesome.Icon.faw_shopping_bag)
+    val create_new = createIcon(MaterialDesignIconic.Icon.gmi_view_list_alt)
+
+    val shopping_cart = createIcon(MaterialDesignIconic.Icon.gmi_shopping_cart)
 
   }
 }
