@@ -1,6 +1,7 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
+import danbroid.ipfs.api.ipfs
 import danbroid.ipfs.api.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -39,27 +40,20 @@ class DagTest {
     ipfs.blocking {
 
       dag.put(json).json().also {
-        log.debug("cid: $it")
+        log.info("cid: $it")
         require(it.Cid.path == people_cid) {
           "Invalid cid: ${it.Cid.path}"
         }
       }
 
       dag.get<List<Person>>(people_cid).json().also {
-        log.warn("Persons: $it")
+        log.info("Persons: $it")
+        require(it == people) {
+          "List doesnt match"
+        }
       }
     }
 
-  }
-
-  @Test
-  fun test2() {
-    log.info("test2()")
-    ipfs.blocking {
-      dag.put().apply {
-
-      }
-    }
   }
 }
 

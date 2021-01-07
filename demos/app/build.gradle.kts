@@ -5,6 +5,8 @@ plugins {
   kotlin("android.extensions")
 //kotlin("org.jetbrains.kotlin:kotlin-android-extensions-runtime:")
   id("org.jetbrains.dokka")
+  kotlin("plugin.serialization")
+
 }
 
 
@@ -125,6 +127,10 @@ dependencies {
 
 
 //  implementation(project(":menu"))
+  testImplementation(Kotlin.Test.junit)
+
+
+  implementation("org.slf4j:slf4j-api:_")
 
   androidTestImplementation(Testing.junit4)
 
@@ -138,7 +144,7 @@ dependencies {
 
   testImplementation("ch.qos.logback:logback-classic:_")
   testImplementation("ch.qos.logback:logback-core:_")
-
+  testImplementation(testFixtures(project(":api")))
 
   implementation(AndroidX.navigation.fragmentKtx)
   implementation(AndroidX.navigation.uiKtx)

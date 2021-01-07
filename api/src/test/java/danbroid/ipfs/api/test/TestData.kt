@@ -1,7 +1,8 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.IPFS
-import danbroid.ipfs.api.okhttp.OkHttpExecutor
+import danbroid.ipfs.api.Dag
+import danbroid.ipfs.api.IpfsLink
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import java.nio.file.Files
 import java.nio.file.LinkOption
@@ -9,7 +10,33 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 
-val ipfs = IPFS(IPFS.CallContext(OkHttpExecutor()))
+@Serializable
+@IpfsLink
+data class UNI(
+  var name: String,
+  var year: Int,
+  @Contextual @IpfsLink var departments: Set<Department>
+) {
+
+  @Serializable
+  data class Address(var street: String, var suburb: String, var postcode: Int, var city: String) :
+    Dag
+
+  @Serializable
+  @IpfsLink
+  data class Department(var name: String)
+
+  @Serializable
+  @Contextual
+  @IpfsLink
+  var address: Address? = null
+
+  @Contextual
+  var date: Date? = null
+
+  @Serializable
+  var message: String? = null
+}
 
 
 object TestData {
@@ -45,7 +72,7 @@ object TestData {
 
   }
 
-
+  @Suppress("NewApi")
   object TestDirectory {
     const val msg1 = "message.txt in directory a\n"
     const val msg2 = "message.txt in directory a/b\n"
@@ -54,7 +81,9 @@ object TestData {
       Paths.get(System.getProperty("java.io.tmpdir")).resolve("add_test").resolve("a")
 
 
+    @Suppress("NewApi")
     fun createTestDir() {
+      @Suppress("NewApi")
       fun deleteDir(path: Path) {
         if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
           Files.newDirectoryStream(path).forEach {
@@ -77,3 +106,5 @@ object TestData {
 
   }
 }
+
+//private val log = org.slf4j.LoggerFactory.getLogger(TestData::class.java)

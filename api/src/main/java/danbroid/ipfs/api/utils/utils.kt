@@ -1,8 +1,5 @@
 package danbroid.ipfs.api.utils
 
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.*
@@ -21,13 +18,13 @@ fun String.addUrlArgs(vararg keywords: Pair<String, Any?>): String = StringBuild
 }.toString()
 
 
-open class SingletonHolder<out T : Any, in A>(creator: (A) -> T) {
-  private var creator: ((A) -> T)? = creator
+open class SingletonHolder<out T : Any, in A>(creator: (A?) -> T) {
+  private var creator: ((A?) -> T)? = creator
 
   @Volatile
   private var instance: T? = null
 
-  fun getInstance(arg: A): T = instance ?: synchronized(this) {
+  fun getInstance(arg: A? = null): T = instance ?: synchronized(this) {
     instance ?: creator!!.invoke(arg).also {
       instance = it
       creator = null

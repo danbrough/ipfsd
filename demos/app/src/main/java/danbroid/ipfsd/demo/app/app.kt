@@ -1,15 +1,19 @@
 package danbroid.ipfsd.demo.app
 
 import danbroid.ipfs.api.Dag
+import danbroid.ipfs.api.Serializable
 import java.util.*
 
 const val IPFSD_APP_ID_PREFIX = "/ipfsd/apps"
 
+@Serializable
 open class IPFSApp : Dag {
 
   @Transient
   var cid: String? = null
 
+
+  @Serializable
   data class AppDescription(
     val type: String,
     var id: String = UUID.randomUUID().toString(),

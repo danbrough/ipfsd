@@ -1,21 +1,19 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
+import danbroid.ipfs.api.ipfs
 import danbroid.ipfs.api.json
 import org.junit.Test
 
 class NetworkTest {
   @Test
   fun idTest() {
-    log.info(
-      "ID: ${
-        ipfs.blocking {
-          network.id().json().also {
-            log.debug("ID: $it")
-          }
-        }
-      }"
-    )
+    val id = ipfs.blocking {
+      network.id().json().also {
+        log.debug("ID: $it")
+      }
+    }
+    log.info("ID: $id")
   }
 }
 
