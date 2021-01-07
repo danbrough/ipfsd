@@ -1,10 +1,11 @@
 plugins {
   kotlin("jvm")
-
   `java-library`
   `maven-publish`
   kotlin("plugin.serialization")
   id("org.jetbrains.dokka")
+  `java-test-fixtures`
+
 }
 
 
@@ -14,13 +15,14 @@ java {
 }
 
 
-
 //languageSettings.useExperimentalAnnotation("org.mylibrary.OptInAnnotation")
+
 /*
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
   kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.serialization.InternalSerializationApi"
 }
 */
+
 
 tasks.withType<Test> {
   useJUnit()
@@ -47,7 +49,7 @@ dependencies {
   implementation("org.slf4j:slf4j-api:_")
   implementation(Kotlin.stdlib.jdk8)
   implementation(KotlinX.coroutines.jdk8)
-  implementation("org.jetbrains.kotlin:kotlin-reflect:_")
+  api("org.jetbrains.kotlin:kotlin-reflect:_")
 
   implementation("com.google.code.gson:gson:_")
   api(Square.okHttp3.okHttp)
@@ -57,10 +59,22 @@ dependencies {
   //compileOnly("org.json:json:_")
 
 
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:_")
+  api("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:_")
+  //testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:_")
+  // testFixturesImplementation(KotlinX.coroutines.jdk8)
 
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+  kotlinOptions {
+    jvmTarget = "1.8"
+    languageVersion = "1.4"
+    // freeCompilerArgs = listOf("-Xjvm-default=enable")
+    freeCompilerArgs += listOf(
+      "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
+    )
+  }
+}
 
 val sourcesJar by tasks.registering(Jar::class) {
   archiveClassifier.set("sources")

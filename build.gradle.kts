@@ -12,7 +12,7 @@ buildscript {
   }
 
   dependencies {
-    classpath("com.android.tools.build:gradle:7.0.0-alpha03")
+    classpath("com.android.tools.build:gradle:7.0.0-alpha04")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
     classpath("org.jetbrains.dokka:dokka-gradle-plugin:_")
 
@@ -65,7 +65,9 @@ subprojects {
         languageVersion = "1.4"
         // freeCompilerArgs = listOf("-Xjvm-default=enable")
         freeCompilerArgs += listOf(
+        //  "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
           "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
+
           "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi",
           "-Xopt-in=kotlin.time.ExperimentalTime",
           "-Xopt-in=kotlin.ExperimentalStdlibApi"

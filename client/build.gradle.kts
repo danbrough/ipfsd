@@ -42,6 +42,9 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
     //freeCompilerArgs = listOf("-Xjsr305=strict")
+    freeCompilerArgs += listOf(
+      "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
+    )
   }
 
   testOptions {

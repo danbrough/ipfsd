@@ -2,6 +2,7 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.flow
+import danbroid.ipfs.api.ipfs
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import org.junit.Test

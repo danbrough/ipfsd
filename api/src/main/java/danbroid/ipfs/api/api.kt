@@ -1,8 +1,12 @@
 package danbroid.ipfs.api
 
+import danbroid.ipfs.api.okhttp.OkHttpExecutor
 import danbroid.ipfs.api.utils.SingletonHolder
 import kotlinx.coroutines.*
 import java.io.*
+
+val ipfs: IPFS
+  inline get() = IPFS.getInstance()
 
 open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.coroutineScope {
 
@@ -15,7 +19,8 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
       get() = if (isSuccessful) reader.readText() else throw Exception(errorMessage)
   }
 
-  companion object : SingletonHolder<IPFS, CallContext>(::IPFS)
+  companion object :
+    SingletonHolder<IPFS, CallContext>({ IPFS(it ?: CallContext(OkHttpExecutor())) })
 
   interface Executor {
     suspend fun <T> invoke(request: Request<T>): ApiResponse<T>
@@ -147,6 +152,19 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
     ).also {
       if (data != null) it.add(data)
     }
+
+    inline fun <reified T : Any> put(
+      data: T, format: String? = null,
+      inputEnc: String? = null,
+      pin: Boolean? = null,
+      hashFunc: String? = null
+    ) = put(
+      data = data.toJson(),
+      format = format,
+      inputEnc = inputEnc,
+      pin = pin,
+      hashFunc = hashFunc
+    )
 
     /**
      * api/v0/dag/get
