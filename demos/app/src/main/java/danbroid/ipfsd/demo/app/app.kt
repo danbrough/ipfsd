@@ -2,6 +2,8 @@ package danbroid.ipfsd.demo.app
 
 import danbroid.ipfs.api.Dag
 import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.Transient
+import danbroid.ipfs.api.dagLink
 import java.util.*
 
 const val IPFSD_APP_ID_PREFIX = "/ipfsd/apps"
@@ -12,7 +14,6 @@ open class IPFSApp : Dag {
   @Transient
   var cid: String? = null
 
-
   @Serializable
   data class AppDescription(
     val type: String,
@@ -20,7 +21,7 @@ open class IPFSApp : Dag {
     val created: Long = System.currentTimeMillis()
   ) : Dag
 
-  val description = AppDescription(javaClass.name)
+  val description = AppDescription(javaClass.name).dagLink()
 
   override fun toString() = description.toString()
 

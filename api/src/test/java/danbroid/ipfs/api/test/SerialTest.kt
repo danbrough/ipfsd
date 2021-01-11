@@ -1,5 +1,6 @@
 package danbroid.ipfs.api.test
 
+import danbroid.ipfs.api.DLink
 import danbroid.ipfs.api.DagLink
 import danbroid.ipfs.api.Serializable
 import danbroid.ipfs.api.dagLink
@@ -19,7 +20,7 @@ interface Project
 //@SerialName("owned")
 class OwnedProject(val name: String, val owner: String) : Project
 
-val module = SerializersModule {
+private val module = SerializersModule {
   polymorphic(Project::class) {
     subclass(OwnedProject::class)
   }
@@ -27,7 +28,7 @@ val module = SerializersModule {
 }
 
 
-val format = Json {
+private val format = Json {
   serializersModule = module
 }
 
@@ -37,7 +38,7 @@ data class Diet(val food: String)
 
 
 @Serializable
-data class Animal(val name: String, val diet: DagLink<Diet>? = null)
+data class Animal(val name: String, val diet: DLink<Diet>? = null)
 
 
 class SerialTest {
