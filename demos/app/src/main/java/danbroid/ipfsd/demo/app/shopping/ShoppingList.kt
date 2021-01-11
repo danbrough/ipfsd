@@ -6,19 +6,17 @@ import danbroid.ipfsd.demo.app.IPFSApp
 
 
 @Serializable
-class ShoppingList : IPFSApp() {
-  var title: String = "Shopping List: ${description.id}"
+data class ShoppingList(val title: String) : IPFSApp() {
+
 
   @Serializable
   data class Thang(var count: Int, val msg: String) : Dag
 
 
-  val thang1 = Thang(12, "a thang")
+  var thang1 = Thang(12, "a thang")
 
 
-  val thang2 = Thang(2, "Thang 2")
-
-  override fun toString() = "${super.toString()}:$title:$thang1:$thang2"
+  override fun toString() = "${super.toString()}:$title:$thang1"
 
 
 }
