@@ -15,15 +15,14 @@ import kotlinx.serialization.serializer
 import org.junit.Test
 
 
-interface DAG<T : Any> {
+private interface DAG<T : Any> {
   val cid: String
   val value: T
 }
 
 
-
 @Serializable(with = IDagSerializer::class)
-class IDag<T : Any>(val serializer: KSerializer<T>, override var cid: String) : DAG<T> {
+private class IDag<T : Any>(val serializer: KSerializer<T>, override var cid: String) : DAG<T> {
   private val _t by lazy {
     ipfs.blocking {
       dag.get<T>(cid).invoke().text.let {
@@ -100,7 +99,8 @@ private val format = Json {
 
 
 @Serializable
-data class ZOO(var name: String = "", var age: Int)
+private data class ZOO(var name: String = "", var age: Int)
+
 class SerialTest2 {
 
 

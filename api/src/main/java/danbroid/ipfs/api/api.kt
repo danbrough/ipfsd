@@ -305,3 +305,4 @@ fun <T> IPFS.blocking(block: suspend IPFS.() -> T): T = runBlocking {
 }
 
 const val CID_EMPTY_OBJECT = "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
+const val CID_NULL_DATA = "bafyreifqwkmiw256ojf2zws6tzjeonw6bpd5vza4i22ccpcq4hjv2ts7cm"
