@@ -22,7 +22,7 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   private val serviceClient = apiClient.serviceClient
 
   val callExecutor: IPFS.Executor = apiClient
-  val api = IPFS(IPFS.CallContext(callExecutor))
+  val api = IPFS.getInstance(callExecutor)
 
   suspend fun sendMessage(msg: IPFSMessage) {
     serviceClient.sendMessage(msg)

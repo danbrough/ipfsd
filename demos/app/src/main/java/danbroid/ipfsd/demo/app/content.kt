@@ -3,9 +3,10 @@ package danbroid.ipfsd.demo.app
 
 import android.content.Context
 import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
+import danbroid.ipfs.api.ipfs
 import danbroid.ipfs.api.json
+import danbroid.ipfsd.client.ipfs
 import danbroid.ipfsd.client.ipfsClient
-import danbroid.ipfsd.client.model.ipfs
 import danbroid.ipfsd.demo.app.shopping.shoppingListManager
 import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
@@ -18,6 +19,8 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
 
   id = URI_CONTENT
   titleID = R.string.app_name
+
+  context.ipfsClient.connect()
 
   onCreate = {
     log.info("${URI_SHOPPING_LISTS}.onCreate()")
@@ -35,6 +38,7 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
+        log.warn("context.ipfs = ${context.ipfs} ipfs = $ipfs")
         context.shoppingListManager.test()
         false
       }

@@ -1,15 +1,17 @@
 package danbroid.ipfsd.demo.app
 
-import danbroid.ipfs.api.Dag
-import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.Transient
-import danbroid.ipfs.api.dagLink
+import android.content.Context
+import android.content.SharedPreferences
+import danbroid.ipfs.api.*
+import danbroid.util.prefs.Prefs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
 const val IPFSD_APP_ID_PREFIX = "/ipfsd/apps"
 
 @Serializable
-open class IPFSApp : Dag {
+open class IPFSApp {
 
   @Transient
   var cid: String? = null
@@ -19,9 +21,9 @@ open class IPFSApp : Dag {
     val type: String,
     var id: String = UUID.randomUUID().toString(),
     val created: Long = System.currentTimeMillis()
-  ) : Dag
+  )
 
-  val description = AppDescription(javaClass.name).dagLink()
+  val description = AppDescription(javaClass.name).toDag()
 
   override fun toString() = description.toString()
 
@@ -31,13 +33,11 @@ open class IPFSApp : Dag {
 }
 
 
-/*
-
 class AppRegistry(private val ipfs: IPFS, val context: Context) {
 
 
   companion object : SingletonHolder<AppRegistry, Pair<IPFS, Context>>({
-    AppRegistry(it.first, it.second)
+    AppRegistry(it!!.first, it!!.second)
   })
 
 
@@ -53,7 +53,7 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
         val hash = prefs.getString(prefKey, null)
         if (hash == null) throw IllegalArgumentException("$prefKey not found")
         val app = type.newInstance()
-        app.description.id = id
+        app.description.value.id = id
         return@withContext app
       }
       val keyPrefix = "$IPFSD_APP_ID_PREFIX/${type.name}"
@@ -72,10 +72,8 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
       save(type.newInstance(), prefs)
     }
 
-  private suspend fun <T : IPFSApp> loadApp(cid: String, type: Class<T>): T =
-    ipfs.dag(cid, type).valueOrThrow().also {
-      it.cid = cid
-    }
+  private suspend fun <T : IPFSApp> loadApp(cid: String, type: Class<T>): T? =
+    cid.cid<T>().value
 
 
   fun <T : IPFSApp> getAll(type: Class<T>): Flow<T> = flow {
@@ -124,7 +122,7 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
 
 val Context.appRegistry: AppRegistry
   get() = AppRegistry.getInstance(Pair(this.ipfs, this))
-  private val log = org.slf4j.LoggerFactory.getLogger(AppRegistry::class.java)
+private val log = org.slf4j.LoggerFactory.getLogger(AppRegistry::class.java)
 */
 
 

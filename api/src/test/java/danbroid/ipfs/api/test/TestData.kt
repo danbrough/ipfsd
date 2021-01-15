@@ -1,6 +1,5 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.Dag
 import danbroid.ipfs.api.IpfsLink
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
@@ -19,8 +18,7 @@ data class UNI(
 ) {
 
   @Serializable
-  data class Address(var street: String, var suburb: String, var postcode: Int, var city: String) :
-    Dag
+  data class Address(var street: String, var suburb: String, var postcode: Int, var city: String)
 
   @Serializable
   @IpfsLink

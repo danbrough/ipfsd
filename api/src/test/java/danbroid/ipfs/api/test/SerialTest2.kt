@@ -1,21 +1,15 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.*
-import kotlinx.serialization.KSerializer
+import danbroid.ipfs.api.DagNode
+import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.toDag
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.modules.subclass
-import kotlinx.serialization.serializer
 import org.junit.Test
 
 
-private interface DAG<T : Any> {
+/*private interface DAG<T : Any> {
   val cid: String
   val value: T
 }
@@ -83,19 +77,8 @@ data class ODag<T : Any>(val serializer: KSerializer<T>, override val value: T) 
     get() = _cid
 }
 
-private inline fun <reified T : Any> T.toDag(): DAG<T> = ODag(T::class.serializer(), this)
+private inline fun <reified T : Any> T.toDag(): DAG<T> = ODag(T::class.serializer(), this)*/
 
-private val format = Json {
-  serializersModule = SerializersModule {
-    polymorphic(DAG::class) {
-      subclass(ODag::class)
-    }
-/*    polymorphic(DAG::class) {
-      subclass(IDag::class)
-      subclass(ODag::class)
-    }*/
-  }
-}
 
 
 @Serializable
@@ -107,13 +90,14 @@ class SerialTest2 {
   @Test
   fun test() {
     log.info("test()")
+    val format = Json
     val zoo = ZOO("Happy Place", 1972)
     log.debug("zoo: $zoo")
-    val link = zoo.dagLink()
+    val link = zoo.toDag()
     log.debug("link: $link")
     val json = format.encodeToString(link)
     log.debug("json: $json")
-    val zoo2Link = format.decodeFromString<IDag<ZOO>>(json)
+    val zoo2Link = format.decodeFromString<DagNode<ZOO>>(json)
     log.info("zoo2Link: $zoo2Link")
     val zoo2 = zoo2Link.value
     log.debug("zoo2: $zoo2")
