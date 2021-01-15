@@ -8,7 +8,8 @@ import java.io.*
 val ipfs: IPFS
   inline get() = IPFS.getInstance()
 
-open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.coroutineScope {
+open class IPFS(executor: Executor, val callContext: CallContext = CallContext(executor)) :
+  CoroutineScope by callContext.coroutineScope {
 
   interface ApiResponse<T> : Closeable {
     val isSuccessful: Boolean
@@ -20,7 +21,7 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
   }
 
   companion object :
-    SingletonHolder<IPFS, CallContext>({ IPFS(it ?: CallContext(OkHttpExecutor())) })
+    SingletonHolder<IPFS, Executor?>({ IPFS(it ?: OkHttpExecutor()) })
 
   interface Executor {
     suspend fun <T> invoke(request: Request<T>): ApiResponse<T>
@@ -295,7 +296,6 @@ open class IPFS(val callContext: CallContext) : CoroutineScope by callContext.co
   val network = Network()
 }
 
-interface Dag
 
 private object api
 

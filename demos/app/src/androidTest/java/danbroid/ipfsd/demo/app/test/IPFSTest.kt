@@ -5,9 +5,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.ServiceApiClient
-import danbroid.ipfsd.demo.app.appRegistry
-import danbroid.ipfsd.demo.app.shopping.ShoppingList
-import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -37,12 +34,7 @@ class IPFSTest {
   @Test
   fun test1() {
     log.info("test1()")
-    runBlocking {
-      val app = ShoppingList()
-      val registry = context.appRegistry
-      registry.save(app)
-      log.debug("got app:$app")
-    }
+
 
   }
 

@@ -1,9 +1,8 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.DLink
-import danbroid.ipfs.api.DagLink
+import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.dagLink
+import danbroid.ipfs.api.toDag
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -38,7 +37,7 @@ data class Diet(val food: String)
 
 
 @Serializable
-data class Animal(val name: String, val diet: DLink<Diet>? = null)
+data class Animal(val name: String, val diet: DagNode<Diet>? = null)
 
 
 class SerialTest {
@@ -48,12 +47,13 @@ class SerialTest {
     log.info(format.encodeToString(data))
     val json = Json
     val animals =
-      listOf(Animal("Oscar", Diet("Bikkies").dagLink()).dagLink(), Animal("Satchmo").dagLink())
+      listOf(Animal("Oscar", Diet("Bikkies").toDag()).toDag(), Animal("Satchmo").toDag())
 
     json.encodeToString(animals).also {
       log.info("box json: $it")
-      val animals2: List<DagLink<Animal>> = json.decodeFromString(it)
-      log.debug("animals: $animals2")
+      val animals2: List<DagNode<Animal>> = json.decodeFromString(it)
+      log.trace("animals: $animals")
+      log.trace("animals2: $animals2")
       require(animals2 == animals) {
         "animals2 != animals"
       }
