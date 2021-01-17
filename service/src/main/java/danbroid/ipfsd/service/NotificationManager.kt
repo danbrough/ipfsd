@@ -1,6 +1,7 @@
 package danbroid.ipfsd.service
 
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_CANCEL_CURRENT
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,8 +15,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import com.mikepenz.iconics.IconicsDrawable
-import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
-
+import com.mikepenz.iconics.typeface.library.googlematerial.GoogleMaterial
 import com.mikepenz.iconics.utils.toAndroidIconCompat
 import danbroid.ipfsd.IPFSD
 import danbroid.util.intent.toPendingIntent
@@ -63,7 +63,7 @@ class NotificationManager(
   private fun createBroadcastIntent(
     action: String,
     instanceId: Int,
-    flags: Int = PendingIntent.FLAG_CANCEL_CURRENT
+    flags: Int = FLAG_CANCEL_CURRENT
   ): PendingIntent =
     Intent(action).setPackage(context.packageName).let {
       it.putExtra(EXTRA_INSTANCE_ID, instanceId)
@@ -92,12 +92,12 @@ class NotificationManager(
     setPriority(NotificationCompat.PRIORITY_DEFAULT)
     setContentIntent(
       context.packageManager?.getLaunchIntentForPackage(context.packageName)?.let { sessionIntent ->
-        PendingIntent.getActivity(context, 0, sessionIntent, PendingIntent.FLAG_CANCEL_CURRENT)
+        PendingIntent.getActivity(context, 0, sessionIntent, FLAG_CANCEL_CURRENT)
       })
 
     setDeleteIntent(
       Intent(context, IPFSService::class.java).setAction(IPFSService.ACTION_STOP).let {
-        PendingIntent.getService(context, 0, it, PendingIntent.FLAG_CANCEL_CURRENT)
+        PendingIntent.getService(context, 0, it, FLAG_CANCEL_CURRENT)
       })
 
 
@@ -105,8 +105,8 @@ class NotificationManager(
       NotificationCompat.Action.Builder(
         IconicsDrawable(
           context,
-          //GoogleMaterial.Icon.gmd_settings
-          MaterialDesignIconic.Icon.gmi_settings
+          GoogleMaterial.Icon.gmd_settings
+
         ).toAndroidIconCompat(), context.getString(R.string.lbl_settings),
         IPFSD.deep_link.ipfsd_settings.toUri().toPendingIntent(context)
       ).build()
@@ -118,7 +118,8 @@ class NotificationManager(
         IconicsDrawable(
           context,
           //GoogleMaterial.Icon.gmd_clear
-          MaterialDesignIconic.Icon.gmi_format_clear
+          GoogleMaterial.Icon.gmd_clear
+          //MaterialDesignIconic.Icon.clear
         ).toAndroidIconCompat(), "Reset Stats",
         IPFSD.intent.resetStatsPromptPending(context)
       ).build()

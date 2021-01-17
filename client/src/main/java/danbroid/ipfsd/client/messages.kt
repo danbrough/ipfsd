@@ -4,7 +4,7 @@ import android.os.Message
 import android.os.Messenger
 import android.os.Parcelable
 import androidx.core.os.bundleOf
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 private const val MESSAGE_KEY = "_message"
 

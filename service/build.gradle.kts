@@ -1,7 +1,6 @@
 plugins {
   id("com.android.application")
   kotlin("android")
-  kotlin("android.extensions")
   id("org.jetbrains.dokka")
   `maven-publish`
 }
@@ -78,7 +77,8 @@ dependencies {
   implementation(Danbroid.slf4j)
   implementation("com.mikepenz:iconics-core:_")
   //implementation("com.mikepenz:google-material-typeface:_")
-   implementation("com.mikepenz:fontawesome-typeface:_")
+  implementation("com.mikepenz:google-material-typeface:4.0.0.1-kotlin@aar")
+  implementation("com.mikepenz:fontawesome-typeface:_")
   implementation("com.mikepenz:material-design-iconic-typeface:_@aar")
 
 //

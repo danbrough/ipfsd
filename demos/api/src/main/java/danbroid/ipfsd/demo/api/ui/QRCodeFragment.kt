@@ -12,16 +12,28 @@ import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
 import danbroid.ipfsd.demo.api.DemoNavGraph
 import danbroid.ipfsd.demo.api.R
-import kotlinx.android.synthetic.main.fragment_settings.*
+import danbroid.ipfsd.demo.api.databinding.FragmentQrcodeBinding
 
 
-class QRCodeFragment : Fragment() {
+class QRCodeFragment : Fragment(R.layout.fragment_qrcode) {
+
+  private var _binding: FragmentQrcodeBinding? = null
+  private val binding: FragmentQrcodeBinding
+    inline get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ) = inflater.inflate(R.layout.fragment_qrcode, container, false)
+  ) = FragmentQrcodeBinding.inflate(inflater, container, false).let {
+    _binding = it
+    it.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
 
   val data: String by lazy {
     requireArguments().getString(DemoNavGraph.args.data)!!
@@ -41,7 +53,7 @@ class QRCodeFragment : Fragment() {
           bmp.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
         }
       }
-      barcode.setImageBitmap(bmp)
+      binding.barcode.setImageBitmap(bmp)
       //  (findViewById(R.id.img_result_qr) as ImageView).setImageBitmap(bmp)
     } catch (e: WriterException) {
       log.error(e.message, e)

@@ -2,7 +2,6 @@ plugins {
   id("com.android.application")
   kotlin("android")
   kotlin("kapt")
-  kotlin("android.extensions")
 //kotlin("org.jetbrains.kotlin:kotlin-android-extensions-runtime:")
   id("org.jetbrains.dokka")
   kotlin("plugin.serialization")
@@ -36,9 +35,8 @@ android {
     targetCompatibility = ProjectVersions.JAVA_VERSION
   }
 
-
-  androidExtensions {
-    isExperimental = true
+  buildFeatures {
+    viewBinding = true
   }
 
   kotlinOptions {

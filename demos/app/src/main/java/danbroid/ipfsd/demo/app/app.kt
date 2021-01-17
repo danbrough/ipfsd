@@ -2,11 +2,20 @@ package danbroid.ipfsd.demo.app
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import danbroid.ipfs.api.*
+import danbroid.ipfs.api.utils.SingletonHolder
+import danbroid.ipfsd.demo.app.shopping.ShoppingList
 import danbroid.util.prefs.Prefs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.serializer
 import java.util.*
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 const val IPFSD_APP_ID_PREFIX = "/ipfsd/apps"
 
@@ -37,7 +46,7 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
 
 
   companion object : SingletonHolder<AppRegistry, Pair<IPFS, Context>>({
-    AppRegistry(it!!.first, it!!.second)
+    AppRegistry(it.first, it.second)
   })
 
 
@@ -45,18 +54,18 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
     get() = context.appPrefs
 
 
-  suspend fun <T : IPFSApp> get(type: Class<T>, id: String? = null): T =
+  suspend fun <T : IPFSApp> get(type: KClass<T>, id: String? = null): T =
     withContext(Dispatchers.IO) {
       val prefs = defaultPrefs.prefs
       if (id != null) {
-        val prefKey = "$IPFSD_APP_ID_PREFIX/${type.name}/$id"
+        val prefKey = "$IPFSD_APP_ID_PREFIX/${type.java.name}/$id"
         val hash = prefs.getString(prefKey, null)
         if (hash == null) throw IllegalArgumentException("$prefKey not found")
-        val app = type.newInstance()
+        val app = type.createInstance()
         app.description.value.id = id
         return@withContext app
       }
-      val keyPrefix = "$IPFSD_APP_ID_PREFIX/${type.name}"
+      val keyPrefix = "$IPFSD_APP_ID_PREFIX/${type.java.name}"
       log.trace("keyPrefix: $keyPrefix")
 
       val cid = prefs.all.filter { it.key.startsWith(keyPrefix) }.map {
@@ -65,40 +74,40 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
 
       if (cid != null) {
         log.warn("loading $cid")
-        return@withContext loadApp(cid, type)
+        return@withContext loadApp(cid, type.serializer())
       }
 
       log.warn("creating new app")
-      save(type.newInstance(), prefs)
+      save(type.createInstance(), type, prefs)
     }
 
-  private suspend fun <T : IPFSApp> loadApp(cid: String, type: Class<T>): T? =
-    cid.cid<T>().value
+  private suspend inline fun <T : Any> loadApp(
+    cid: String,
+    serializer: KSerializer<T>
+  ): T =
+    DagNode(null, serializer, cid).value()!!
 
 
-  fun <T : IPFSApp> getAll(type: Class<T>): Flow<T> = flow {
-    getIDs(type).forEach {
-      emit(loadApp(it.id, type))
+  fun <T : IPFSApp> getAll(type: KClass<T>): Flow<T> = flow {
+    defaultPrefs.prefs.getIDs(type.java).forEach {
+      emit(loadApp(it.id, type.serializer()))
     }
   }
 
-  fun getIDs(prefs: SharedPreferences = defaultPrefs.prefs): List<DagID> =
-    prefs.all.filter { it.key.startsWith("$IPFSD_APP_ID_PREFIX/") }.map {
-      DagID(it.key, it.value as String)
-    }
-
-  fun <T> getIDs(type: Class<T>, prefs: SharedPreferences = defaultPrefs.prefs) =
-    getIDs(prefs).filter { it.id.startsWith("$IPFSD_APP_ID_PREFIX/${type.name}") }
+  data class DagID(val id: String, val cid: String)
 
 
   @Suppress("BlockingMethodInNonBlockingContext")
-  suspend fun <T : IPFSApp> save(app: T, prefs: SharedPreferences = defaultPrefs.prefs): T =
+  suspend fun <T : IPFSApp> save(
+    app: T,
+    type: KClass<T>,
+    prefs: SharedPreferences = defaultPrefs.prefs
+  ): T =
     withContext(Dispatchers.IO) {
-      val cid =
-        ipfs.dag.put(pin = true, data = app).get().value.cid.cid
+      val cid = app.toDag(type.serializer()).cid()
       prefs.edit(commit = true) {
         putString(
-          "$IPFSD_APP_ID_PREFIX/${app.javaClass.name}/${app.description.id}",
+          "$IPFSD_APP_ID_PREFIX/${app.javaClass.name}/${app.description.value.id}",
           cid
         )
       }
@@ -110,7 +119,7 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
   suspend fun test() {
     log.warn("test()")
     runCatching {
-      get(ShoppingList::class.java).also {
+      get(ShoppingList::class).also {
         log.warn("LOADED $it")
       }
     }.exceptionOrNull()?.also {
@@ -120,9 +129,19 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
 }
 
 
+fun SharedPreferences.getIDs(): List<AppRegistry.DagID> =
+  all.filter { it.key.startsWith("$IPFSD_APP_ID_PREFIX/") }.map {
+    AppRegistry.DagID(it.key, it.value as String)
+  }
+
+fun <T> SharedPreferences.getIDs(type: Class<T>): List<AppRegistry.DagID> =
+  getIDs().filter { it.id.startsWith("$IPFSD_APP_ID_PREFIX/${type.name}") }
+
+
 val Context.appRegistry: AppRegistry
-  get() = AppRegistry.getInstance(Pair(this.ipfs, this))
+  get() = AppRegistry.getInstance(Pair(ipfs, this))
+
 private val log = org.slf4j.LoggerFactory.getLogger(AppRegistry::class.java)
-*/
+
 
 

@@ -2,7 +2,6 @@ plugins {
   id("com.android.application")
   kotlin("android")
   kotlin("kapt")
-  kotlin("android.extensions")
 //kotlin("org.jetbrains.kotlin:kotlin-android-extensions-runtime:")
   id("org.jetbrains.dokka")
 }
@@ -28,15 +27,14 @@ android {
   lintOptions {
     isAbortOnError = false
   }
-
+  buildFeatures {
+    viewBinding = true
+  }
   compileOptions {
     sourceCompatibility = ProjectVersions.JAVA_VERSION
     targetCompatibility = ProjectVersions.JAVA_VERSION
   }
 
-  androidExtensions {
-    isExperimental = true
-  }
 
 /*
   kotlinOptions {
