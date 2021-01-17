@@ -3,7 +3,7 @@ package danbroid.ipfsd.client
 import android.content.Context
 import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.Request
-import danbroid.ipfs.api.ipfs
+import danbroid.ipfs.api.okhttp.OkHttpExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
 import kotlinx.coroutines.launch
@@ -45,11 +45,11 @@ class ServiceApiClient private constructor(
     const val DEFAULT_PORT = 5001
     const val DEFAULT_API_URL = "http://localhost:$DEFAULT_PORT/api/v0"
 
-    fun getInstance(context: Context): ServiceApiClient =
+    fun getInstance(context: Context, executor: IPFS.Executor): ServiceApiClient =
       getInstance(
         Pair(
           ServiceClient.getInstance(context),
-          ipfs.callContext.executor
+          executor,
         )
       )
 
@@ -64,7 +64,7 @@ class ServiceApiClient private constructor(
 }
 
 private class AndroidIPFS(context: Context) :
-  IPFS(CallContext(ServiceApiClient.getInstance(context))) {
+  IPFS(CallContext(ServiceApiClient.getInstance(context, OkHttpExecutor()))) {
   companion object : SingletonHolder<AndroidIPFS, Context>(::AndroidIPFS)
 }
 

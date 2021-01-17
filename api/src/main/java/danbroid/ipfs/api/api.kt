@@ -5,8 +5,10 @@ import danbroid.ipfs.api.utils.SingletonHolder
 import kotlinx.coroutines.*
 import java.io.*
 
+private val executor = OkHttpExecutor()
+
 val ipfs: IPFS
-  inline get() = IPFS.getInstance()
+  get() = IPFS.getInstance(executor)
 
 open class IPFS(executor: Executor, val callContext: CallContext = CallContext(executor)) :
   CoroutineScope by callContext.coroutineScope {

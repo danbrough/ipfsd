@@ -10,8 +10,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import danbroid.ipfsd.demo.api.DemoNavGraph
-import danbroid.ipfsd.demo.api.R
-import kotlinx.android.synthetic.main.fragment_browser.*
+import danbroid.ipfsd.demo.api.databinding.FragmentBrowserBinding
 
 
 class BrowserFragment : Fragment() {
@@ -111,21 +110,44 @@ class BrowserFragment : Fragment() {
 
   }
 
+  private var _binding: FragmentBrowserBinding? = null
+
+  // This property is only valid between onCreateView and
+// onDestroyView.
+  private inline val binding get() = _binding!!
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ) = FragmentBrowserBinding.inflate(inflater, container, false).let {
+    _binding = it
+    it.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    binding.webView.destroy()
+    _binding = null
+  }
+
   @SuppressLint("SetJavaScriptEnabled")
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    val webView = binding.webView
     if (savedInstanceState != null) {
       // context.debugToast("found existing state")
-      webView?.restoreState(savedInstanceState)
+
+      webView.restoreState(savedInstanceState)
       return
     }
 
-    webView?.webViewClient = WebClient()
+    binding.webView.webViewClient = WebClient()
 
     //progress_bar.visibility = View.GONE
     //shadow.visibility = View.GONE
 
 
-    with(webView!!.settings) {
+    with(webView.settings) {
       // this.minimumFontSize=12
       javaScriptCanOpenWindowsAutomatically = true
       javaScriptEnabled = true
@@ -135,7 +157,7 @@ class BrowserFragment : Fragment() {
       displayZoomControls = false
     }
 
-    webView?.apply {
+    webView.apply {
       isFocusableInTouchMode = true
       // addJavascriptInterface(Console(activity!!), "console")
     }
@@ -144,25 +166,19 @@ class BrowserFragment : Fragment() {
     //webView?.addJavascriptInterface(Console(), "audienz")
 
     log.debug("loading url: ${url}")
-    webView?.loadUrl(url)
+    webView.loadUrl(url)
   }
 
 
-  override fun onDestroy() {
+  /*override fun onDestroy() {
     super.onDestroy()
     webView?.destroy()
-  }
+  }*/
 
   override fun onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    webView?.saveState(outState)
+    binding.webView.saveState(outState)
   }
-
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ) = inflater.inflate(R.layout.fragment_browser, container, false)
 
 
 }

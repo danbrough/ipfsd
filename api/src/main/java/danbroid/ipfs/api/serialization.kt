@@ -44,12 +44,12 @@ class DagNode<T : Any> constructor(
     } ?: CID_NULL_DATA
   }
 
-  val value: T? by lazy {
+  val value: T by lazy {
     _cid?.let { c ->
       api.blocking {
         _value(c)
       }
-    } ?: _value
+    } ?: _value!!
   }
 
   suspend fun value(): T? = _cid?.let { c -> _value(c) } ?: _value
@@ -73,18 +73,18 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
 
   override fun serialize(encoder: Encoder, value: DagNode<T>) =
     encoder.encodeSerializableValue(linkSerializer, Types.Link(value.cid))
-
 }
 
-
 inline fun <reified T : Any> T?.toDag(json: Json = Json): DagNode<T> =
-  DagNode(this, serializer(), null)
+  DagNode(this, T::class.serializer())
+
+inline fun <T : Any> T?.toDag(serializer: KSerializer<T>, json: Json = Json): DagNode<T> =
+  DagNode(this, serializer, null, json)
 
 inline fun <reified T : Any> String.cid(
   serializer: KSerializer<T> = serializer(),
   json: Json = Json
-): DagNode<T> =
-  DagNode(null, serializer, this, json)
+): DagNode<T> = DagNode(null, serializer, this, json)
 
 
 /*
