@@ -4,7 +4,7 @@ plugins {
   `maven-publish`
   kotlin("plugin.serialization")
   id("org.jetbrains.dokka")
-  `java-test-fixtures`
+ // `java-test-fixtures`
 
 }
 
@@ -36,9 +36,6 @@ tasks.withType<Test> {
 }
 
 dependencies {
-/* api(project(":common_domain")) {
-   exclude(group = "com.android", module = "android")
- }*/
 
 
   testImplementation(Kotlin.Test.junit)
@@ -49,6 +46,7 @@ dependencies {
   implementation("org.slf4j:slf4j-api:_")
   implementation(Kotlin.stdlib.jdk8)
   implementation(KotlinX.coroutines.jdk8)
+
   api("org.jetbrains.kotlin:kotlin-reflect:_")
 
   implementation("com.google.code.gson:gson:_")

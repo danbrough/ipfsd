@@ -77,17 +77,27 @@ tasks.withType<Test> {
 
 
 dependencies {
-  implementation(project(":api"))
-  implementation(project(":client"))
+
+  implementation(Kotlin.stdlib.jdk8)
+
+  implementation(AndroidX.navigation.fragmentKtx)
+  implementation(AndroidX.navigation.uiKtx)
+  implementation(AndroidX.constraintLayout)
+  implementation(AndroidX.preferenceKtx)
   implementation("org.jetbrains.kotlin:kotlin-reflect:_")
 
   implementation("com.google.code.gson:gson:_")
   implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(AndroidX.lifecycle.liveDataKtx)
-  implementation(AndroidX.coreKtx)
+  implementation(AndroidX.core.ktx)
   implementation(AndroidX.appCompatResources)
   implementation(AndroidX.appCompat)
-  implementation(Kotlin.stdlib.jdk8)
+
+
+  implementation(project(":api"))
+  implementation(project(":client"))
+
+
   //implementation("org.jetbrains.kotlin:kotlin-reflect:_")
 
 
@@ -143,11 +153,6 @@ dependencies {
   testImplementation("ch.qos.logback:logback-classic:_")
   testImplementation("ch.qos.logback:logback-core:_")
   testImplementation(testFixtures(project(":api")))
-
-  implementation(AndroidX.navigation.fragmentKtx)
-  implementation(AndroidX.navigation.uiKtx)
-  implementation(AndroidX.constraintLayout)
-  implementation(AndroidX.preferenceKtx)
 
 
 }

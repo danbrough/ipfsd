@@ -56,12 +56,12 @@ dependencies {
      exclude(group = "com.android", module = "android")
    }*/
 
-  implementation("com.github.danbrough.ipfsd:bridge:${Danbroid.bridge_version}")
   //implementation(project(":bridge"))
+  implementation("danbroid.ipfsd:bridge:_")
 
   implementation(project(":client"))
 
-  api("org.slf4j:slf4j-api:_")
+  implementation("org.slf4j:slf4j-api:_")
 
   implementation(AndroidX.appCompat)
   implementation(Google.android.material)
@@ -75,11 +75,16 @@ dependencies {
   }
 
   implementation(Danbroid.slf4j)
+  //implementation("com.mikepenz:iconics-core:_")
+  //implementation("com.mikepenz:library-typeface-api:5.2.4")
   implementation("com.mikepenz:iconics-core:_")
-  //implementation("com.mikepenz:google-material-typeface:_")
-  implementation("com.mikepenz:google-material-typeface:4.0.0.1-kotlin@aar")
-  implementation("com.mikepenz:fontawesome-typeface:_")
-  implementation("com.mikepenz:material-design-iconic-typeface:_@aar")
+
+
+  implementation("com.mikepenz:google-material-typeface:_@aar")
+
+  /*implementation("com.mikepenz:fontawesome-typeface:_")
+  implementation("com.mikepenz:material-design-iconic-typeface:_")*/
+
 
 //
   //implementation("com.mikepenz:library-typeface-api:5.2.4")
@@ -89,13 +94,14 @@ dependencies {
   //api(Libs.kotlinx_coroutines_android)
   //implementation("com.google.code.gson:gson:_")
   //api(Libs.gson)
-  implementation(AndroidX.coreKtx)
+  implementation(AndroidX.core.ktx)
   implementation(AndroidX.preference)
 
 
   //implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(KotlinX.coroutines.android)
 //  implementation(Square.okHttp3.okHttp)
+
 
   implementation(AndroidX.lifecycle.liveDataKtx)
   testImplementation(Testing.junit4)

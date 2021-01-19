@@ -11,7 +11,8 @@ object ProjectVersions {
   var GROUP_ID = ""
   var KEYSTORE_PASSWORD = ""
   var VERSION_FORMAT = ""
-  val NDK_VERSION = "21.1.6352462"
+  val NDK_VERSION = "21.2.6472646"
+  var COMPOSE_VERSION = "1.0.0-alpha10"
 
   val VERSION_NAME: String
     get() = getVersionName()
@@ -22,7 +23,7 @@ object ProjectVersions {
     BUILD_VERSION = props.getProperty("buildVersion", "1").toInt()
     VERSION_OFFSET = props.getProperty("versionOffset", "1").toInt()
     VERSION_FORMAT = props.getProperty("versionFormat", "0.0.%d")
-    GROUP_ID = props.getProperty("groupID", "com.github.danbrough.androidutils")
+    GROUP_ID = props.getProperty("groupID", "")
     KEYSTORE_PASSWORD = props.getProperty("keystorePassword", "")
   }
 
@@ -31,4 +32,6 @@ object ProjectVersions {
 
   fun getVersionName(version: Int = BUILD_VERSION) =
     VERSION_FORMAT.format(version - VERSION_OFFSET)
+
+
 }

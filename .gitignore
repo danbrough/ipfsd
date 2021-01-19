@@ -7,3 +7,6 @@ build
 .externalNativeBuild
 /.idea
 /stuff
+**/release/**
+/old
+/buildSrc/src/main/kotlin/KeystoreConfig.kt
