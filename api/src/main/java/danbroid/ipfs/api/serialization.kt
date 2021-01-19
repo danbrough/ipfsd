@@ -78,7 +78,7 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
 inline fun <reified T : Any> T?.toDag(json: Json = Json): DagNode<T> =
   DagNode(this, T::class.serializer())
 
-inline fun <T : Any> T?.toDag(serializer: KSerializer<T>, json: Json = Json): DagNode<T> =
+fun <T : Any> T?.toDag(serializer: KSerializer<T>, json: Json = Json): DagNode<T> =
   DagNode(this, serializer, null, json)
 
 inline fun <reified T : Any> String.cid(

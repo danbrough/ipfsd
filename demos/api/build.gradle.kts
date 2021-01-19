@@ -63,7 +63,7 @@ dependencies {
 
   implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(AndroidX.lifecycle.liveDataKtx)
-  implementation(AndroidX.coreKtx)
+  implementation("androidx.core:core-ktx:1.5.0-beta01")
   implementation(AndroidX.appCompatResources)
   implementation(AndroidX.appCompat)
   implementation(Kotlin.stdlib.jdk8)
@@ -73,7 +73,6 @@ dependencies {
   //sliding panel library
 
   //implementation(Libs.slf4j_android)
-  implementation("org.slf4j:slf4j-api:_")
   //implementation(Libs.slf4j)
 
   if (Danbroid.useLocalUtils) {

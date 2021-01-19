@@ -3,6 +3,7 @@ plugins {
   kotlin("android")
   id("org.jetbrains.dokka")
   `maven-publish`
+
   id("kotlin-parcelize")
 }
 
@@ -82,7 +83,10 @@ dependencies {
   //api(Libs.kotlinx_coroutines_android)
   //implementation("com.google.code.gson:gson:_")
   //api(Libs.gson)
-  implementation(AndroidX.coreKtx)
+
+  implementation(AndroidX.core.ktx)
+
+
   //implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(KotlinX.coroutines.android)
   api(Google.android.material)

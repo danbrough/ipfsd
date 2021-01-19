@@ -17,16 +17,7 @@ android {
     consumerProguardFiles("consumer-rules.pro")
   }
 
-  buildTypes {
-    getByName("release") {
-      isMinifyEnabled = true
-      proguardFiles(
-        getDefaultProguardFile("proguard-android-optimize.txt"),
-        "proguard-rules.pro"
-      )
-    }
 
-  }
   compileOptions {
     sourceCompatibility = ProjectVersions.JAVA_VERSION
     targetCompatibility = ProjectVersions.JAVA_VERSION
@@ -38,9 +29,105 @@ android {
     unitTests.isReturnDefaultValues = true
   }
 
+/*  signingConfigs {
+    register("release") {
+      storeFile = file("/home/dan/.android/ipfsd.keystore")
+      keyAlias = "ipfsd"
+      storePassword = KeystoreConfig.PASSWORD
+      keyPassword = KeystoreConfig.PASSWORD
+    }
+  }*/
+
+  buildTypes {
+    getByName("release") {
+      isMinifyEnabled = true
+      proguardFiles(
+        getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+      )
+      consumerProguardFiles("proguard-rules.pro")
+      //signingConfig = signingConfigs.getByName("release")
+    }
+  }
+
 }
 
 
+val sourcesJar by tasks.registering(Jar::class) {
+  archiveClassifier.set("sources")
+  from(android.sourceSets.getByName("main").java.srcDirs)
+}
+
+
+afterEvaluate {
+  publishing {
+    //val projectName = name
+    publications {
+      // Creates a Maven publication called "release".
+      create<MavenPublication>("release") {
+        from(components["release"])
+        artifact(sourcesJar.get())
+        version = Danbroid.bridge_version
+        groupId = ProjectVersions.GROUP_ID
+       // artifactId = projectName
+        // Applies the component for the release build variant.
+        /*  from components . release
+
+              // You can then customize attributes of the publication as shown below.
+              groupId = 'com.example.MyLibrary'
+          artifactId = 'final'
+          version = '1.0'*/
+      }
+      // Creates a Maven publication called “debug”.
+
+    }
+  }
+}
+
+/*
+
+        val sourcesJar by tasks.registering(Jar::class) {
+          archiveClassifier.set("sources")
+          from(sourceSets.getByName("main").java.srcDirs)
+        }
+
+
+        afterEvaluate {
+          publishing.apply {
+            val projectName = name
+            publications {
+              val release by registering(MavenPublication::class) {
+                from(components["release"])
+                artifact(sourcesJar.get())
+                artifactId = projectName
+                groupId = ProjectVersions.GROUP_ID
+                version = defaultConfig.versionName
+                maven = true
+              }
+            }
+          }
+        }
+ */
+
+/*
+val sourcesJar by tasks.registering(Jar::class) {
+  archiveClassifier.set("sources")
+  from(sourceSets.getByName("main").java.srcDirs)
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      groupId = ProjectVersions.GROUP_ID
+      artifact(sourcesJar.get())
+
+      //artifactId = "library"
+     // version = defaultConfig.versionName
+
+      from(components["release"])
+    }
+  }
+}
+*/
 
 
 dependencies {

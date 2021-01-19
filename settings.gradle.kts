@@ -1,4 +1,25 @@
-import de.fayard.dependencies.bootstrapRefreshVersionsAndDependencies
+
+import de.fayard.refreshVersions.bootstrapRefreshVersions
+
+buildscript {
+  repositories { gradlePluginPortal() }
+  dependencies.classpath("de.fayard.refreshVersions:refreshVersions:0.9.7")
+}
+
+bootstrapRefreshVersions()
+
+include(":service", ":bridge", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")
+
+rootProject.name = "ipfsd"
+
+if (false) {
+  include(":menu", ":slf4j", ":misc")
+  project(":menu").projectDir = file("../androidutils/menu")
+  project(":slf4j").projectDir = file("../androidutils/slf4j")
+  project(":misc").projectDir = file("../androidutils/misc")
+}
+
+/*import de.fayard.dependencies.bootstrapRefreshVersionsAndDependencies
 
 
 buildscript {
@@ -13,17 +34,7 @@ buildscript {
 }
 
 
-bootstrapRefreshVersionsAndDependencies()
-include(":service", ":bridge", ":client", ":apiold", ":api", ":demos:app", ":demos:api")
-
-rootProject.name = "ipfsd"
-
-if (false) {
-  include(":menu", ":slf4j", ":misc")
-  project(":menu").projectDir = file("../androidutils/menu")
-  project(":slf4j").projectDir = file("../androidutils/slf4j")
-  project(":misc").projectDir = file("../androidutils/misc")
-}
+bootstrapRefreshVersionsAndDependencies()*/
 
 
 

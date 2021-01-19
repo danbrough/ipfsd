@@ -15,7 +15,6 @@ buildscript {
     classpath("com.android.tools.build:gradle:7.0.0-alpha04")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
     classpath("org.jetbrains.dokka:dokka-gradle-plugin:_")
-
   }
 
 }
@@ -29,13 +28,14 @@ allprojects {
     jcenter()
     mavenCentral()
 
-    //  maven("https://h1.danbrough.org/maven")
-    //maven("https://jitpack.io")
-    mavenLocal()
+    maven("https://h1.danbrough.org/maven")
+    maven("https://jitpack.io")
+   // mavenLocal()
 
   }
 
-  tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
+  tasks.withType<org.jetbrains.dokka.gradle.
+  DokkaTask>().configureEach {
     dokkaSourceSets {
       configureEach {
         includes.from(file("README.md"))
@@ -65,7 +65,7 @@ subprojects {
         languageVersion = "1.4"
         // freeCompilerArgs = listOf("-Xjvm-default=enable")
         freeCompilerArgs += listOf(
-        //  "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
+          //  "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
           "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
 
           "-Xopt-in=kotlinx.coroutines.InternalCoroutinesApi",
@@ -74,6 +74,7 @@ subprojects {
         )
       }
     }
+
 
     (extensions.findByType(com.android.build.gradle.LibraryExtension::class)
       ?: extensions.findByType(com.android.build.gradle.AppExtension::class))?.apply {
@@ -127,7 +128,7 @@ subprojects {
           extensions.findByType(PublishingExtension::class.java) ?: return@afterEvaluate
 
 
-        val sourcesJar by tasks.registering(Jar::class) {
+        /*val sourcesJar by tasks.registering(Jar::class) {
           archiveClassifier.set("sources")
           from(sourceSets.getByName("main").java.srcDirs)
         }
@@ -138,15 +139,17 @@ subprojects {
             val projectName = name
             publications {
               val release by registering(MavenPublication::class) {
-                from(components["debug"])
+                from(components["release"])
                 artifact(sourcesJar.get())
                 artifactId = projectName
                 groupId = ProjectVersions.GROUP_ID
                 version = defaultConfig.versionName
+                maven = true
               }
             }
           }
-        }
+        }*/
+
       }
     }
   }
