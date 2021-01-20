@@ -75,15 +75,15 @@ dependencies {
   //implementation(Libs.slf4j_android)
   //implementation(Libs.slf4j)
 
-  if (Danbroid.useLocalUtils) {
+  if (Danbroid.utils.useLocalUtils) {
     implementation(project(":menu"))
     implementation(project(":misc"))
   } else {
-    implementation(Danbroid.menu)
-    implementation(Danbroid.misc)
+    implementation(Danbroid.utils.menu)
+    implementation(Danbroid.utils.misc)
   }
 
-  implementation(Danbroid.slf4j)
+  implementation(Danbroid.utils.slf4j)
 
   implementation("com.google.zxing:android-core:_")
 
@@ -98,7 +98,7 @@ dependencies {
   androidTestImplementation(AndroidX.test.rules)
   androidTestImplementation(AndroidX.test.ext.junitKtx)
   androidTestImplementation("com.google.truth:truth:_")
-  androidTestImplementation(Danbroid.slf4j)
+  androidTestImplementation(Danbroid.utils.slf4j)
 
 
   testImplementation("ch.qos.logback:logback-classic:_")

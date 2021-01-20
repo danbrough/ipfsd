@@ -75,7 +75,7 @@ dependencies {
   implementation(AndroidX.appCompat)
   api(project(":api"))
 
-  implementation(Danbroid.misc)
+  implementation(Danbroid.utils.misc)
 
   //implementation("commons-io:commons-io:_")
   //implementation("ipfs.gomobile:core:0.8.0-dan04@aar")
@@ -102,7 +102,7 @@ dependencies {
   // testImplementation("net.sf.kxml:kxml2-min:_")
   //testImplementation(Libs.robolectric)
   androidTestImplementation(Testing.junit4)
-  androidTestImplementation(Danbroid.slf4j)
+  androidTestImplementation(Danbroid.utils.slf4j)
 
   androidTestImplementation(AndroidX.test.core)
   androidTestImplementation(AndroidX.test.runner)

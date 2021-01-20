@@ -57,7 +57,7 @@ dependencies {
    }*/
 
   //implementation(project(":bridge"))
-  implementation("danbroid.ipfsd:bridge:_")
+  implementation(Danbroid.ipfsd_bridge)
 
   implementation(project(":client"))
 
@@ -66,15 +66,15 @@ dependencies {
   implementation(AndroidX.appCompat)
   implementation(Google.android.material)
 
-  if (Danbroid.useLocalUtils) {
+  if (Danbroid.utils.useLocalUtils) {
     implementation(project(":menu"))
     implementation(project(":misc"))
   } else {
-    implementation(Danbroid.menu)
-    implementation(Danbroid.misc)
+    implementation(Danbroid.utils.menu)
+    implementation(Danbroid.utils.misc)
   }
 
-  implementation(Danbroid.slf4j)
+  implementation(Danbroid.utils.slf4j)
   //implementation("com.mikepenz:iconics-core:_")
   //implementation("com.mikepenz:library-typeface-api:5.2.4")
   implementation("com.mikepenz:iconics-core:_")
@@ -112,7 +112,7 @@ dependencies {
   // testImplementation("net.sf.kxml:kxml2-min:_")
   //testImplementation(Libs.robolectric)
   androidTestImplementation(Testing.junit4)
-  androidTestImplementation(Danbroid.slf4j)
+  androidTestImplementation(Danbroid.utils.slf4j)
 
   androidTestImplementation(AndroidX.test.core)
   androidTestImplementation(AndroidX.test.runner)
