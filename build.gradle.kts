@@ -1,7 +1,6 @@
+
 plugins {
-
   id("org.jetbrains.dokka")
-
 }
 
 buildscript {
@@ -27,11 +26,9 @@ allprojects {
     google()
     jcenter()
     mavenCentral()
-
-    maven("https://h1.danbrough.org/maven")
+    //maven("https://h1.danbrough.org/maven")
     maven("https://jitpack.io")
-   // mavenLocal()
-
+    mavenLocal()
   }
 
   tasks.withType<org.jetbrains.dokka.gradle.
