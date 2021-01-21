@@ -8,7 +8,7 @@ object Danbroid {
 
   object utils {
     val useLocalUtils = false
-    const val version = "1.2.0-alpha02" //"1.1.4-beta01"
+    const val version = "1.1.4"
     private const val pkg = "com.github.danbrough.androidutils"
     const val misc = "$pkg:misc:_"
     const val menu = "$pkg:menu:_"
