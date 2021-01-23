@@ -28,7 +28,7 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   }
 
   override fun onCleared() {
-    log.debug("onCleared()")
+    log.error("onCleared()")
   }
 
   companion object {

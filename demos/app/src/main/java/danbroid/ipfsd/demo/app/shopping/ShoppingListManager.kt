@@ -25,7 +25,8 @@ class ShoppingListManager(val context: Context) {
     if (cid == null) {
       log.debug("creating new shopping list")
       list = ShoppingList("default")
-      context.appPrefs.shoppingListApp = list.toDag().cid
+      context.appPrefs.shoppingListApp = list.toDag().cid()
+      log.info("new cid: ${context.appPrefs.shoppingListApp}")
     } else {
       list = cid.cid<ShoppingList>().value()!!
     }

@@ -10,6 +10,7 @@ import android.os.Looper
 import android.os.Messenger
 import android.widget.Toast
 import androidx.annotation.MainThread
+import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.IPFSMessage
 import danbroid.ipfsd.client.toIPFSMessage
 import danbroid.ipfsd.service.settings.IPFSServicePrefs
@@ -50,19 +51,20 @@ class IPFSService : Service() {
       }
     }
 
-    fun resetStats(context: Context) = context.startService(
-      Intent(
-        context,
-        IPFSService::class.java
-      ).setAction(ACTION_CLEAR_NET_STATS)
-    )
+    fun resetStats(context: Context) = serviceAction(context, ACTION_CLEAR_NET_STATS)
 
-    fun stopService(context: Context) = context.startService(
-      Intent(
-        context,
-        IPFSService::class.java
-      ).setAction(ACTION_STOP)
-    )
+    fun serviceAction(context: Context, action: String) =
+      context.startService(Intent(action).setPackage(IPFSD.SERVICE_PKG))
+/*      context.startService(
+        Intent(
+          context,
+          IPFSService::class.java
+        ).setAction(action)
+      )*/
+
+    fun startService(context: Context) = serviceAction(context, ACTION_START)
+
+    fun stopService(context: Context) = serviceAction(context, ACTION_STOP)
 
 
   }
@@ -214,7 +216,7 @@ class IPFSService : Service() {
   private fun readStats(resetStats: Boolean = false) {
     coroutineScope.launch {
       ipfs.newRequest("stats/bw")?.send()?.also {
-        messengerHandler.sendEmptyMessageDelayed(MSG_POLL_STATS, 10000)
+        messengerHandler.sendEmptyMessageDelayed(MSG_POLL_STATS, 20000)
         val stats = JSONObject(it.decodeToString())
         withContext(Dispatchers.Main) {
           notificationManager.showNotification {
@@ -338,7 +340,7 @@ class IPFSService : Service() {
         }
         _ipfs = null
       }.also {
-        log.debug("stopped in $it")
+        log.trace("stopped in $it")
       }
     }
 

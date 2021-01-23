@@ -7,6 +7,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
+import org.slf4j.LoggerFactory
 
 @Target(AnnotationTarget.FIELD, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
@@ -29,6 +30,7 @@ class DagNode<T : Any> constructor(
 ) {
 
   private suspend fun _cid(t: T): String = json.encodeToString(serializer!!, t).let {
+    log.trace("_cid() $t")
     api.dag.put(it).json().Cid.path
   }
 
@@ -86,6 +88,7 @@ inline fun <reified T : Any> String.cid(
   json: Json = Json
 ): DagNode<T> = DagNode(null, serializer, this, json)
 
+private val log = LoggerFactory.getLogger(DagNode::class.java)
 
 /*
 interface DLink<T : Any> {

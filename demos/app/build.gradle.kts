@@ -77,7 +77,8 @@ tasks.withType<Test> {
 
 
 dependencies {
-
+  implementation(project(":api"))
+  implementation(project(":client"))
   implementation(Kotlin.stdlib.jdk8)
 
   implementation(AndroidX.navigation.fragmentKtx)
@@ -93,9 +94,7 @@ dependencies {
   implementation(AndroidX.appCompatResources)
   implementation(AndroidX.appCompat)
 
-
-  implementation(project(":api"))
-  implementation(project(":client"))
+  implementation("androidx.datastore:datastore-preferences:_")
 
 
   //implementation("org.jetbrains.kotlin:kotlin-reflect:_")

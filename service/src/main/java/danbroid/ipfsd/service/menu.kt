@@ -42,22 +42,31 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
   menu {
     title = "Start Service"
     onClick = {
-      context.startService(
+      IPFSService.startService(context)
+ /*     context.startService(
         Intent().setComponent(
           ComponentName(
             IPFSService::class.java.`package`!!.name,
             IPFSService::class.java.name
           )
         )
-      )
+      )*/
       false
     }
   }
 
   menu {
-    title = "Test2"
+    title = "Stop Service"
     onClick = {
-      context.startService(Intent(context, IPFSService::class.java))
+      IPFSService.stopService(context)
+      /* context.stopService(
+         Intent().setComponent(
+           ComponentName(
+             IPFSService::class.java.`package`!!.name,
+             IPFSService::class.java.name
+           )
+         )
+       )*/
       false
     }
   }

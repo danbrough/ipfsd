@@ -21,6 +21,8 @@ class IPFSD {
   class action {
     companion object {
       const val service_start = "$SERVICE_PKG.ACTION_START"
+      const val service_stop = "$SERVICE_PKG.ACTION_STOP"
+
     }
   }
 
