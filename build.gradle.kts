@@ -1,4 +1,3 @@
-
 plugins {
   id("org.jetbrains.dokka")
 }
@@ -140,7 +139,8 @@ subprojects {
                 artifact(sourcesJar.get())
                 artifactId = projectName
                 groupId = ProjectVersions.GROUP_ID
-                version = defaultConfig.versionName
+                version =
+                  if (projectName == "bridge") Danbroid.bridge_version else defaultConfig.versionName
               }
             }
           }
