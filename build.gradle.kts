@@ -139,6 +139,7 @@ subprojects {
                 artifact(sourcesJar.get())
                 artifactId = projectName
                 groupId = ProjectVersions.GROUP_ID
+               // println("PROJECT NAME IS $projectName setting version to ${Danbroid.bridge_version}")
                 version =
                   if (projectName == "bridge") Danbroid.bridge_version else defaultConfig.versionName
               }
