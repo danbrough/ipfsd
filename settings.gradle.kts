@@ -1,4 +1,3 @@
-
 import de.fayard.refreshVersions.bootstrapRefreshVersions
 
 buildscript {
@@ -8,7 +7,11 @@ buildscript {
 
 bootstrapRefreshVersions()
 
-include(":service", ":bridge", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")
+include(":service", ":bridge", ":client", ":api")
+
+if (!System.getenv().containsKey("JITPACK")) {
+  include(":demos:app", ":demos:api", ":demos:shopping")
+}
 
 rootProject.name = "ipfsd"
 
