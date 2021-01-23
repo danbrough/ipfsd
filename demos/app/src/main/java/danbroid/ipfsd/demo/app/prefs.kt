@@ -1,17 +1,11 @@
 package danbroid.ipfsd.demo.app
 
 import android.content.Context
-import danbroid.util.prefs.Prefs
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.createDataStore
 
 
-class AppPrefs(context: Context) : Prefs(context, PREFS_FILE) {
+inline fun <reified T : IPFSApp> appKey(id: String) =
+  stringPreferencesKey("$IPFSD_APP_ID_PREFIX/${T::class.java.name}/$id")
 
-  var shoppingListApp: String? by Pref(null)
-
-  companion object {
-    const val PREFS_FILE = "app_prefs"
-  }
-}
-
-val Context.appPrefs: AppPrefs
-  get() = AppPrefs(this)
+fun Context.appPrefs() = createDataStore("ipfsd_apps")

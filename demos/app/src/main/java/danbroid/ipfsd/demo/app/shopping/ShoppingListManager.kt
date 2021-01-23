@@ -1,10 +1,10 @@
 package danbroid.ipfsd.demo.app.shopping
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.createDataStore
+import androidx.datastore.preferences.core.stringPreferencesKey
+import danbroid.ipfsd.demo.app.appPrefs
 import danbroid.util.misc.SingletonHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.util.*
 
 class ShoppingListManager(val context: Context) {
 
   companion object : SingletonHolder<ShoppingListManager, Context>(::ShoppingListManager)
 
-  val dataStore: DataStore<Preferences> = context.createDataStore("apps")
-  val appPrefs: Flow<Any> = dataStore.data
+  val appPrefs: Flow<Any> = context.appPrefs().data
     .catch { exception ->
       if (exception is IOException) {
         log.warn("no app prefs")
@@ -29,12 +29,16 @@ class ShoppingListManager(val context: Context) {
     }
 
   suspend fun test() = withContext(Dispatchers.IO) {
-    appPrefs.collect {
-      log.info("got $it")
+    val prefs = context.appPrefs()
+    prefs.edit {
+      it[stringPreferencesKey("test")] = "Hello world at ${Date()}"
     }
-    dataStore.updateData {
-      it
+
+    prefs.data.collect {
+      log.warn("PREFS: $it ${it.asMap()}")
     }
+
+
 /*    val cid = context.appPrefs.shoppingListApp
     ipfs.network.id().json().also {
       log.info("id is $it")

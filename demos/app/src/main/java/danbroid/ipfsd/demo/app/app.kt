@@ -1,23 +1,14 @@
 package danbroid.ipfsd.demo.app
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
-import danbroid.ipfs.api.*
+import danbroid.ipfs.api.IPFS
+import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.Transient
+import danbroid.ipfs.api.toDag
 import danbroid.ipfs.api.utils.SingletonHolder
-import danbroid.ipfsd.demo.app.shopping.ShoppingList
-import danbroid.util.prefs.Prefs
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.serializer
 import java.util.*
-import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
 
-const val IPFSD_APP_ID_PREFIX = "/ipfsd/apps"
+const val IPFSD_APP_ID_PREFIX = "ipfsd/apps"
 
 @Serializable
 open class IPFSApp {
@@ -50,11 +41,7 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
   })
 
 
-  private val defaultPrefs: Prefs
-    get() = context.appPrefs
-
-
-  suspend fun <T : IPFSApp> get(type: KClass<T>, id: String? = null): T =
+/*  suspend fun <T : IPFSApp> get(type: KClass<T>, id: String? = null): T =
     withContext(Dispatchers.IO) {
       val prefs = defaultPrefs.prefs
       if (id != null) {
@@ -92,9 +79,9 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
     defaultPrefs.prefs.getIDs(type.java).forEach {
       emit(loadApp(it.id, type.serializer()))
     }
-  }
+  }*/
 
-  data class DagID(val id: String, val cid: String)
+/*  data class DagID(val id: String, val cid: String)
 
 
   @Suppress("BlockingMethodInNonBlockingContext")
@@ -125,10 +112,11 @@ class AppRegistry(private val ipfs: IPFS, val context: Context) {
     }.exceptionOrNull()?.also {
       log.error(it.message, it)
     }
-  }
+  }*/
 }
 
 
+/*
 fun SharedPreferences.getIDs(): List<AppRegistry.DagID> =
   all.filter { it.key.startsWith("$IPFSD_APP_ID_PREFIX/") }.map {
     AppRegistry.DagID(it.key, it.value as String)
@@ -140,6 +128,7 @@ fun <T> SharedPreferences.getIDs(type: Class<T>): List<AppRegistry.DagID> =
 
 val Context.appRegistry: AppRegistry
   get() = AppRegistry.getInstance(Pair(ipfs, this))
+*/
 
 private val log = org.slf4j.LoggerFactory.getLogger(AppRegistry::class.java)
 
