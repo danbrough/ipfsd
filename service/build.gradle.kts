@@ -57,7 +57,11 @@ dependencies {
    }*/
 
   //implementation(project(":bridge"))
-  implementation(Danbroid.ipfsd_bridge)
+  if (System.getenv().containsKey("JITPACK")) {
+    implementation(project(":bridge"))
+  } else {
+    implementation(Danbroid.ipfsd_bridge)
+  }
 
   implementation(project(":client"))
 
