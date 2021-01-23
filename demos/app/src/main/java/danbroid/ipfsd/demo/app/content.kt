@@ -20,11 +20,12 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
   id = URI_CONTENT
   titleID = R.string.app_name
 
-  context.ipfsClient.connect()
+  //context.ipfsClient.connect()
 
   onCreate = {
     log.info("${URI_SHOPPING_LISTS}.onCreate()")
-    requireContext().ipfsClient.connect()
+
+
   }
 
   menu {
