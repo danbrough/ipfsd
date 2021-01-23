@@ -125,7 +125,7 @@ subprojects {
           extensions.findByType(PublishingExtension::class.java) ?: return@afterEvaluate
 
 
-        /*val sourcesJar by tasks.registering(Jar::class) {
+        val sourcesJar by tasks.registering(Jar::class) {
           archiveClassifier.set("sources")
           from(sourceSets.getByName("main").java.srcDirs)
         }
@@ -141,21 +141,16 @@ subprojects {
                 artifactId = projectName
                 groupId = ProjectVersions.GROUP_ID
                 version = defaultConfig.versionName
-                maven = true
               }
             }
           }
-        }*/
+        }
 
       }
     }
   }
 }
 
-/*
-
-
- */
 
 
 tasks.dokkaGfmMultiModule {
