@@ -1,11 +1,9 @@
 package danbroid.ipfsd.demo.app.shopping
 
 import android.content.Context
-import danbroid.ipfs.api.cid
-import danbroid.ipfs.api.ipfs
-import danbroid.ipfs.api.json
-import danbroid.ipfs.api.toDag
-import danbroid.ipfsd.demo.app.appPrefs
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.createDataStore
 import danbroid.util.misc.SingletonHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,9 +12,12 @@ class ShoppingListManager(val context: Context) {
 
   companion object : SingletonHolder<ShoppingListManager, Context>(::ShoppingListManager)
 
-
+  val datastore: DataStore<Preferences> = context.createDataStore("apps")
   suspend fun test() = withContext(Dispatchers.IO) {
-    val cid = context.appPrefs.shoppingListApp
+    datastore.updateData {
+      it
+    }
+/*    val cid = context.appPrefs.shoppingListApp
     ipfs.network.id().json().also {
       log.info("id is $it")
     }
@@ -31,7 +32,7 @@ class ShoppingListManager(val context: Context) {
       list = cid.cid<ShoppingList>().value()!!
     }
 
-    log.debug("shopping list: $list description: ${list.description.value()}")
+    log.debug("shopping list: $list description: ${list.description.value()}")*/
   }
 
 
