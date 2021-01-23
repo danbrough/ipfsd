@@ -52,7 +52,7 @@ android {
 }
 
 
-val sourcesJar by tasks.registering(Jar::class) {
+/*val sourcesJar by tasks.registering(Jar::class) {
   archiveClassifier.set("sources")
   from(android.sourceSets.getByName("main").java.srcDirs)
 }
@@ -70,18 +70,18 @@ afterEvaluate {
         groupId = ProjectVersions.GROUP_ID
        // artifactId = projectName
         // Applies the component for the release build variant.
-        /*  from components . release
+        *//*  from components . release
 
               // You can then customize attributes of the publication as shown below.
               groupId = 'com.example.MyLibrary'
           artifactId = 'final'
-          version = '1.0'*/
+          version = '1.0'*//*
       }
       // Creates a Maven publication called “debug”.
 
     }
   }
-}
+}*/
 
 /*
 
