@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-  ndkVersion = ProjectVersions.NDK_VERSION
+ // ndkVersion = ProjectVersions.NDK_VERSION
 
   compileSdkVersion(ProjectVersions.SDK_VERSION)
   defaultConfig {
