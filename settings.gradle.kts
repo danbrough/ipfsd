@@ -7,11 +7,10 @@ buildscript {
 
 bootstrapRefreshVersions()
 
-include(":service", ":bridge", ":client", ":api")
+include(":service", ":bridge", ":api", ":client")
 
-if (!System.getenv().containsKey("JITPACK")) {
-  include(":demos:app", ":demos:api", ":demos:shopping")
-}
+//include(":demos:app", ":demos:api", ":demos:shopping")
+
 
 rootProject.name = "ipfsd"
 
