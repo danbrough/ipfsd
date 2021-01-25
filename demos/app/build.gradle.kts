@@ -95,6 +95,7 @@ dependencies {
   implementation(AndroidX.appCompat)
 
   implementation("androidx.datastore:datastore-preferences:_")
+  //implementation("androidx.datastore:datastore:_")
 
 
   //implementation("org.jetbrains.kotlin:kotlin-reflect:_")
