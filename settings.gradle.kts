@@ -7,6 +7,7 @@ buildscript {
 
 bootstrapRefreshVersions()
 
+
 //include(":bridge")
 include(":service", ":client", ":api")
 include(":demos:app", ":demos:api", ":demos:shopping")

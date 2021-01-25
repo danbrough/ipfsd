@@ -19,36 +19,40 @@ inline fun <reified T : Any> T.toJson(): String = Json.encodeToString(T::class.s
 typealias Serializable = kotlinx.serialization.Serializable
 typealias Transient = kotlinx.serialization.Transient
 
+class DagOptions<T : Any>(
+  var serializer: KSerializer<T>,
+  var json: Json = Json,
+  var api: IPFS = ipfs
+)
 
 @Serializable(with = DagNodeSerializer::class)
 class DagNode<T : Any> constructor(
   private val _value: T? = null,
-  private val serializer: KSerializer<T>? = null,
   private val _cid: String? = null,
-  private val json: Json = Json,
-  private val api: IPFS = ipfs
+  private val options: DagOptions<T>
 ) {
 
-  private suspend fun _cid(t: T): String = json.encodeToString(serializer!!, t).let {
-    log.trace("_cid() $t")
-    api.dag.put(it).json().Cid.path
-  }
+  private suspend fun _cid(t: T): String =
+    options.json.encodeToString(options.serializer, t).let {
+      log.trace("_cid() $t")
+      options.api.dag.put(it).json().Cid.path
+    }
 
-  private suspend fun _value(cid: String) = ipfs.dag.get<T>(cid).invoke().text.let {
-    json.decodeFromString(serializer!!, it)
+  private suspend fun _value(cid: String) = options.api.dag.get<T>(cid).invoke().text.let {
+    options.json.decodeFromString(options.serializer, it)
   }
 
   val cid: String by lazy {
     _cid ?: _value?.let {
-      ipfs.blocking {
+      options.api.blocking {
         _cid(it)
       }
-    } ?: CID_NULL_DATA
+    } ?: CID_DAG_NULL
   }
 
   val value: T by lazy {
     _cid?.let { c ->
-      api.blocking {
+      options.api.blocking {
         _value(c)
       }
     } ?: _value!!
@@ -56,7 +60,7 @@ class DagNode<T : Any> constructor(
 
   suspend fun value(): T? = _cid?.let { c -> _value(c) } ?: _value
 
-  suspend fun cid(): String = _cid ?: _value?.let { _cid(it) } ?: CID_NULL_DATA
+  suspend fun cid(): String = _cid ?: _value?.let { _cid(it) } ?: CID_DAG_NULL
 
   override fun toString(): String = "DagNode<${_cid ?: _value}>"
 
@@ -71,22 +75,28 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
   private val linkSerializer = Types.Link.serializer()
 
   override fun deserialize(decoder: Decoder): DagNode<T> =
-    DagNode(null, serializer, decoder.decodeSerializableValue(linkSerializer).path, Json)
+    DagNode(
+      null,
+      decoder.decodeSerializableValue(linkSerializer).path,
+      options = DagOptions(serializer)
+    )
 
   override fun serialize(encoder: Encoder, value: DagNode<T>) =
     encoder.encodeSerializableValue(linkSerializer, Types.Link(value.cid))
 }
 
-inline fun <reified T : Any> T?.toDag(json: Json = Json): DagNode<T> =
-  DagNode(this, T::class.serializer())
 
-fun <T : Any> T?.toDag(serializer: KSerializer<T>, json: Json = Json): DagNode<T> =
-  DagNode(this, serializer, null, json)
+inline fun <reified T : Any> T?.toDag(options: DagOptions<T> = DagOptions(serializer())): DagNode<T> =
+  DagNode(this, options = options)
+
+inline suspend fun <reified T : Any> T?.cid(options: DagOptions<T> = DagOptions(serializer())): String =
+  DagNode(this, options = options).cid()
+
 
 inline fun <reified T : Any> String.cid(
   serializer: KSerializer<T> = serializer(),
-  json: Json = Json
-): DagNode<T> = DagNode(null, serializer, this, json)
+  options: DagOptions<T> = DagOptions(serializer)
+): DagNode<T> = DagNode(null, this, options)
 
 private val log = LoggerFactory.getLogger(DagNode::class.java)
 

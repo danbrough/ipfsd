@@ -61,7 +61,7 @@ class SerialTest3 {
 
     var n: Int? = null
     val nullLink = n.toDag()
-    require(nullLink.cid == CID_NULL_DATA) {
+    require(nullLink.cid == CID_DAG_NULL) {
       "nullLink.cid != CID_NULL_DATA"
     }
     val bigNumberString = "12344444444444444444444444444444444444444444444444445"

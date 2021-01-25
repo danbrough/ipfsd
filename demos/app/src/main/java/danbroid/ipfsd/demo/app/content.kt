@@ -5,8 +5,8 @@ import android.content.Context
 import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
 import danbroid.ipfs.api.ipfs
 import danbroid.ipfs.api.json
-import danbroid.ipfsd.client.ipfs
-import danbroid.ipfsd.client.ipfsClient
+import danbroid.ipfsd.client.androidIPFS
+import danbroid.ipfsd.demo.app.shopping.ShoppingList
 import danbroid.ipfsd.demo.app.shopping.shoppingListManager
 import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
@@ -39,8 +39,9 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
-        log.warn("context.ipfs = ${context.ipfs} ipfs = $ipfs")
-        context.shoppingListManager.test()
+        log.warn("context.ipfs = ${context.androidIPFS} ipfs = $ipfs")
+        val listCount = context.appsDataStore.getAppIDS<ShoppingList>().size + 1
+        context.shoppingListManager.createList("List_$listCount")
         false
       }
     }
@@ -68,7 +69,7 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       title = "Get ID"
       icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_folder_person)
       onClick = {
-        ipfs.network.id().json().also {
+        context.androidIPFS.network.id().json().also {
           log.info("ID: $it")
         }
         false

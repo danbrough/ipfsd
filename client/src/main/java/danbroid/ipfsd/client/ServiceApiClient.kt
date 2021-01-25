@@ -68,7 +68,7 @@ private class AndroidIPFS(context: Context) :
   companion object : SingletonHolder<AndroidIPFS, Context>(::AndroidIPFS)
 }
 
-val Context.ipfs: IPFS
+val Context.androidIPFS: IPFS
   get() = AndroidIPFS.getInstance(this)
 
 private val log = org.slf4j.LoggerFactory.getLogger(ServiceApiClient::class.java)
