@@ -2,7 +2,8 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.toDag
+import danbroid.ipfs.api.toDagNode
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -89,22 +90,25 @@ class SerialTest2 {
 
   @Test
   fun test() {
-    log.info("test()")
-    val format = Json
-    val zoo = ZOO("Happy Place", 1972)
-    log.debug("zoo: $zoo")
-    val link = zoo.toDag()
-    log.debug("link: $link")
-    val json = format.encodeToString(link)
-    log.debug("json: $json")
-    val zoo2Link = format.decodeFromString<DagNode<ZOO>>(json)
-    log.info("zoo2Link: $zoo2Link")
-    val zoo2 = zoo2Link.value
-    log.debug("zoo2: $zoo2")
-    require(zoo == zoo2) {
-      "zoo != zoo2"
-    }
+    runBlocking {
+      log.info("test()")
+      val zoo = ZOO("Happy Place", 1972)
+      log.debug("zoo: $zoo")
+      val link = zoo.toDagNode()
+      log.debug("link: $link")
 
+      val data = Json.encodeToString(link)
+      log.info("data: $data")
+
+
+      val zoo2Link = Json.decodeFromString<DagNode<ZOO>>(data)
+      log.info("zoo2Link: $zoo2Link")
+      val zoo2 = zoo2Link.value()
+      log.debug("zoo2: $zoo2")
+      require(zoo == zoo2) {
+        "zoo != zoo2"
+      }
+    }
   }
 }
 

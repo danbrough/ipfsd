@@ -1,5 +1,7 @@
 package danbroid.ipfs.api
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -7,7 +9,6 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import org.slf4j.LoggerFactory
 
 @Target(AnnotationTarget.FIELD, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
@@ -27,46 +28,33 @@ class DagOptions<T : Any>(
 
 @Serializable(with = DagNodeSerializer::class)
 class DagNode<T : Any> constructor(
-  private val _value: T? = null,
-  private val _cid: String? = null,
+  private var value: T? = null,
+  private var cid: String? = null,
+  @Transient
   private val options: DagOptions<T>
 ) {
 
-  private suspend fun _cid(t: T): String =
-    options.json.encodeToString(options.serializer, t).let {
-      log.trace("_cid() $t")
-      options.api.dag.put(it).json().Cid.path
+  suspend fun cid(): String =
+    cid ?: options.json.encodeToString(options.serializer, value!!).let {
+      options.api.dag.put(it).json().Cid.path.also {
+        cid = it
+      }
     }
 
-  private suspend fun _value(cid: String) = options.api.dag.get<T>(cid).invoke().text.let {
-    options.json.decodeFromString(options.serializer, it)
+  suspend fun value(): T = value ?: options.api.dag.get<T>(cid!!).invoke().text.let {
+    options.json.decodeFromString(options.serializer, it).also {
+      value = it
+    }
   }
 
-  val cid: String by lazy {
-    _cid ?: _value?.let {
-      options.api.blocking {
-        _cid(it)
-      }
-    } ?: CID_DAG_NULL
-  }
+  override fun equals(other: Any?) = other is DagNode<*> && other.cidBlocking() == cidBlocking()
 
-  val value: T by lazy {
-    _cid?.let { c ->
-      options.api.blocking {
-        _value(c)
-      }
-    } ?: _value!!
-  }
+  fun cidBlocking() = cid ?: runBlocking(Dispatchers.IO) { this@DagNode.cid() }
+  fun valueBlocking() = value ?: runBlocking(Dispatchers.IO) { this@DagNode.value() }
 
-  suspend fun value(): T? = _cid?.let { c -> _value(c) } ?: _value
 
-  suspend fun cid(): String = _cid ?: _value?.let { _cid(it) } ?: CID_DAG_NULL
+  override fun toString(): String = "DagNode<${cid ?: value}>"
 
-  override fun toString(): String = "DagNode<${_cid ?: _value}>"
-
-  override fun equals(other: Any?): Boolean = other is DagNode<*> && cid == other.cid
-
-  override fun hashCode(): Int = cid.hashCode()
 }
 
 class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<DagNode<T>> {
@@ -82,23 +70,32 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
     )
 
   override fun serialize(encoder: Encoder, value: DagNode<T>) =
-    encoder.encodeSerializableValue(linkSerializer, Types.Link(value.cid))
+    encoder.encodeSerializableValue(linkSerializer, Types.Link(value.cidBlocking()))
+
 }
 
 
-inline fun <reified T : Any> T?.toDag(options: DagOptions<T> = DagOptions(serializer())): DagNode<T> =
-  DagNode(this, options = options)
+inline suspend fun <reified T : Any> T.cid(serializer: KSerializer<T>): String =
+  cid(DagOptions(serializer))
+
 
 inline suspend fun <reified T : Any> T?.cid(options: DagOptions<T> = DagOptions(serializer())): String =
-  DagNode(this, options = options).cid()
+  if (this == null) CID_DAG_NULL else
+    DagNode(this, options = options).cid()
 
 
-inline fun <reified T : Any> String.cid(
-  serializer: KSerializer<T> = serializer(),
-  options: DagOptions<T> = DagOptions(serializer)
-): DagNode<T> = DagNode(null, this, options)
+inline fun <reified T : Any> T.toDagNode(options: DagOptions<T> = DagOptions(serializer())): DagNode<T> =
+  DagNode(this, options = options)
 
-private val log = LoggerFactory.getLogger(DagNode::class.java)
+inline fun <reified T : Any> dagNode(
+  cid: String,
+  serializer: KSerializer<T> = serializer()
+): DagNode<T> = dagNode(cid, DagOptions(serializer))
+
+inline fun <reified T : Any> dagNode(cid: String, options: DagOptions<T>): DagNode<T> =
+  DagNode(null, cid, options)
+
+//private val log = LoggerFactory.getLogger(DagNode::class.java)
 
 /*
 interface DLink<T : Any> {
