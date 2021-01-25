@@ -2,7 +2,7 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.toDag
+import danbroid.ipfs.api.toDagNode
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -47,7 +47,7 @@ class SerialTest {
     log.info(format.encodeToString(data))
     val json = Json
     val animals =
-      listOf(Animal("Oscar", Diet("Bikkies").toDag()).toDag(), Animal("Satchmo").toDag())
+      listOf(Animal("Oscar", Diet("Bikkies").toDagNode()).toDagNode(), Animal("Satchmo").toDagNode())
 
     json.encodeToString(animals).also {
       log.info("box json: $it")

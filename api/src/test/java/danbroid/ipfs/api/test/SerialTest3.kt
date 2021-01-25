@@ -1,6 +1,10 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.*
+import danbroid.ipfs.api.DagNode
+import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.dagNode
+import danbroid.ipfs.api.toDagNode
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -43,49 +47,44 @@ class SerialTest3 {
   @Test
   fun test() {
     log.info("test()")
-    val zoo = ZOO3("Happy Place", 1972)
-    zoo.s = Something("Something", 123)
-    log.debug("zoo: $zoo")
-    val link = zoo.toDag()
-    log.debug("link: $link")
-    val format = Json
-    val json = format.encodeToString(link)
-    log.debug("json: $json")
-    val zoo2Link = format.decodeFromString<DagNode<ZOO3>>(json)
-    log.info("zoo2Link: $zoo2Link")
-    val zoo2 = zoo2Link.value
-    log.debug("zoo2: $zoo2")
-    require(zoo == zoo2) {
-      "zoo != zoo2"
+    runBlocking {
+      val zoo = ZOO3("Happy Place", 1972)
+      zoo.s = Something("Something", 123)
+      log.debug("zoo: $zoo")
+      val link = zoo.toDagNode()
+      log.debug("link: $link")
+      val json = Json.encodeToString(link)
+      log.debug("json: $json")
+      val zoo2Link = Json.decodeFromString<DagNode<ZOO3>>(json)
+      log.info("zoo2Link: $zoo2Link")
+      val zoo2 = zoo2Link.valueBlocking()
+      log.debug("zoo2: $zoo2")
+      require(zoo == zoo2) {
+        "zoo != zoo2"
+      }
+
+
+      val bigNumberString = "12344444444444444444444444444444444444444444444444445"
+      val bigInt = bigNumberString.toBigInteger()
+      val bigNumberCID = "bafyreihydhtymenpvt4mrwrt35jqmf64fua6ius65o72wjs7jnuu6sxlra"
+      val cid123 = "bafyreihbb6wszf7ordq4vfd3ab65wxjygixfgqe3qqc2qwbbdnzy4zifj4"
+      val bigIntDag = dagNode(bigNumberCID, BigIntSerializer)
+      log.info("BIG CID: ${bigIntDag.cid()} value: ${bigIntDag.value()}")
+
+
+      val n = 123
+      val nLink = n.toDagNode()
+      require(nLink.cid() == cid123) {
+        "nLink.cid:${nLink.cid()} != $cid123"
+      }
+      require(nLink.value() == 123) {
+        "nLink.value: ${nLink.value()} != 123"
+      }
+
+      require(dagNode<Int>(cid123).value() == 123) {
+        "cid123.cid<Int>().value != 123"
+      }
     }
-
-    var n: Int? = null
-    val nullLink = n.toDag()
-    require(nullLink.cid == CID_DAG_NULL) {
-      "nullLink.cid != CID_NULL_DATA"
-    }
-    val bigNumberString = "12344444444444444444444444444444444444444444444444445"
-    val bigInt = bigNumberString.toBigInteger()
-    val bigNumberCID = "bafyreihydhtymenpvt4mrwrt35jqmf64fua6ius65o72wjs7jnuu6sxlra"
-    val cid123 = "bafyreihbb6wszf7ordq4vfd3ab65wxjygixfgqe3qqc2qwbbdnzy4zifj4"
-    val bigIntDag = bigNumberCID.cid(BigIntSerializer)
-    log.info("BIG CID: ${bigIntDag.cid} value: ${bigIntDag.value}")
-
-
-    n = 123
-    val nLink = n.toDag()
-    require(nLink.cid == cid123) {
-      "nLink.cid:${nLink.cid} != $cid123"
-    }
-    require(nLink.value == 123) {
-      "nLink.value: ${nLink.value} != 123"
-    }
-
-
-    require(cid123.cid<Int>().value == 123) {
-      "cid123.cid<Int>().value != 123"
-    }
-
   }
 }
 
