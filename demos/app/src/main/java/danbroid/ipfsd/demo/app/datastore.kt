@@ -13,13 +13,17 @@ import kotlinx.coroutines.flow.firstOrNull
 import java.io.IOException
 
 
-inline fun <reified T : IPFSApp> T.appID() =
-  stringPreferencesKey("${IPFSApp.ID_PREFIX}/${T::class.java.name}/${description.id}")
+inline fun <reified T : IPFSApp> T.appID() = appPrefsKey(T::class.java.name, description.id)
+
+fun appPrefsKey(type: String, id: String) = stringPreferencesKey("${IPFSApp.ID_PREFIX}/$type/$id")
 
 class AppsDataStore(context: Context) {
   val dataStore: DataStore<Preferences> = context.createDataStore("ipfsd_apps")
 
-  data class AppCID(val type: String, val id: String, val cid: String)
+  data class AppCID(val type: String, val id: String, val cid: String) {
+    val prefsKey: Preferences.Key<String>
+      get() = appPrefsKey(type, id)
+  }
 
   val prefs: Flow<Preferences> = dataStore.data
     .catch { exception ->
