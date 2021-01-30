@@ -9,7 +9,6 @@ object ProjectVersions {
   var BUILD_VERSION = 1
   var VERSION_OFFSET = 1
   var GROUP_ID = ""
-  var KEYSTORE_PASSWORD = ""
   var VERSION_FORMAT = ""
   val NDK_VERSION = "21.2.6472646"
   var COMPOSE_VERSION = "1.0.0-alpha10"
@@ -24,7 +23,6 @@ object ProjectVersions {
     VERSION_OFFSET = props.getProperty("versionOffset", "1").toInt()
     VERSION_FORMAT = props.getProperty("versionFormat", "0.0.%d")
     GROUP_ID = props.getProperty("groupID", "")
-    KEYSTORE_PASSWORD = props.getProperty("keystorePassword", "")
   }
 
   fun getIncrementedVersionName() = getVersionName(BUILD_VERSION + 1)

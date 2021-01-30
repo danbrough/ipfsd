@@ -1,11 +1,9 @@
 package danbroid.ipfsd.service
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import danbroid.ipfs.api.flow
 import danbroid.ipfsd.IPFSD
-import danbroid.ipfsd.client.model.ipfs
+import danbroid.ipfsd.client.androidIPFS
 import danbroid.ipfsd.ui.snackBar
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
@@ -23,11 +21,10 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
     //icon = iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
     //  icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_play)
     onClick = {
-      ipfs.network.id().flow().collect {
+      requireContext().androidIPFS.network.id().flow().collect {
         log.warn("GOT RESULT: $it")
         requireActivity().snackBar("result: $it")
       }
-      false
     }
   }
 
@@ -43,15 +40,14 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
     title = "Start Service"
     onClick = {
       IPFSService.startService(context)
- /*     context.startService(
-        Intent().setComponent(
-          ComponentName(
-            IPFSService::class.java.`package`!!.name,
-            IPFSService::class.java.name
-          )
-        )
-      )*/
-      false
+      /*     context.startService(
+             Intent().setComponent(
+               ComponentName(
+                 IPFSService::class.java.`package`!!.name,
+                 IPFSService::class.java.name
+               )
+             )
+           )*/
     }
   }
 
@@ -67,7 +63,6 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
            )
          )
        )*/
-      false
     }
   }
 }
