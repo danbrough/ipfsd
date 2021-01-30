@@ -5,19 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.json
 import danbroid.ipfsd.client.ipfsClient
 import danbroid.ipfsd.client.model.ipfs
-import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.demo.api.R
 import danbroid.ipfsd.demo.api.activities.activityInterface
 import danbroid.ipfsd.demo.api.openBrowser
-import danbroid.util.menu.MENU_TINT_DISABLED
-import danbroid.util.menu.MenuItemBuilder
-import danbroid.util.menu.menu
-import danbroid.util.menu.rootMenu
+import danbroid.util.menu.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
@@ -32,8 +27,8 @@ private object Content
 
 val log = LoggerFactory.getLogger(Content::class.java)
 
-val Fragment.api: IPFS
-  get() = ipfsModel.api
+val MenuItemClickContext.api: IPFS
+  get() = fragment.ipfs
 
 open class MenuTheme {
   companion object {
@@ -93,7 +88,6 @@ fun rootContent(context: Context): MenuItemBuilder =
         title = "List kitty"
         onClick = {
           log.debug("kitty: ${api.basic.ls(dir_kitty).json()}")
-          false
         }
       }
 
@@ -101,7 +95,6 @@ fun rootContent(context: Context): MenuItemBuilder =
         title = "List kitty.danbrough.org"
         onClick = {
           log.debug("kitty: ${api.basic.ls("/ipns/kitty.danbrough.org").json()}")
-          false
         }
       }
 
@@ -126,7 +119,6 @@ fun rootContent(context: Context): MenuItemBuilder =
             requireContext().startActivity(Intent(Intent.ACTION_VIEW).also {
               it.data = Uri.parse(url_webui)
             })
-            false
           }
         }
 
@@ -134,7 +126,6 @@ fun rootContent(context: Context): MenuItemBuilder =
           title = "WebUI embedded browser"
           onClick = {
             findNavController().openBrowser(url_webui)
-            false
           }
         }
       }
@@ -150,8 +141,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Get ID"
     onClick = {
-      debug(" ID: ${ipfs.network.id().json()}")
-      false
+      log.debug(" ID: ${api.network.id().json()}")
     }
   }
 
@@ -161,7 +151,6 @@ fun MenuItemBuilder.commands() = menu {
     title = "Profile Apply"
     onClick = {
       //TODO apiTest(api.config.profile.apply("lowpower"))
-      false
     }
   }
 
@@ -173,7 +162,6 @@ fun MenuItemBuilder.commands() = menu {
       val msg = "Hello from the ipfs demo at ${Date()}.\n"
       log.trace("adding message: $msg")
       //TODO apiTest(api.basic.add(msg, fileName = "ipfs_test_message.txt"), "added")
-      false
     }
   }
 
@@ -182,7 +170,6 @@ fun MenuItemBuilder.commands() = menu {
     title = "Bandwidth"
     onClick = {
       //TODO apiTest(api.stats.bw(), "bandwidth")
-      false
     }
   }
 

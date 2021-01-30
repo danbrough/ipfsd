@@ -14,9 +14,6 @@ class FlowTest {
     emit("The date is ${Date()}")
   }
 
-  val s: String by lazy {
-    ""
-  }
 
   fun getMessage(scope: CoroutineScope = GlobalScope): Deferred<String> =
     scope.async(Dispatchers.IO, start = CoroutineStart.LAZY) {

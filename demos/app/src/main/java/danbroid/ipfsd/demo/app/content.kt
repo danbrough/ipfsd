@@ -3,13 +3,13 @@ package danbroid.ipfsd.demo.app
 
 import android.content.Context
 import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
-import danbroid.ipfs.api.ipfs
 import danbroid.ipfs.api.json
 import danbroid.ipfsd.client.androidIPFS
 import danbroid.ipfsd.demo.app.shopping.ShoppingList
 import danbroid.ipfsd.demo.app.shopping.shoppingListManager
 import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
+import danbroid.util.menu.invalidateMenu
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
 import org.slf4j.LoggerFactory
@@ -23,10 +23,10 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
   //context.ipfsClient.connect()
 
   onCreate = {
-    log.info("${URI_SHOPPING_LISTS}.onCreate()")
-
-
+    log.warn("${URI_SHOPPING_LISTS}.onCreate()")
   }
+
+  context.androidIPFS
 
   menu {
     id = URI_SHOPPING_LISTS
@@ -39,10 +39,42 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
-        log.warn("context.ipfs = ${context.androidIPFS} ipfs = $ipfs")
-        val listCount = context.appsDataStore.getAppIDS<ShoppingList>().size + 1
-        context.shoppingListManager.createList("List_$listCount")
-        false
+        context.shoppingListManager.createList(fragment)
+        invalidateMenu()
+      }
+    }
+
+    menu {
+      inlineChildren = true
+      onCreate = {
+        children?.clear()
+        context.shoppingListManager.appsDataStore.getAppIDS<ShoppingList>().forEach {
+          menu {
+            id = it.prefsKey.name
+            title = it.prefsKey.name
+            onLongClick = {
+              context.shoppingListManager.deleteList(id) {
+                children?.remove(this@menu)
+                invalidateMenu()
+              }
+            }
+          }
+        }
+      }
+    }
+
+    menu {
+      title = "Test"
+      onClick = {
+        context.shoppingListManager.test()
+      }
+    }
+
+
+    menu {
+      title = "List"
+      onClick = {
+        context.shoppingListManager.list()
       }
     }
 
@@ -57,13 +89,6 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       }
     }
 
-    menu {
-      title = "Lists"
-      onClick = {
-
-        false
-      }
-    }
 
     menu {
       title = "Get ID"
@@ -72,7 +97,6 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
         context.androidIPFS.network.id().json().also {
           log.info("ID: $it")
         }
-        false
       }
     }
   }
