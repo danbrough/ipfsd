@@ -56,7 +56,6 @@ dependencies {
      exclude(group = "com.android", module = "android")
    }*/
 
-  //implementation(project(":bridge"))
   if (System.getenv().containsKey("JITPACK") || true) {
     implementation(project(":bridge"))
   } else {

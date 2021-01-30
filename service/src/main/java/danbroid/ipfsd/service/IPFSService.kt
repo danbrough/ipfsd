@@ -15,6 +15,7 @@ import danbroid.ipfsd.client.IPFSMessage
 import danbroid.ipfsd.client.toIPFSMessage
 import danbroid.ipfsd.service.settings.IPFSServicePrefs
 import danbroid.util.format.humanReadableByteCount
+import ipfs.gomobile.android.IPFS
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -54,7 +55,7 @@ class IPFSService : Service() {
     fun resetStats(context: Context) = serviceAction(context, ACTION_CLEAR_NET_STATS)
 
     fun serviceAction(context: Context, action: String) =
-      context.startService(Intent(action).setPackage(IPFSD.SERVICE_PKG))
+        context.startService(Intent(action).setPackage(IPFSD.SERVICE_PKG))
 /*      context.startService(
         Intent(
           context,
@@ -188,9 +189,9 @@ class IPFSService : Service() {
     log.error("CONNECT MESSAGE: $connectMessage")
 
     notificationManager = NotificationManager(
-      this, CHANNEL_ID,
-      CHANNEL_NAME, CHANNEL_DESCRIPTION,
-      listener = notificationListener
+        this, CHANNEL_ID,
+        CHANNEL_NAME, CHANNEL_DESCRIPTION,
+        listener = notificationListener
     )
 
     messengerHandler = Handler(Looper.myLooper()!!, messengerCallback)
@@ -236,9 +237,9 @@ class IPFSService : Service() {
               newDataIn = 0
               newDataOut = 0
               Toast.makeText(
-                this@IPFSService,
-                R.string.msg_stats_reset,
-                Toast.LENGTH_SHORT
+                  this@IPFSService,
+                  R.string.msg_stats_reset,
+                  Toast.LENGTH_SHORT
               ).show()
             } else {
               newDataIn = prefs.dataIn + newDataIn
@@ -251,17 +252,17 @@ class IPFSService : Service() {
 
 
             sendMessage(
-              danbroid.ipfsd.client.IPFSMessage.BANDWIDTH(
-                newDataIn,
-                newDataOut,
-                rateIn,
-                rateOut
-              )
+                danbroid.ipfsd.client.IPFSMessage.BANDWIDTH(
+                    newDataIn,
+                    newDataOut,
+                    rateIn,
+                    rateOut
+                )
             )
 
             //val msg = "In: %02d Out:%02d (%.0f,%.0f)".format(totalIn, totalOut, rateIn, rateOut)
             val msg =
-              "${newDataIn.humanReadableByteCount()} in ${newDataOut.humanReadableByteCount()} out. Total: ${(newDataIn + newDataOut).humanReadableByteCount()}"
+                "${newDataIn.humanReadableByteCount()} in ${newDataOut.humanReadableByteCount()} out. Total: ${(newDataIn + newDataOut).humanReadableByteCount()}"
             setContentText(msg)
           }
         }
