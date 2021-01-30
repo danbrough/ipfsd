@@ -95,6 +95,7 @@ dependencies {
   implementation(AndroidX.appCompat)
 
   implementation("androidx.datastore:datastore-preferences:_")
+  //implementation("androidx.datastore:datastore:_")
 
 
   //implementation("org.jetbrains.kotlin:kotlin-reflect:_")
@@ -129,6 +130,8 @@ dependencies {
   implementation("com.google.zxing:android-core:_")
 
   implementation("com.google.zxing:core:_")
+  implementation("com.afollestad.material-dialogs:input:_")
+  implementation("com.afollestad.material-dialogs:lifecycle:_")
 
   implementation(Square.okHttp3.okHttp)
 

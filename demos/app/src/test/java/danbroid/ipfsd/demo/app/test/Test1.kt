@@ -1,9 +1,6 @@
 package danbroid.ipfsd.demo.app.test
 
-import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.ipfs
-import danbroid.ipfs.api.json
-import danbroid.ipfs.api.toJson
+import danbroid.ipfs.api.*
 import danbroid.ipfsd.demo.app.shopping.ShoppingList
 import org.junit.Test
 
@@ -16,7 +13,7 @@ class Test1 {
     ipfs.blocking {
       log.debug("running test")
       val list = ShoppingList("Test List").also {
-        it.thang1 = ShoppingList.Thang(111, "Its a thang")
+        it.thang = ShoppingList.Thang(111, "Its a thang").dagNode()
       }
       log.debug("json: ${list.toJson()}")
       val cid = dag.put(list).json().Cid.path
@@ -26,7 +23,7 @@ class Test1 {
       require(list == list2) {
         "Lists do not match"
       }
-      log.debug("description: ${list.description.value}")
+      log.debug("description: ${list.description}")
     }
   }
 }

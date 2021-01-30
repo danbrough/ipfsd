@@ -2,8 +2,6 @@ package danbroid.ipfsd.ui
 
 import android.R
 import android.app.Activity
-import android.app.AlertDialog
-import android.content.Context
 import android.view.View
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
