@@ -10,3 +10,4 @@ build
 **/release/**
 /old
 /buildSrc/src/main/kotlin/KeystoreConfig.kt
+/tmp
