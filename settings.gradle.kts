@@ -9,7 +9,6 @@ bootstrapRefreshVersions()
 
 
 include(":bridge")
-include(":service", ":client", ":api")
 
 
 rootProject.name = "ipfsd"
