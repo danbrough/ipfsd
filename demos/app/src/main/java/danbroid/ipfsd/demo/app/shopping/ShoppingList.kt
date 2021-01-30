@@ -1,5 +1,6 @@
 package danbroid.ipfsd.demo.app.shopping
 
+import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.Serializable
 import danbroid.ipfsd.demo.app.IPFSApp
 
@@ -12,10 +13,10 @@ data class ShoppingList(val title: String) : IPFSApp() {
   data class Thang(var count: Int, val msg: String)
 
 
-  var thang1 = Thang(12, "a thang")
+  var thang: DagNode<Thang>? = null
 
 
-  override fun toString() = "${super.toString()}:$title:$thang1"
+  override fun toString() = "${super.toString()}:$title:$thang"
 
 
 }

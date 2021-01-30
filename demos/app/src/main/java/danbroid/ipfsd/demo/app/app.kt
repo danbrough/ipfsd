@@ -3,18 +3,15 @@ package danbroid.ipfsd.demo.app
 import android.content.Context
 import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.Transient
-import danbroid.ipfs.api.toDag
 import danbroid.ipfs.api.utils.SingletonHolder
 import java.util.*
 
-const val IPFSD_APP_ID_PREFIX = "ipfsd/apps"
 
 @Serializable
 open class IPFSApp {
-
-  @Transient
-  var cid: String? = null
+  companion object {
+    const val ID_PREFIX = "ipfsd/apps"
+  }
 
   @Serializable
   data class AppDescription(
@@ -23,13 +20,11 @@ open class IPFSApp {
     val created: Long = System.currentTimeMillis()
   )
 
-  val description = AppDescription(javaClass.name).toDag()
+  val description = AppDescription(javaClass.name)
 
   override fun toString() = description.toString()
 
-  suspend fun save() {
 
-  }
 }
 
 

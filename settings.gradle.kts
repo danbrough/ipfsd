@@ -7,9 +7,9 @@ buildscript {
 
 bootstrapRefreshVersions()
 
-include(":service", ":bridge", ":api", ":client")
 
-//include(":demos:app", ":demos:api", ":demos:shopping")
+include(":bridge")
+include(":service", ":client", ":api")
 
 
 rootProject.name = "ipfsd"
