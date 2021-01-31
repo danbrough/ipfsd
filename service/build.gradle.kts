@@ -24,8 +24,8 @@ android {
     getByName("release") {
       isMinifyEnabled = true
       proguardFiles(
-        getDefaultProguardFile("proguard-android-optimize.txt"),
-        "proguard-rules.pro"
+          getDefaultProguardFile("proguard-android-optimize.txt"),
+          "proguard-rules.pro"
       )
     }
   }
@@ -56,7 +56,7 @@ dependencies {
      exclude(group = "com.android", module = "android")
    }*/
 
-  if (System.getenv().containsKey("JITPACK") || true) {
+  if (System.getenv().containsKey("JITPACK")) {
     implementation(project(":bridge"))
   } else {
     implementation(Danbroid.ipfsd_bridge)
