@@ -16,7 +16,7 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class OkHttpExecutor(
+open class OkHttpExecutor(
   val urlBase: String = "http://localhost:5001/api/v0",
   val builder: OkHttpClient.Builder = OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS)
 ) : IPFS.Executor {

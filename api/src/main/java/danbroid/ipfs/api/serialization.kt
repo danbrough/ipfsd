@@ -21,9 +21,9 @@ typealias Serializable = kotlinx.serialization.Serializable
 typealias Transient = kotlinx.serialization.Transient
 
 class DagOptions<T : Any>(
+  var api: IPFS,
   var serializer: KSerializer<T>,
   var json: Json = Json,
-  var api: IPFS = ipfs
 )
 
 @Serializable(with = DagNodeSerializer::class)
@@ -68,8 +68,9 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
     DagNode(
       null,
       decoder.decodeSerializableValue(linkSerializer).path,
-      options = DagOptions(serializer)
+      options = DagOptions(api = IPFS.getInstance(), serializer)
     )
+
 
   override fun serialize(encoder: Encoder, value: DagNode<T>) =
     encoder.encodeSerializableValue(linkSerializer, Types.Link(value.cidBlocking()))
@@ -77,23 +78,31 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
 }
 
 
-inline suspend fun <reified T : Any> T.cid(serializer: KSerializer<T>): String =
-  cid(DagOptions(serializer))
+inline suspend fun <reified T : Any> T.cid(
+  api: IPFS,
+  serializer: KSerializer<T> = serializer()
+): String =
+  cid(DagOptions(api, serializer))
 
 
-inline suspend fun <reified T : Any> T?.cid(options: DagOptions<T> = DagOptions(serializer())): String =
+suspend fun <T : Any> T?.cid(options: DagOptions<T>): String =
   if (this == null) CID_DAG_NULL else
     DagNode(this, options = options).cid()
 
 
-inline fun <reified T : Any> T.dagNode(options: DagOptions<T> = DagOptions(serializer())): DagNode<T> =
-
-  DagNode(this, options = options)
+inline fun <reified T : Any> T.dagNode(
+  api: IPFS = IPFS.getInstance(),
+  options: DagOptions<T> = DagOptions(
+    api,
+    serializer = serializer()
+  )
+): DagNode<T> = DagNode(this, options = options)
 
 inline fun <reified T : Any> dagNode(
   cid: String,
+  api: IPFS,
   serializer: KSerializer<T> = serializer()
-): DagNode<T> = dagNode(cid, DagOptions(serializer))
+): DagNode<T> = dagNode(cid, DagOptions(api = api, serializer = serializer))
 
 inline fun <reified T : Any> dagNode(cid: String, options: DagOptions<T>): DagNode<T> =
   DagNode(null, cid, options)

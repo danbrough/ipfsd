@@ -2,7 +2,7 @@ object Danbroid {
 
 
   const val IPFSD_SCHEME = "ipfsd"
-  const val bridge_version = "0.8.0_01"
+  const val bridge_version = "0.8.0_02"
   const val ipfsd_bridge = "com.github.danbrough.ipfsd:bridge:${bridge_version}"
 
 

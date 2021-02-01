@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import java.io.IOException
 
 
-inline fun <reified T : IPFSApp> T.appID() =
-  stringPreferencesKey("${IPFSApp.ID_PREFIX}/${T::class.java.name}/${description.id}")
+inline suspend fun <reified T : IPFSApp> T.appID() =
+  stringPreferencesKey("${IPFSApp.ID_PREFIX}/${T::class.java.name}/${description.value().id}")
 
 class AppsDataStore(context: Context) {
   val dataStore: DataStore<Preferences> = context.createDataStore("ipfsd_apps")
@@ -24,7 +24,7 @@ class AppsDataStore(context: Context) {
   val prefs: Flow<Preferences> = dataStore.data
     .catch { exception ->
       if (exception is IOException) {
-        log.trace("no app prefs")
+        //log.trace("no app prefs")
         emit(emptyPreferences())
       } else {
         throw exception
@@ -50,4 +50,4 @@ val Context.appsDataStore: AppsDataStore
   get() = AppsDataStore.getInstance(this)
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(AppsDataStore::class.java)
+//private val log = org.slf4j.LoggerFactory.getLogger(AppsDataStore::class.java)

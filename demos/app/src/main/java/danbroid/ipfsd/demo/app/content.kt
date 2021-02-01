@@ -2,8 +2,9 @@ package danbroid.ipfsd.demo.app
 
 
 import android.content.Context
+import android.widget.Toast
 import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
-import danbroid.ipfs.api.ipfs
+
 import danbroid.ipfs.api.json
 import danbroid.ipfsd.client.androidIPFS
 import danbroid.ipfsd.demo.app.shopping.ShoppingList
@@ -39,29 +40,26 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
-        log.warn("context.ipfs = ${context.androidIPFS} ipfs = $ipfs")
+        log.debug("androidIPFS: ${requireContext().androidIPFS}")
         val listCount = context.appsDataStore.getAppIDS<ShoppingList>().size + 1
         context.shoppingListManager.createList("List_$listCount")
-        false
       }
     }
 
+
     menu {
-      inlineChildren = true
-      isBrowsable = true
-      menu {
-        title = "Test1"
-      }
-      menu {
-        title = "Test2"
+      title = "Test Hello2"
+      onClick = {
+        Toast.makeText(requireContext(), ipfsd.Ipfsd.greetings("Dan"), Toast.LENGTH_SHORT).show()
       }
     }
+
+
 
     menu {
       title = "Lists"
       onClick = {
-
-        false
+        context.shoppingListManager.list()
       }
     }
 
@@ -72,7 +70,7 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
         context.androidIPFS.network.id().json().also {
           log.info("ID: $it")
         }
-        false
+        consumed = true
       }
     }
   }

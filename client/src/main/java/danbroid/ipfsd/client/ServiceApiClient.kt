@@ -21,6 +21,7 @@ class ServiceApiClient private constructor(
   }
 
   override suspend fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> {
+    log.info("invoke() $request")
     serviceClient.waitTillStarted()
     return executor.invoke(request)
   }
@@ -63,13 +64,9 @@ class ServiceApiClient private constructor(
 
 }
 
-private class AndroidIPFS(context: Context) :
-  IPFS(CallContext(ServiceApiClient.getInstance(context, OkHttpExecutor()))) {
-  companion object : SingletonHolder<AndroidIPFS, Context>(::AndroidIPFS)
-}
 
 val Context.androidIPFS: IPFS
-  get() = AndroidIPFS.getInstance(this)
+  get() = IPFS.getInstance(ServiceApiClient.getInstance(this, OkHttpExecutor()))
 
 private val log = org.slf4j.LoggerFactory.getLogger(ServiceApiClient::class.java)
 

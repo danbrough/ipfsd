@@ -5,11 +5,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import danbroid.ipfs.api.cid
+import danbroid.ipfsd.client.androidIPFS
 import danbroid.ipfsd.demo.app.appID
 import danbroid.ipfsd.demo.app.appsDataStore
 import danbroid.util.misc.SingletonHolder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 class ShoppingListManager(val context: Context) {
@@ -29,16 +32,19 @@ class ShoppingListManager(val context: Context) {
     }
 
 
-  suspend fun createList(name: String): ShoppingList =
+  suspend fun createList(name: String): ShoppingList = withContext(Dispatchers.IO) {
+    log.info("createList() $name")
     ShoppingList(name).also { list ->
-      val cid = list.cid()
+      log.debug("getting cid ...")
+      val cid = list.cid(context.androidIPFS)
       log.info("created list $list  with cid: $cid")
       appsDataStore.dataStore.edit {
         it[list.appID()] = cid
       }
     }
+  }
 
-  suspend fun list() {
+  suspend fun list() = withContext(Dispatchers.IO) {
     log.info("list()")
     appsDataStore.getAppIDS<ShoppingList>().forEach {
       log.info("LIST: $it")

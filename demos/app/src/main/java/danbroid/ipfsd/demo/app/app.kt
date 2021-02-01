@@ -1,8 +1,10 @@
 package danbroid.ipfsd.demo.app
 
 import android.content.Context
+import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.dagNode
 import danbroid.ipfs.api.utils.SingletonHolder
 import java.util.*
 
@@ -20,7 +22,7 @@ open class IPFSApp {
     val created: Long = System.currentTimeMillis()
   )
 
-  val description = AppDescription(javaClass.name)
+  val description: DagNode<AppDescription> = AppDescription(javaClass.name).dagNode()
 
   override fun toString() = description.toString()
 
