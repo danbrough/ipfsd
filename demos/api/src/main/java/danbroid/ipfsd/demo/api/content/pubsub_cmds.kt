@@ -18,7 +18,6 @@ fun MenuItemBuilder.pubSubCommands() = menu {
       ).invoke().also {
         log.info("msg: ${it.text}")
       }
-      false
     }
   }
 
@@ -26,9 +25,8 @@ fun MenuItemBuilder.pubSubCommands() = menu {
     title = "Pubsub Test Subscribe"
     onClick = {
       api.pubsub.sub("poiqwe098123").flow().collect {
-        debug("result: $it")
+        log.debug("result: $it")
       }
-      false
     }
   }
 }

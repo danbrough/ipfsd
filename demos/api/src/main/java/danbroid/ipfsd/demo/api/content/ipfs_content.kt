@@ -3,6 +3,7 @@ package danbroid.ipfsd.demo.api.content
 import danbroid.ipfs.api.json
 import danbroid.util.menu.MenuDSL
 import danbroid.util.menu.MenuItemBuilder
+import danbroid.util.menu.invalidateMenu
 import danbroid.util.menu.menu
 import danbroid.util.menu.model.menuViewModel
 
@@ -25,9 +26,8 @@ fun MenuItemBuilder.ipfsDir(
             subtitle = "${link.Hash} size:${link.Size}"
           }
         }
-        menuViewModel().invalidate(this)
+        invalidateMenu()
       }
-      true
     }
 
 

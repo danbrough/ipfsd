@@ -7,7 +7,7 @@ buildscript {
 
 bootstrapRefreshVersions()
 
-if (false)
+if (true)
     include(":bridge_native", ":bridge")
 else
     include(":service", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")
