@@ -6,7 +6,7 @@ import kotlinx.coroutines.*
 import java.io.*
 
 
-open class IPFS(executor: Executor, val callContext: CallContext = CallContext(executor)) :
+open class IPFS(executor: Executor, private val callContext: CallContext = CallContext(executor)) :
   CoroutineScope by callContext.coroutineScope {
 
   interface ApiResponse<T> : Closeable {

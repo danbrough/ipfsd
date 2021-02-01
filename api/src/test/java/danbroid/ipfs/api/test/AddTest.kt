@@ -1,6 +1,9 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.*
+import danbroid.ipfs.api.Types
+import danbroid.ipfs.api.blocking
+import danbroid.ipfs.api.flow
+import danbroid.ipfs.api.parseJson
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import org.junit.Before
@@ -16,7 +19,7 @@ class AddTest {
   @Test
   fun test1() {
     log.debug("test1() adding hello world message..")
-    ipfs.blocking {
+    api.blocking {
       basic.add(
         data = TestData.HelloWorld.data,
         fileName = TestData.HelloWorld.name
@@ -38,7 +41,7 @@ class AddTest {
   @Test
   fun test2() {
     log.debug("test2() adding hello world message in directory..")
-    ipfs.blocking {
+    api.blocking {
       basic.add(
         data = TestData.HelloWorld.data,
         fileName = TestData.HelloWorld.name,
@@ -63,14 +66,14 @@ class AddTest {
   @Test
   fun test3() {
     log.debug("test3() directory test")
-    ipfs.blocking {
+    api.blocking {
       basic.add().apply {
         addDirectory("a").apply {
           add(TestData.TestDirectory.msg1, "message.txt")
           addDirectory("b").add(TestData.TestDirectory.msg2, "message.txt")
         }
       }.flow().collect {
-        log.debug("file: $it")
+        log.info("file: $it")
       }
     }
   }
@@ -79,10 +82,10 @@ class AddTest {
   @Test
   fun test5() {
     log.info("test5() adding test dir: ${TestData.TestDirectory.testPath}")
-    ipfs.blocking {
+    api.blocking {
       basic.add(file = TestData.TestDirectory.testPath.toFile(), recurseDirectory = true).flow()
         .collect {
-          log.debug("file: $it")
+          log.info("file: $it")
         }
     }
   }

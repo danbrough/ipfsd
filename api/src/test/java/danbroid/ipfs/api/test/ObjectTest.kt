@@ -1,7 +1,6 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.ipfs
 import danbroid.ipfs.api.json
 import org.junit.Test
 
@@ -14,7 +13,7 @@ class ObjectTest {
     val hash_empty_string = "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
     val hello_world = "Hello World"
 
-    ipfs.blocking {
+    api.blocking {
       var result = obj.patch.setData(TestData.CID_EMPTY_OBJECT, "").json()
       require(result.Hash == hash_empty_string) {
         "Invalid hash: ${result.Hash} expecting $hash_empty_string"

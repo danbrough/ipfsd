@@ -94,7 +94,7 @@ class SerialTest2 {
       log.info("test()")
       val zoo = ZOO("Happy Place", 1972)
       log.debug("zoo: $zoo")
-      val link = zoo.dagNode()
+      val link = zoo.dagNode(api)
       log.debug("link: $link")
 
       val data = Json.encodeToString(link)

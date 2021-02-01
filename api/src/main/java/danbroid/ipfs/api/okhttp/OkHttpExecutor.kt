@@ -25,7 +25,7 @@ open class OkHttpExecutor(
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpExecutor::class.java)
     val MEDIA_TYPE_APPLICATION = "application/octet-stream".toMediaType()
     val MEDIA_TYPE_DIRECTORY = "application/x-directory".toMediaType()
-    var DEBUG_HTTP = false
+    var DEBUG_HTTP = true
   }
 
   private val httpClient by lazy {
@@ -62,6 +62,7 @@ open class OkHttpExecutor(
     override fun close() = response.close()
   }
 
+  @Suppress("BlockingMethodInNonBlockingContext")
   override suspend fun <T> invoke(request: Request<T>): IPFS.ApiResponse<T> =
     withContext(Dispatchers.IO) {
       createCall(request).execute().let {
@@ -83,7 +84,9 @@ open class OkHttpExecutor(
     httpClient.newCall(
       okhttp3.Request.Builder().url("$urlBase/${request.path}")
         .post(requestBody(request))
-        .build()
+        .build().also {
+          log.debug("path is ${it.url}")
+        }
     )
 
   protected fun <T> requestBody(request: Request<T>): RequestBody {

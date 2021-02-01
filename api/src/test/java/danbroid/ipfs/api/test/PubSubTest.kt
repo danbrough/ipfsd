@@ -2,7 +2,6 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.flow
-import danbroid.ipfs.api.ipfs
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -23,7 +22,7 @@ class PubSubTest {
 
   @Test
   fun test1() {
-    ipfs.blocking {
+    api.blocking {
 
       val job = launch {
 

@@ -67,7 +67,7 @@ class SerialTest3 {
       val bigInt = bigNumberString.toBigInteger()
       val bigNumberCID = "bafyreihydhtymenpvt4mrwrt35jqmf64fua6ius65o72wjs7jnuu6sxlra"
       val cid123 = "bafyreihbb6wszf7ordq4vfd3ab65wxjygixfgqe3qqc2qwbbdnzy4zifj4"
-      val bigIntDag = dagNode(bigNumberCID, BigIntSerializer)
+      val bigIntDag = dagNode(bigNumberCID, api, BigIntSerializer)
       log.info("BIG CID: ${bigIntDag.cid()} value: ${bigIntDag.value()}")
 
 
@@ -80,7 +80,7 @@ class SerialTest3 {
         "nLink.value: ${nLink.value()} != 123"
       }
 
-      require(dagNode<Int>(cid123).value() == 123) {
+      require(dagNode<Int>(cid123, api).value() == 123) {
         "cid123.cid<Int>().value != 123"
       }
     }

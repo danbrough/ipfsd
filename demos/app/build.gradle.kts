@@ -80,7 +80,7 @@ dependencies {
   implementation(project(":api"))
   implementation(project(":client"))
   implementation(Kotlin.stdlib.jdk8)
-  implementation(files("/shared/build/src/ipfsd/ipfsd.aar"))
+  //implementation(files("/shared/build/src/ipfsd/ipfsd.aar"))
 
   implementation(AndroidX.navigation.fragmentKtx)
   implementation(AndroidX.navigation.uiKtx)

@@ -1,7 +1,6 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.ipfs
 import danbroid.ipfs.api.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -37,7 +36,7 @@ class DagTest {
     log.info("test1()")
 
     val json = Json.encodeToString(jsonData)
-    ipfs.blocking {
+    api.blocking {
 
       dag.put(json).json().also {
         log.info("cid: $it")

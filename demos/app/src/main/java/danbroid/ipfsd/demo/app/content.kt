@@ -2,9 +2,7 @@ package danbroid.ipfsd.demo.app
 
 
 import android.content.Context
-import android.widget.Toast
 import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
-
 import danbroid.ipfs.api.json
 import danbroid.ipfsd.client.androidIPFS
 import danbroid.ipfsd.demo.app.shopping.ShoppingList
@@ -50,7 +48,7 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
     menu {
       title = "Test Hello2"
       onClick = {
-        Toast.makeText(requireContext(), ipfsd.Ipfsd.greetings("Dan"), Toast.LENGTH_SHORT).show()
+        // Toast.makeText(requireContext(), ipfsd.Ipfsd.greetings("Dan"), Toast.LENGTH_SHORT).show()
       }
     }
 

@@ -46,8 +46,14 @@ class SerialTest {
     val data: Project = OwnedProject("kotlinx.coroutines", "kotlin")
     log.info(format.encodeToString(data))
     val json = Json
+
+
+
     val animals =
-      listOf(Animal("Oscar", Diet("Bikkies").dagNode()).dagNode(), Animal("Satchmo").dagNode())
+      listOf(
+        Animal("Oscar", Diet("Bikkies").dagNode(api)).dagNode(api),
+        Animal("Satchmo").dagNode(api)
+      )
 
     json.encodeToString(animals).also {
       log.info("box json: $it")

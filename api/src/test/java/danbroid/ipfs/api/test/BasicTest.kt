@@ -2,7 +2,6 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.flow
-import danbroid.ipfs.api.ipfs
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import org.junit.Test
@@ -14,7 +13,7 @@ class BasicTest {
     val path = "/ipfs/QmZh1JZaEsNjGS1CcSEPPohitG9oEVdYb9uUsmhveSAsAn"
     log.info("listing $path")
 
-    ipfs.blocking {
+    api.blocking {
 
       basic.ls(path, resolveSize = false, resolveType = true, stream = true).flow()
         .collect {
