@@ -11,7 +11,7 @@ interface Call<T> {
 }
 
 open class Request<T>(
-  val callContext: IPFS.CallContext,
+  val executor: IPFS.Executor,
   path: String,
   vararg args: Pair<String, Any?>
 ) :
@@ -20,7 +20,7 @@ open class Request<T>(
 
   inline suspend fun <U> invoke(block: (IPFS.ApiResponse<T>) -> U): U = invoke().use(block)
 
-  override suspend fun invoke(): IPFS.ApiResponse<T> = callContext.invoke(this)
+  override suspend fun invoke(): IPFS.ApiResponse<T> = executor.invoke(this)
 
 }
 
@@ -71,10 +71,10 @@ open class Part(var name: String = "", val isDirectory: Boolean) : PartList {
 }
 
 class DirectoryRequest<T : Any>(
-  callContext: IPFS.CallContext,
+  executor: IPFS.Executor,
   path: String,
   vararg args: Pair<String, Any?>
-) : Request<T>(callContext, path, *args), PartList {
+) : Request<T>(executor, path, *args), PartList {
 
   private var root = Part("", true)
 

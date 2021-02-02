@@ -3,10 +3,10 @@ package danbroid.ipfs.api.okhttp
 import danbroid.ipfs.api.*
 import danbroid.ipfs.api.Request
 import danbroid.ipfs.api.utils.uriEncode
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
-import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okio.Buffer
@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit
 
 open class OkHttpExecutor(
   val urlBase: String = "http://localhost:5001/api/v0",
-  val builder: OkHttpClient.Builder = OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS)
+  val builder: OkHttpClient.Builder = OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS),
+  override val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : IPFS.Executor {
 
   companion object {
@@ -70,23 +71,23 @@ open class OkHttpExecutor(
       }
     }
 
-
   override fun <T> invoke(request: Request<T>, callback: IPFS.Executor.Callback<T>) {
-    createCall(request).enqueue(object : Callback {
-      override fun onFailure(call: Call, e: IOException) = callback.onResponse(request, null, e)
+    createCall(request).enqueue(object : okhttp3.Callback {
+      override fun onFailure(call: okhttp3.Call, e: IOException) {
+        callback.onResponse(request, null, e)
+      }
 
-      override fun onResponse(call: Call, response: Response) =
+      override fun onResponse(call: okhttp3.Call, response: Response) {
         callback.onResponse(request, HttpResponse(response))
+      }
     })
   }
 
-  fun createCall(request: Request<*>): Call =
+  fun createCall(request: Request<*>): okhttp3.Call =
     httpClient.newCall(
       okhttp3.Request.Builder().url("$urlBase/${request.path}")
         .post(requestBody(request))
-        .build().also {
-          log.debug("path is ${it.url}")
-        }
+        .build()
     )
 
   protected fun <T> requestBody(request: Request<T>): RequestBody {

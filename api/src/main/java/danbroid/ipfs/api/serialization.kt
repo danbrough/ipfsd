@@ -68,7 +68,7 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
     DagNode(
       null,
       decoder.decodeSerializableValue(linkSerializer).path,
-      options = DagOptions(api = IPFS.getInstance(), serializer)
+      TODO("fix") //options = DagOptions(api = IPFS.getInstance(), serializer)
     )
 
 
@@ -91,7 +91,7 @@ suspend fun <T : Any> T?.cid(options: DagOptions<T>): String =
 
 
 inline fun <reified T : Any> T.dagNode(
-  api: IPFS = IPFS.getInstance(),
+  api: IPFS,
   options: DagOptions<T> = DagOptions(
     api,
     serializer = serializer()

@@ -20,7 +20,9 @@ class IPFSClientModel(val context: Application) : AndroidViewModel(context) {
   private val serviceClient = ServiceClient.getInstance(context)
   private var apiClient = ServiceApiClient.getInstance(Pair(serviceClient, OkHttpExecutor()))
 
-  val api = IPFS.getInstance(apiClient)
+  val api by lazy {
+    IPFS(apiClient)
+  }
 
 
   suspend fun sendMessage(msg: IPFSMessage) {

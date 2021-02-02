@@ -6,11 +6,13 @@ import danbroid.ipfs.api.Request
 import danbroid.ipfs.api.okhttp.OkHttpExecutor
 import danbroid.ipfsd.IPFSD
 import danbroid.util.misc.SingletonHolder
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class ServiceApiClient private constructor(
   val serviceClient: ServiceClient,
   private val executor: IPFS.Executor,
+  override val coroutineScope: CoroutineScope = executor.coroutineScope,
 ) : IPFS.Executor {
 
   init {
@@ -28,9 +30,9 @@ class ServiceApiClient private constructor(
 
 
   override fun <T> invoke(request: Request<T>, callback: IPFS.Executor.Callback<T>) {
-    request.callContext.coroutineScope.launch {
+    executor.coroutineScope.launch {
       serviceClient.waitTillStarted()
-      request.callContext.executor.invoke(request, callback)
+      executor.invoke(request, callback)
     }
   }
 
@@ -64,9 +66,17 @@ class ServiceApiClient private constructor(
 
 }
 
+object _androidIPFS : danbroid.ipfs.api.utils.SingletonHolder<IPFS, Context>({
+  IPFS(
+    ServiceApiClient.getInstance(
+      it,
+      OkHttpExecutor()
+    )
+  )
+})
 
 val Context.androidIPFS: IPFS
-  get() = IPFS.getInstance(ServiceApiClient.getInstance(this, OkHttpExecutor()))
+  get() = _androidIPFS.getInstance(this)
 
 private val log = org.slf4j.LoggerFactory.getLogger(ServiceApiClient::class.java)
 

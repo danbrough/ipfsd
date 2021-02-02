@@ -1,13 +1,10 @@
 package danbroid.ipfs.api
 
-import danbroid.ipfs.api.okhttp.OkHttpExecutor
-import danbroid.ipfs.api.utils.SingletonHolder
 import kotlinx.coroutines.*
 import java.io.*
 
 
-open class IPFS(executor: Executor, private val callContext: CallContext = CallContext(executor)) :
-  CoroutineScope by callContext.coroutineScope {
+open class IPFS(val executor: Executor) : CoroutineScope by executor.coroutineScope {
 
   interface ApiResponse<T> : Closeable {
     val isSuccessful: Boolean
@@ -18,21 +15,15 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
       get() = if (isSuccessful) reader.readText() else throw Exception(errorMessage)
   }
 
-  companion object :
-    SingletonHolder<IPFS, Executor?>({ IPFS(it ?: OkHttpExecutor()) })
-
   interface Executor {
-    suspend fun <T> invoke(request: Request<T>): ApiResponse<T>
-    fun <T> invoke(request: Request<T>, callback: Callback<T>)
+    val coroutineScope: CoroutineScope
+
+    suspend abstract fun <T> invoke(request: Request<T>): ApiResponse<T>
+    abstract fun <T> invoke(request: Request<T>, callback: Callback<T>)
     interface Callback<T> {
       fun onResponse(request: Request<T>, response: ApiResponse<T>?, err: Exception? = null)
     }
   }
-
-  class CallContext(
-    val executor: Executor,
-    val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-  ) : Executor by executor
 
 
   inner class Basic {
@@ -70,7 +61,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
       noCopy: Boolean? = null,
     ) =
       DirectoryRequest<Types.File>(
-        callContext,
+        executor,
         "add",
         "progress" to progress,
         "wrap-with-directory" to wrapWithDirectory,
@@ -112,7 +103,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
       resolveSize: Boolean? = null
     ) =
       Request<Types.Object.ObjectArray>(
-        callContext, "ls", "arg" to path, "stream" to stream,
+        executor, "ls", "arg" to path, "stream" to stream,
         "resolve-type" to resolveType, "size" to resolveSize
       )
 
@@ -142,7 +133,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
       pin: Boolean? = null,
       hashFunc: String? = null,
     ) = DirectoryRequest<Types.CID>(
-      callContext,
+      executor,
       "dag/put",
       "format" to format,
       "input-enc" to inputEnc,
@@ -172,7 +163,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
      * Get a dag node from ipfs.
      **/
 
-    fun <T> get(arg: String) = Request<T>(callContext, "dag/get", "arg" to arg)
+    fun <T> get(arg: String) = Request<T>(executor, "dag/get", "arg" to arg)
 
   }
 
@@ -180,7 +171,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
   inner class Network {
     fun id(peerID: String? = null, peerIDBase: String? = null) =
       Request<Types.ID>(
-        callContext, "id",
+        executor, "id",
         "arg" to peerID,
         "peerid-base" to peerIDBase
       )
@@ -206,7 +197,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
      */
     fun get(arg: String, dataEncoding: String? = null) =
       Request<Types.Object>(
-        callContext,
+        executor,
         "object/get",
         "arg" to arg,
         "data-encoding" to dataEncoding
@@ -224,7 +215,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
        */
       fun addLink(objectHash: String, linkHash: String, linkName: String) =
         Request<Types.Hash>(
-          callContext,
+          executor,
           "object/patch/add-link",
           "arg" to objectHash,
           "arg" to linkHash,
@@ -238,7 +229,7 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
        * @param data Data to set
        */
       fun setData(hash: String, data: ByteArray? = null) =
-        DirectoryRequest<Types.Hash>(callContext, "object/patch/set-data", "arg" to hash).also {
+        DirectoryRequest<Types.Hash>(executor, "object/patch/set-data", "arg" to hash).also {
           if (data != null) it.add(data)
         }
 
@@ -267,12 +258,12 @@ open class IPFS(executor: Executor, private val callContext: CallContext = CallC
      */
 
     fun sub(arg: String) = Request<Types.Message>(
-      callContext,
+      executor,
       "pubsub/sub", "arg" to arg
     )
 
     fun pub(topic: String, data: String) = Request<Any>(
-      callContext,
+      executor,
       "pubsub/pub", "arg" to topic, "arg" to data
     )
 
