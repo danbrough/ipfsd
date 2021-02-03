@@ -6,7 +6,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import org.junit.Test
 
-class BasicTest {
+class Basic {
   @InternalCoroutinesApi
   @Test
   fun ls() {
@@ -29,4 +29,4 @@ class BasicTest {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(BasicTest::class.java)
+private val log = org.slf4j.LoggerFactory.getLogger(Basic::class.java)

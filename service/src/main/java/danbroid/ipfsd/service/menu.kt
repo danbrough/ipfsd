@@ -25,6 +25,7 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
         log.warn("GOT RESULT: $it")
         requireActivity().snackBar("result: $it")
       }
+      consumed = true
     }
   }
 

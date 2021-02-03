@@ -17,38 +17,82 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 open class OkHttpExecutor(
-  val urlBase: String = "http://localhost:5001/api/v0",
-  val builder: OkHttpClient.Builder = OkHttpClient.Builder().readTimeout(0, TimeUnit.MILLISECONDS),
+  var urlBase: String = IPFS_DEFAULT_API_URL,
+  var builder: OkHttpClient.Builder =
+    OkHttpClient.Builder().readTimeout(0, TimeUnit.SECONDS),
   override val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : IPFS.Executor {
+
+
+  init {
+    log.info("HERE2")
+    val env = System.getenv()
+
+    env.get(ENV_IPFS_API)?.also {
+      urlBase = it
+    }
+
+    env.get(ENV_IPFS_USERNAME)?.also {
+      log.error("configuring basic authentication")
+      val password = env.get(ENV_IPFS_PASSWORD)
+      if (password == null) throw Exception("$ENV_IPFS_PASSWORD is not set in the environment")
+      setCredentials(it, password)
+    }
+
+    if (!this::httpClient.isInitialized)
+      buildClient()
+  }
+
+  private var authenticator: Authenticator? = null
+
+  override fun setCredentials(username: String, password: String) {
+    val creds = Credentials.basic(username, password)
+    authenticator = Authenticator { route, response ->
+      //log.warn("route: $route response: $response")
+      response.request.newBuilder().addHeader("Authorization", creds).build()
+    }
+    buildClient()
+  }
+
+  private lateinit var httpClient: OkHttpClient
+
+  private fun buildClient(): OkHttpClient = builder.let { builder ->
+    authenticator?.also {
+      log.debug("setting authenticator")
+      builder.authenticator(it)
+    }
+
+    if (DEBUG_HTTP) {
+      log.warn("adding network interceptor")
+      builder.addNetworkInterceptor {
+        val request = it.request()
+        log.trace("request: ${request}")
+        val body = request.body
+        if (body is MultipartBody) {
+          val sink = Buffer()
+          body.writeTo(sink)
+          val output = ByteArrayOutputStream()
+          sink.writeTo(output)
+          log.trace("body: ${output}")
+        }
+        it.proceed(request)
+      }
+    }
+
+    httpClient = builder.build()
+    httpClient
+  }
+
 
   companion object {
     private val log = org.slf4j.LoggerFactory.getLogger(OkHttpExecutor::class.java)
     val MEDIA_TYPE_APPLICATION = "application/octet-stream".toMediaType()
     val MEDIA_TYPE_DIRECTORY = "application/x-directory".toMediaType()
-    var DEBUG_HTTP = true
+
+    //true if DEBUG_OKHTTP=1 environmental variable is set
+    var DEBUG_HTTP = System.getenv().get("DEBUG_OKHTTP") == "1"
   }
 
-  private val httpClient by lazy {
-    builder
-      .apply {
-        if (DEBUG_HTTP)
-          addNetworkInterceptor {
-            val request = it.request()
-            log.trace("request: ${request}")
-            val body = request.body
-            if (body is MultipartBody) {
-              val sink = Buffer()
-              body.writeTo(sink)
-              val output = ByteArrayOutputStream()
-              sink.writeTo(output)
-              log.trace("body: ${output}")
-            }
-            it.proceed(request)
-          }
-      }
-      .build()
-  }
 
   class HttpResponse<T>(val response: Response) : IPFS.ApiResponse<T> {
 

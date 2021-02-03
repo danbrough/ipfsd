@@ -153,7 +153,7 @@ dependencies {
 
   testImplementation("ch.qos.logback:logback-classic:_")
   testImplementation("ch.qos.logback:logback-core:_")
-  testImplementation(testFixtures(project(":api")))
+//  testImplementation(testFixtures(project(":api")))
 
 
 }

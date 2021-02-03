@@ -10,7 +10,7 @@ import java.util.*
 
 
 @Serializable
-open class IPFSApp {
+open class IPFSApp() {
   companion object {
     const val ID_PREFIX = "ipfsd/apps"
   }
@@ -21,6 +21,7 @@ open class IPFSApp {
     var id: String = UUID.randomUUID().toString(),
     val created: Long = System.currentTimeMillis()
   )
+
 
   val description: DagNode<AppDescription> = AppDescription(javaClass.name).dagNode()
 

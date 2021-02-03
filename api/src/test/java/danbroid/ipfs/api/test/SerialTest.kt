@@ -2,6 +2,7 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.dagNode
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -45,23 +46,25 @@ class SerialTest {
   fun test1() {
     val data: Project = OwnedProject("kotlinx.coroutines", "kotlin")
     log.info(format.encodeToString(data))
-    val json = Json
+    val json = format
 
+    api.blocking {
 
+      val animals =
+        listOf(
+          Animal("Oscar", Diet("Bikkies").dagNode(this)).dagNode(this),
+          Animal("Satchmo").dagNode(this)
+        )
 
-    val animals =
-      listOf(
-        Animal("Oscar", Diet("Bikkies").dagNode(api)).dagNode(api),
-        Animal("Satchmo").dagNode(api)
-      )
+      json.encodeToString(animals).also {
+        log.info("box json: $it")
+        val animals2: List<DagNode<Animal>> = json.decodeFromString(it)
+        log.trace("animals: $animals")
+        log.trace("animals2: $animals2")
+        require(animals2 == animals) {
+          "animals2 != animals"
+        }
 
-    json.encodeToString(animals).also {
-      log.info("box json: $it")
-      val animals2: List<DagNode<Animal>> = json.decodeFromString(it)
-      log.trace("animals: $animals")
-      log.trace("animals2: $animals2")
-      require(animals2 == animals) {
-        "animals2 != animals"
       }
     }
 

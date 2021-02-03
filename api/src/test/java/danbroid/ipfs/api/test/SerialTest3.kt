@@ -2,8 +2,8 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.dagNode
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -46,17 +46,17 @@ class SerialTest3 {
   @Test
   fun test() {
     log.info("test()")
-    runBlocking {
+    api.blocking {
       val zoo = ZOO3("Happy Place", 1972)
       zoo.s = Something("Something", 123)
       log.debug("zoo: $zoo")
-      val link = zoo.dagNode()
+      val link = zoo.dagNode(this)
       log.debug("link: $link")
       val json = Json.encodeToString(link)
       log.debug("json: $json")
       val zoo2Link = Json.decodeFromString<DagNode<ZOO3>>(json)
       log.info("zoo2Link: $zoo2Link")
-      val zoo2 = zoo2Link.valueBlocking()
+      val zoo2 = zoo2Link.value(this)
       log.debug("zoo2: $zoo2")
       require(zoo == zoo2) {
         "zoo != zoo2"
@@ -67,24 +67,29 @@ class SerialTest3 {
       val bigInt = bigNumberString.toBigInteger()
       val bigNumberCID = "bafyreihydhtymenpvt4mrwrt35jqmf64fua6ius65o72wjs7jnuu6sxlra"
       val cid123 = "bafyreihbb6wszf7ordq4vfd3ab65wxjygixfgqe3qqc2qwbbdnzy4zifj4"
-      val bigIntDag = dagNode(bigNumberCID, api, BigIntSerializer)
+      val bigIntDag: DagNode<BigInteger> =
+        dagNode(bigNumberCID, serializer = BigIntSerializer, api = this)
       log.info("BIG CID: ${bigIntDag.cid()} value: ${bigIntDag.value()}")
 
 
       val n = 123
-      val nLink = n.dagNode()
-      require(nLink.cid() == cid123) {
-        "nLink.cid:${nLink.cid()} != $cid123"
+      val nLink = n.dagNode(this)
+      log.debug("getting cid for $n")
+      val nCid = nLink.cid(this)
+      log.debug("cid is $nCid")
+      require(nCid == cid123) {
+        "nLink.cid:$nCid != $cid123"
       }
-      require(nLink.value() == 123) {
-        "nLink.value: ${nLink.value()} != 123"
+      require(nLink.value(this) == 123) {
+        "nLink.value: ${nLink.value(this)} != 123"
       }
 
-      require(dagNode<Int>(cid123, api).value() == 123) {
+      require(dagNode<Int>(cid123).value(this) == 123) {
         "cid123.cid<Int>().value != 123"
       }
     }
   }
+
 }
 
 private val log = org.slf4j.LoggerFactory.getLogger(SerialTest2::class.java)

@@ -23,6 +23,8 @@ open class IPFS(val executor: Executor) : CoroutineScope by executor.coroutineSc
     interface Callback<T> {
       fun onResponse(request: Request<T>, response: ApiResponse<T>?, err: Exception? = null)
     }
+
+    fun setCredentials(username: String, password: String) {}
   }
 
 
@@ -295,3 +297,7 @@ fun <T> IPFS.blocking(block: suspend IPFS.() -> T): T = runBlocking {
 
 const val CID_EMPTY_OBJECT = "QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n"
 const val CID_DAG_NULL = "bafyreifqwkmiw256ojf2zws6tzjeonw6bpd5vza4i22ccpcq4hjv2ts7cm"
+const val IPFS_DEFAULT_API_URL = "http://localhost:5001/api/v0"
+const val ENV_IPFS_API = "IPFS_API"
+const val ENV_IPFS_USERNAME = "IPFS_USERNAME"
+const val ENV_IPFS_PASSWORD = "IPFS_PASSWORD"

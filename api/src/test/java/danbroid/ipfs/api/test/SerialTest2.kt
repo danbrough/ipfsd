@@ -2,8 +2,8 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.DagNode
 import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.dagNode
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -90,20 +90,19 @@ class SerialTest2 {
 
   @Test
   fun test() {
-    runBlocking {
+    api.blocking {
       log.info("test()")
       val zoo = ZOO("Happy Place", 1972)
       log.debug("zoo: $zoo")
-      val link = zoo.dagNode(api)
+      val link = zoo.dagNode(this)
       log.debug("link: $link")
 
       val data = Json.encodeToString(link)
       log.info("data: $data")
 
-
       val zoo2Link = Json.decodeFromString<DagNode<ZOO>>(data)
       log.info("zoo2Link: $zoo2Link")
-      val zoo2 = zoo2Link.value()
+      val zoo2 = zoo2Link.value(this)
       log.debug("zoo2: $zoo2")
       require(zoo == zoo2) {
         "zoo != zoo2"

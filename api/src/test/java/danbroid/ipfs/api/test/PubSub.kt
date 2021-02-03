@@ -12,12 +12,12 @@ import org.junit.Test
 import java.util.logging.Level
 import java.util.logging.Logger
 
-class PubSubTest {
+class PubSub {
   init {
     Logger.getLogger(OkHttpClient::javaClass.name).setLevel(Level.FINE)
   }
 
-  val topic = "test"
+  val topic = "secretgroup"
 
 
   @Test
@@ -67,7 +67,17 @@ class PubSubTest {
     }
   }
 
+  @Test
+  fun subscribe() {
+    api.blocking {
+      log.debug("subscribing to secret group ..")
+      pubsub.sub("secretgroup").flow().collect {
+        log.info("message: $it")
+      }
+    }
+  }
+
 }
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(PubSubTest::class.java)
+private val log = org.slf4j.LoggerFactory.getLogger(PubSub::class.java)

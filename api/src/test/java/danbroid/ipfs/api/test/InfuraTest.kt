@@ -1,6 +1,7 @@
 package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.IPFS
+import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.json
 import danbroid.ipfs.api.okhttp.OkHttpExecutor
 import danbroid.ipfs.api.toJson
@@ -43,6 +44,13 @@ class InfuraTest {
       }
       /*val cid = api.dag.put(data = msg).json().Cid.path
       log.debug("cid is $cid")*/
+    }
+  }
+
+  @Test
+  fun test2() {
+    danbroid.ipfs.api.test.api.blocking {
+      log.debug("id: ${network.id().json()}")
     }
   }
 }

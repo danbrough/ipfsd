@@ -68,10 +68,15 @@ class ServiceApiClient private constructor(
 
 object _androidIPFS : danbroid.ipfs.api.utils.SingletonHolder<IPFS, Context>({
   IPFS(
-    ServiceApiClient.getInstance(
+    OkHttpExecutor().apply {
+      urlBase = "https://home.danbrough.org/api/v0"
+      setCredentials("dan", "poiqwe098123")
+      log.info("HERE1")
+    }
+    /*ServiceApiClient.getInstance(
       it,
       OkHttpExecutor()
-    )
+    )*/
   )
 })
 
