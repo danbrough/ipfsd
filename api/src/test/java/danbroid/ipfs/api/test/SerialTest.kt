@@ -1,9 +1,6 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.DagNode
-import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.dagNode
+import danbroid.ipfs.api.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -24,7 +21,6 @@ private val module = SerializersModule {
   polymorphic(Project::class) {
     subclass(OwnedProject::class)
   }
-
 }
 
 
@@ -55,6 +51,9 @@ class SerialTest {
           Animal("Oscar", Diet("Bikkies").dagNode(this)).dagNode(this),
           Animal("Satchmo").dagNode(this)
         )
+
+
+
 
       json.encodeToString(animals).also {
         log.info("box json: $it")

@@ -20,11 +20,13 @@ open class OkHttpExecutor(
   var urlBase: String = IPFS_DEFAULT_API_URL,
   var builder: OkHttpClient.Builder =
     OkHttpClient.Builder().readTimeout(0, TimeUnit.SECONDS),
-  override val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+  override val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
+  private val init: (OkHttpExecutor.() -> Unit)? = null
 ) : IPFS.Executor {
 
 
   init {
+    init?.invoke(this)
     log.info("HERE2")
     val env = System.getenv()
 

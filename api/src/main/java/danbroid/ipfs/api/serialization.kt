@@ -30,30 +30,31 @@ class DagNode<T : Any> constructor(
   @Transient private val json: Json = Json
 ) {
 
-  suspend fun cid(api: IPFS? = null): String =
+  suspend fun cid(api: IPFS = _api!!): String =
     cid ?: json.encodeToString(serializer, value!!).let {
-      (api ?: _api!!).dag.put(it).json().Cid.path.also {
+      api.dag.put(it).json().Cid.path.also {
         cid = it
       }
     }
 
-  suspend fun value(api: IPFS? = null): T =
-    value ?: (api ?: _api!!).dag.get<T>(cid!!).invoke().text.let {
+  suspend fun value(api: IPFS = _api!!): T =
+    value ?: api.dag.get<T>(cid!!).invoke().text.let {
       json.decodeFromString(serializer, it).also {
         value = it
       }
     }
 
 
-  fun cidBlocking(api: IPFS? = null) =
+  fun cidBlocking(api: IPFS = _api!!) =
     cid ?: runBlocking(Dispatchers.IO) { this@DagNode.cid(api) }
 
-  fun valueBlocking(api: IPFS? = null) =
+  fun valueBlocking(api: IPFS = _api!!) =
     value ?: runBlocking(Dispatchers.IO) { this@DagNode.value(api) }
 
 
   override fun equals(other: Any?): Boolean {
     log.debug("equals()")
+    log.debug("cid: ${cid ?: value}")
 
     return when {
       other == null -> cidBlocking() == CID_DAG_NULL
@@ -64,7 +65,7 @@ class DagNode<T : Any> constructor(
 
   override fun hashCode() = cidBlocking().hashCode()
 
-  override fun toString(): String = "DagNode<${cid ?: value}>"
+  override fun toString(): String = "DagNode<${cid}>"
 
 }
 
@@ -88,12 +89,12 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
 inline suspend fun <reified T : Any> T.cid(
   api: IPFS
 ): String =
-  DagNode(this, null, serializer()).cid(api)
+  DagNode(this, null, serializer(), api).cid()
 
 @JvmName("cidNullable")
 suspend inline fun <reified T : Any> T?.cid(api: IPFS): String =
   if (this == null) CID_DAG_NULL else
-    DagNode(this, null, serializer()).cid(api)
+    DagNode(this, null, serializer(), api).cid()
 
 
 inline fun <reified T : Any> T.dagNode(

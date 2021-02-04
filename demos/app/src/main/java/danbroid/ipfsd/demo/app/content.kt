@@ -43,6 +43,18 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
         context.shoppingListManager.createList("List_$listCount")
       }
     }
+    menu {
+      title = "Test"
+      //icon = iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
+      //  icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_play)
+      onClick = {
+
+        ipfsd.Ipfsd.sayHello()
+
+
+        consumed = true
+      }
+    }
 
 
     menu {

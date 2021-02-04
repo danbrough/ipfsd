@@ -5,7 +5,7 @@ import danbroid.ipfsd.demo.app.IPFSApp
 
 
 @Serializable
-data class ShoppingList(val title: String) : IPFSApp() {
+class ShoppingList(val title: String) : IPFSApp() {
 
 
   @Serializable

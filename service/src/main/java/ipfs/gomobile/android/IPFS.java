@@ -166,6 +166,8 @@ public class IPFS {
             throw new NodeStartException("Node start failed", e);
         }
 
+
+
         //shell = Core.newUDSShell(absSockPath);
         shell = Core.newTCPShell("5001");
     }

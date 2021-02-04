@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.createDataStore
+import danbroid.ipfs.api.IPFS
 import danbroid.util.misc.SingletonHolder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -13,8 +14,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import java.io.IOException
 
 
-inline suspend fun <reified T : IPFSApp> T.appID() =
-  stringPreferencesKey("${IPFSApp.ID_PREFIX}/${T::class.java.name}/${description.value().id}")
+inline suspend fun <reified T : IPFSApp> T.appID(api:IPFS) =
+  stringPreferencesKey("${IPFSApp.ID_PREFIX}/${T::class.java.name}/${description.value(api).id}")
 
 class AppsDataStore(context: Context) {
   val dataStore: DataStore<Preferences> = context.createDataStore("ipfsd_apps")

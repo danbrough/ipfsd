@@ -1,11 +1,12 @@
 package danbroid.ipfsd.demo.app
 
 import android.content.Context
-import danbroid.ipfs.api.DagNode
-import danbroid.ipfs.api.IPFS
-import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.dagNode
+import danbroid.ipfs.api.*
 import danbroid.ipfs.api.utils.SingletonHolder
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import java.util.*
 
 
@@ -15,6 +16,9 @@ open class IPFSApp() {
     const val ID_PREFIX = "ipfsd/apps"
   }
 
+  @Transient
+  lateinit var api: IPFS
+
   @Serializable
   data class AppDescription(
     val type: String,
@@ -23,10 +27,24 @@ open class IPFSApp() {
   )
 
 
-  val description: DagNode<AppDescription> = AppDescription(javaClass.name).dagNode()
+  val description: DagNode<AppDescription> = AppDescription(javaClass.name).dagNode(api)
 
   override fun toString() = description.toString()
 
+
+}
+
+object AppSerializer : KSerializer<IPFSApp> {
+  override fun deserialize(decoder: Decoder): IPFSApp {
+    TODO("Not yet implemented")
+  }
+
+  override val descriptor: SerialDescriptor
+    get() = TODO("Not yet implemented")
+
+  override fun serialize(encoder: Encoder, value: IPFSApp) {
+    TODO("Not yet implemented")
+  }
 
 }
 

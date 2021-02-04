@@ -4,7 +4,7 @@ plugins {
   `maven-publish`
   kotlin("plugin.serialization")
   id("org.jetbrains.dokka")
- // `java-test-fixtures`
+  // `java-test-fixtures`
 
 }
 
@@ -51,11 +51,14 @@ dependencies {
 
   implementation("com.google.code.gson:gson:_")
   api(Square.okHttp3.okHttp)
+  implementation("com.github.ipld:java-cid:_")
+  implementation("com.github.ipfs:java-ipfs-http-client:v1.3.3")
 
   //implementation(KotlinX.serialization.runtimeCommon)
 
   //compileOnly("org.json:json:_")
 
+  //testImplementation(files("/home/dan/workspace/android/ipfsd/go/ipfsd.aar"))
 
   api("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:_")
   //testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:_")

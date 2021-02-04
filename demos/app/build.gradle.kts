@@ -134,6 +134,7 @@ dependencies {
 
   implementation(Square.okHttp3.okHttp)
 
+  implementation(files("/home/dan/workspace/android/ipfsd/go/ipfsd.aar"))
 
 //  implementation(project(":menu"))
   testImplementation(Kotlin.Test.junit)
