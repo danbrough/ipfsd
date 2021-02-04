@@ -2,6 +2,7 @@ package danbroid.ipfsd.demo.app
 
 
 import android.content.Context
+import android.widget.Toast
 import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
 import danbroid.ipfs.api.json
 import danbroid.ipfsd.client.androidIPFS
@@ -49,7 +50,6 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       //  icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_play)
       onClick = {
 
-        ipfsd.Ipfsd.sayHello()
 
 
         consumed = true
