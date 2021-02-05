@@ -1,24 +1,24 @@
 import de.fayard.refreshVersions.bootstrapRefreshVersions
 
 buildscript {
-    repositories { gradlePluginPortal() }
-    dependencies.classpath("de.fayard.refreshVersions:refreshVersions:0.9.7")
+  repositories { gradlePluginPortal() }
+  dependencies.classpath("de.fayard.refreshVersions:refreshVersions:0.9.7")
 }
 
 bootstrapRefreshVersions()
 
-if (false)
-    include(":bridge_native", ":bridge")
+if (System.getenv().containsKey("JITPACK"))
+  include(":bridge_native", ":bridge", ":client", ":api")
 else
-    include(":service", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")
+  include(":service", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")
 
 rootProject.name = "ipfsd"
 
 if (false) {
-    include(":menu", ":slf4j", ":misc")
-    project(":menu").projectDir = file("../androidutils/menu")
-    project(":slf4j").projectDir = file("../androidutils/slf4j")
-    project(":misc").projectDir = file("../androidutils/misc")
+  include(":menu", ":slf4j", ":misc")
+  project(":menu").projectDir = file("../androidutils/menu")
+  project(":slf4j").projectDir = file("../androidutils/slf4j")
+  project(":misc").projectDir = file("../androidutils/misc")
 }
 
 /*import de.fayard.dependencies.bootstrapRefreshVersionsAndDependencies
