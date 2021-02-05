@@ -29,7 +29,7 @@ object ProjectVersions {
 
 
   fun getVersionName(version: Int = BUILD_VERSION) =
-    VERSION_FORMAT.format(version - VERSION_OFFSET)
+    VERSION_FORMAT.format(version - VERSION_OFFSET).trim()
 
 
 }

@@ -2,11 +2,8 @@ package danbroid.ipfs.api.test
 
 import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.flow
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.junit.Test
 import java.util.logging.Level
@@ -67,15 +64,8 @@ class PubSub {
     }
   }
 
-  @Test
-  fun subscribe() {
-    api.blocking {
-      log.debug("subscribing to secret group ..")
-      pubsub.sub("secretgroup").flow().collect {
-        log.info("message: $it")
-      }
-    }
-  }
+
+
 
 }
 

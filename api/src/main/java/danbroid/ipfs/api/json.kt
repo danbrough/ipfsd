@@ -11,11 +11,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-inline fun <reified T : Any> String.parseJson(): T = Json.decodeFromString(this)
+inline fun <reified T : Any> String.parseJson(json: Json = Json): T = json.decodeFromString(this)
 
-inline suspend fun <reified T : Any> Request<T>.json(): T = withContext(Dispatchers.IO) {
-  invoke().text.parseJson()
-}
+inline suspend fun <reified T : Any> Request<T>.json(json: Json = Json): T =
+  withContext(Dispatchers.IO) {
+    invoke().text.parseJson(json)
+  }
 
 //inline fun <reified T : Any> JsonElement.parse(): T = Json.decodeFromJsonElement(this)
 

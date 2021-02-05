@@ -18,8 +18,8 @@ open class IPFS(val executor: Executor) : CoroutineScope by executor.coroutineSc
   interface Executor {
     val coroutineScope: CoroutineScope
 
-    suspend abstract fun <T> invoke(request: Request<T>): ApiResponse<T>
-    abstract fun <T> invoke(request: Request<T>, callback: Callback<T>)
+    suspend fun <T> invoke(request: Request<T>): ApiResponse<T>
+    fun <T> invoke(request: Request<T>, callback: Callback<T>)
     interface Callback<T> {
       fun onResponse(request: Request<T>, response: ApiResponse<T>?, err: Exception? = null)
     }
@@ -129,7 +129,7 @@ open class IPFS(val executor: Executor) : CoroutineScope by executor.coroutineSc
 
 
     fun put(
-      data: String? = null,
+      jsonData: String? = null,
       format: String? = null,
       inputEnc: String? = null,
       pin: Boolean? = null,
@@ -142,16 +142,17 @@ open class IPFS(val executor: Executor) : CoroutineScope by executor.coroutineSc
       "pin" to pin,
       "hash" to hashFunc
     ).also {
-      if (data != null) it.add(data)
+      if (jsonData != null) it.add(jsonData)
     }
 
-    inline fun <reified T : Any> put(
-      data: T, format: String? = null,
+    inline fun <reified T : Any> putObject(
+      data: T,
+      format: String? = null,
       inputEnc: String? = null,
       pin: Boolean? = null,
       hashFunc: String? = null
     ) = put(
-      data = data.toJson(),
+      jsonData = data.toJson(),
       format = format,
       inputEnc = inputEnc,
       pin = pin,

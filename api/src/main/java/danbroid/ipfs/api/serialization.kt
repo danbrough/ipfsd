@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -16,7 +17,14 @@ import org.slf4j.LoggerFactory
 annotation class IpfsLink
 
 @InternalSerializationApi
-inline fun <reified T : Any> T.toJson(): String = Json.encodeToString(T::class.serializer(), this)
+inline fun <reified T : Any> T.toJson(json: Json = Json): String = json.encodeToString(T::class.serializer(), this)
+
+@Serializable
+data class DagLink(@SerialName("/") val cid: String)
+
+suspend inline fun <reified T : Any> T.dagCid(api: IPFS): String =
+  api.dag.putObject(this, pin = false).json().Cid.path
+
 
 typealias Serializable = kotlinx.serialization.Serializable
 typealias Transient = kotlinx.serialization.Transient
@@ -86,13 +94,13 @@ class DagNodeSerializer<T : Any>(val serializer: KSerializer<T>) : KSerializer<D
 }
 
 
-inline suspend fun <reified T : Any> T.cid(
+/*inline suspend fun <reified T : Any> T.dagCid(
   api: IPFS
 ): String =
-  DagNode(this, null, serializer(), api).cid()
+  DagNode(this, null, serializer(), api).cid()*/
 
 @JvmName("cidNullable")
-suspend inline fun <reified T : Any> T?.cid(api: IPFS): String =
+suspend inline fun <reified T : Any> T?.dagCid(api: IPFS): String =
   if (this == null) CID_DAG_NULL else
     DagNode(this, null, serializer(), api).cid()
 

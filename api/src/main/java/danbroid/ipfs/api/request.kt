@@ -1,6 +1,7 @@
 package danbroid.ipfs.api
 
 import danbroid.ipfs.api.utils.addUrlArgs
+import kotlinx.serialization.json.Json
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
@@ -9,7 +10,6 @@ import java.io.InputStream
 interface Call<T> {
   suspend fun invoke(): T
 }
-
 
 
 open class Request<T>(

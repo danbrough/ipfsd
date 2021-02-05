@@ -9,7 +9,7 @@ cd `dirname $0` && cd ..
 
 VERSION_NAME=$(./gradlew -q projectNextVersionName)
 
-echo Creating release: $VERSION_NAME
+echo Creating release: '<'$VERSION_NAME'>'
 
 while true; do
     read -p "Do you wish to proceed?: " yn
