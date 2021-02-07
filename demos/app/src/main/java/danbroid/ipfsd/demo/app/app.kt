@@ -27,26 +27,14 @@ open class IPFSApp() {
   )
 
 
-  val description: DagNode<AppDescription> = AppDescription(javaClass.name).dagNode(api)
+  val description: DagLink<AppDescription> =
+    api.blocking { AppDescription(javaClass.name).dagLink(api) }
 
   override fun toString() = description.toString()
 
 
 }
 
-object AppSerializer : KSerializer<IPFSApp> {
-  override fun deserialize(decoder: Decoder): IPFSApp {
-    TODO("Not yet implemented")
-  }
-
-  override val descriptor: SerialDescriptor
-    get() = TODO("Not yet implemented")
-
-  override fun serialize(encoder: Encoder, value: IPFSApp) {
-    TODO("Not yet implemented")
-  }
-
-}
 
 
 class AppRegistry(private val ipfs: IPFS, val context: Context) {

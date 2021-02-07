@@ -1,9 +1,6 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.DagNode
-import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.dagNode
+import danbroid.ipfs.api.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -13,6 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import org.junit.Test
 import java.math.BigInteger
 
@@ -50,11 +48,11 @@ class SerialTest3 {
       val zoo = ZOO3("Happy Place", 1972)
       zoo.s = Something("Something", 123)
       log.debug("zoo: $zoo")
-      val link = zoo.dagNode(this)
+      val link:DagLink<ZOO3> = zoo.dagLink(this)
       log.debug("link: $link")
       val json = Json.encodeToString(link)
       log.debug("json: $json")
-      val zoo2Link = Json.decodeFromString<DagNode<ZOO3>>(json)
+      val zoo2Link = Json.decodeFromString<DagLink<ZOO3>>(json)
       log.info("zoo2Link: $zoo2Link")
       val zoo2 = zoo2Link.value(this)
       log.debug("zoo2: $zoo2")
@@ -67,15 +65,15 @@ class SerialTest3 {
       val bigInt = bigNumberString.toBigInteger()
       val bigNumberCID = "bafyreihydhtymenpvt4mrwrt35jqmf64fua6ius65o72wjs7jnuu6sxlra"
       val cid123 = "bafyreihbb6wszf7ordq4vfd3ab65wxjygixfgqe3qqc2qwbbdnzy4zifj4"
-      val bigIntDag: DagNode<BigInteger> =
-        dagNode(bigNumberCID, serializer = BigIntSerializer, api = this)
-      log.info("BIG CID: ${bigIntDag.cid()} value: ${bigIntDag.value()}")
+      val bigIntLink: DagLink<BigInteger> =
+        DagLink(bigNumberCID, serializer = BigIntSerializer)
+      log.info("BIG CID: ${bigInt} value: ${bigIntLink.value(this)}")
 
 
       val n = 123
-      val nLink = n.dagNode(this)
+      val nLink:DagLink<Int> = n.dagLink(this)
       log.debug("getting cid for $n")
-      val nCid = nLink.cid(this)
+      val nCid = nLink.cid
       log.debug("cid is $nCid")
       require(nCid == cid123) {
         "nLink.cid:$nCid != $cid123"
@@ -84,7 +82,7 @@ class SerialTest3 {
         "nLink.value: ${nLink.value(this)} != 123"
       }
 
-      require(dagNode<Int>(cid123).value(this) == 123) {
+      require(dagLink<Int>(cid123).value(this) == 123) {
         "cid123.cid<Int>().value != 123"
       }
     }

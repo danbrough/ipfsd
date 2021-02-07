@@ -1,6 +1,7 @@
 package danbroid.ipfs.api
 
 import kotlinx.coroutines.*
+import kotlinx.serialization.json.Json
 import java.io.*
 
 
@@ -14,6 +15,8 @@ open class IPFS(val executor: Executor) : CoroutineScope by executor.coroutineSc
     val text: String
       get() = if (isSuccessful) reader.readText() else throw Exception(errorMessage)
   }
+
+  open var json: Json = Json
 
   interface Executor {
     val coroutineScope: CoroutineScope

@@ -1,9 +1,6 @@
 package danbroid.ipfs.api.test
 
-import danbroid.ipfs.api.DagNode
-import danbroid.ipfs.api.Serializable
-import danbroid.ipfs.api.blocking
-import danbroid.ipfs.api.dagNode
+import danbroid.ipfs.api.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -37,7 +34,7 @@ data class Diet(val food: String)
 
 
 @Serializable
-data class Animal(val name: String, val diet: DagNode<Diet>? = null)
+data class Animal(val name: String, val diet: DagLink<Diet>? = null)
 
 
 class SerialTest {
@@ -48,19 +45,26 @@ class SerialTest {
     val json = format
 
     api.blocking {
+      val satchmo = Animal("Satchmo", Diet("Biikkies").dagLink(this))
+      val data = satchmo.toJson(this.json)
+      log.info("data: $data")
+      val satchmo2: Animal = data.parseJson(this.json)
+      log.info("satchmo2: $satchmo2")
 
-      val animals =
+      val satchLink: DagLink<Animal> = satchmo.dagLink(this)
+      log.info("satchlink $satchLink")
+
+
+      val animals: List<DagLink<Animal>> =
         listOf(
-          Animal("Oscar", Diet("Bikkies").dagNode(this)).dagNode(this),
-          Animal("Satchmo").dagNode(this)
+          Animal("Oscar", Diet("Bikkies").dagLink(this)).dagLink<Animal>(this),
+          satchLink
         )
 
-
-
-
+      log.debug("created $animals")
       json.encodeToString(animals).also {
         log.info("box json: $it")
-        val animals2: List<DagNode<Animal>> = json.decodeFromString(it)
+        val animals2: List<DagLink<Animal>> = json.decodeFromString(it)
         log.trace("animals: $animals")
         log.trace("animals2: $animals2")
         require(animals2 == animals) {
