@@ -1,12 +1,11 @@
 package danbroid.ipfsd.demo.app
 
 import android.content.Context
-import danbroid.ipfs.api.*
+import danbroid.ipfs.api.DagLink
+import danbroid.ipfs.api.IPFS
+import danbroid.ipfs.api.Serializable
+import danbroid.ipfs.api.Transient
 import danbroid.ipfs.api.utils.SingletonHolder
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import java.util.*
 
 
@@ -27,14 +26,12 @@ open class IPFSApp() {
   )
 
 
-  val description: DagLink<AppDescription> =
-    api.blocking { AppDescription(javaClass.name).dagLink(api) }
+  lateinit var description: DagLink<AppDescription>
 
   override fun toString() = description.toString()
 
 
 }
-
 
 
 class AppRegistry(private val ipfs: IPFS, val context: Context) {
