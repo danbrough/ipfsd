@@ -160,16 +160,12 @@ public class IPFS {
         try {
             openRepoIfClosed();
             node = Core.newNode(repo);
-            //node.serveUnixSocketAPI(absSockPath);
-            node.serveTCPAPI("5001");
+            node.serveUnixSocketAPI(absSockPath);
         } catch (Exception e) {
             throw new NodeStartException("Node start failed", e);
         }
 
-
-
-        //shell = Core.newUDSShell(absSockPath);
-        shell = Core.newTCPShell("5001");
+        shell = Core.newUDSShell(absSockPath);
     }
 
     /**
@@ -199,38 +195,6 @@ public class IPFS {
     synchronized public void restart() throws NodeStopException {
         stop();
         try { start(); } catch(NodeStartException ignore) { /* Should never happen */ }
-    }
-
-    /**
-    * Enable PubSub experimental feature on an IPFS node instance.
-    * <b>A started instance must be restarted for this feature to be enabled.</b>
-    *
-    * @throws ExtraOptionException If enable the extra option failed
-    * @see <a href="https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#ipfs-pubsub">Experimental features of IPFS</a>
-    */
-    synchronized public void enablePubsubExperiment() throws ExtraOptionException {
-        try {
-            openRepoIfClosed();
-            repo.enablePubsubExperiment();
-        } catch (Exception e) {
-            throw new ExtraOptionException("Enable pubsub experiment failed", e);
-        }
-    }
-
-    /**
-    * Enable PubSub experimental feature and IPNS record distribution through PubSub.
-    * <b>A started instance must be restarted for this feature to be enabled.</b>
-    *
-    * @throws ExtraOptionException If enable the extra option failed
-    * @see <a href="https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#ipns-pubsub">Experimental features of IPFS</a>
-    */
-    synchronized public void enableNamesysPubsub() throws ExtraOptionException {
-        try {
-            openRepoIfClosed();
-            repo.enableNamesysPubsub();
-        } catch (Exception e) {
-            throw new ExtraOptionException("Enable namesys pubsub failed", e);
-        }
     }
 
     /**

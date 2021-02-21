@@ -46,8 +46,6 @@ class IPFSService : Service() {
 
     fun getIPFS(context: Context) = _ipfs ?: synchronized(IPFSService::class.java) {
       _ipfs ?: IPFS(context.applicationContext).also {
-        it.enableNamesysPubsub()
-        it.enablePubsubExperiment()
         _ipfs = it
       }
     }
