@@ -4,6 +4,8 @@ object Danbroid {
   const val IPFSD_SCHEME = "ipfsd"
   const val bridge_version = "0.8.0_03"
   const val ipfsd_bridge = "com.github.danbrough.ipfsd:bridge:${bridge_version}"
+  val IPFS_API = System.getenv().getOrDefault("IPFS_API", "")
+  val BRIDGE_BUILD = true
 
 
   object utils {
@@ -14,7 +16,6 @@ object Danbroid {
     const val menu = "$pkg:menu:_"
     const val slf4j = "$pkg:slf4j:_"
   }
-
 
 
 }

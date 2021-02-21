@@ -20,9 +20,7 @@ android {
     consumerProguardFiles("consumer-rules.pro")
 
     buildTypes {
-      forEach {
-        it.buildConfigField("String", "ipfsd_scheme", "\"${Danbroid.IPFSD_SCHEME}\"")
-      }
+
 
       getByName("release") {
         isMinifyEnabled = true

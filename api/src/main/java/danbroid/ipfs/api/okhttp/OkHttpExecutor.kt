@@ -27,7 +27,6 @@ open class OkHttpExecutor(
 
   init {
     init?.invoke(this)
-    log.info("HERE2")
     val env = System.getenv()
 
     env.get(ENV_IPFS_API)?.also {

@@ -7,7 +7,7 @@ import android.net.Uri
 import androidx.fragment.app.Fragment
 import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.json
-import danbroid.ipfsd.client.androidIPFS
+import danbroid.ipfsd.client.ipfsApi
 import danbroid.ipfsd.client.ipfsServiceClient
 import danbroid.ipfsd.client.model.ipfsModel
 import danbroid.ipfsd.demo.api.R
@@ -28,7 +28,7 @@ private object Content
 
 val log = LoggerFactory.getLogger(Content::class.java)
 val MenuItemClickContext.api: IPFS
-  get() = requireContext().androidIPFS
+  get() = requireContext().ipfsApi
 
 val Fragment.api: IPFS
   get() = ipfsModel.api

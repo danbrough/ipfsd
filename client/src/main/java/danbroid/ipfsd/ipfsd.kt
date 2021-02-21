@@ -12,8 +12,8 @@ import danbroid.ipfsd.client.BuildConfig
 class IPFSD {
 
   companion object {
-    const val URI_SERVICE_PREFIX = "${BuildConfig.ipfsd_scheme}://service"  // ipfsd:/
-    const val URI_ACTION_PREFIX = "${BuildConfig.ipfsd_scheme}://action"
+    const val URI_SERVICE_PREFIX = "${BuildConfig.IPFSD_SCHEME}://service"  // ipfsd:/
+    const val URI_ACTION_PREFIX = "${BuildConfig.IPFSD_SCHEME}://action"
     const val SERVICE_PKG = "danbroid.ipfsd.service"
     const val SERVICE_CLASS = "$SERVICE_PKG.IPFSService"
   }

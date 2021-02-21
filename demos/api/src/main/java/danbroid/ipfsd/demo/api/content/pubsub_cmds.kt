@@ -16,7 +16,7 @@ fun MenuItemBuilder.pubSubCommands() = menu {
         "poiqwe098123",
         "Hello from the IPFS app at ${Date()}\n "
       ).invoke().also {
-        log.info("msg: ${it.text}")
+        log.info("msg: ${it.text()}")
       }
     }
   }

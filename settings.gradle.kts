@@ -6,8 +6,7 @@ buildscript {
 }
 
 bootstrapRefreshVersions()
-
-if (System.getenv().containsKey("JITPACK"))
+if (System.getenv().containsKey("JITPACK")||true)
   include(":bridge_native", ":bridge", ":client", ":api")
 else
   include(":service", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")

@@ -10,7 +10,7 @@ buildscript {
   }
 
   dependencies {
-    classpath("com.android.tools.build:gradle:7.0.0-alpha05")
+    classpath("com.android.tools.build:gradle:_")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:_")
     classpath("org.jetbrains.dokka:dokka-gradle-plugin:_")
   }
@@ -28,25 +28,13 @@ allprojects {
     maven("https://jitpack.io")
   }
 
-  tasks.withType<org.jetbrains.dokka.gradle.
-  DokkaTask>().configureEach {
+  tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
     dokkaSourceSets {
       configureEach {
         includes.from(file("README.md"))
       }
     }
   }
-
-
-  /* android {
-     buildTypes {
-       forEach {
-         it.manifestPlaceholders(mapOf("ipfsdScheme" to Danbroid.IPFSD_SCHEME))
-
-         it.buildConfigField("String", "IPFSD_SCHEME", "\"${Danbroid.IPFSD_SCHEME}\"")
-       }
-     }
-   }*/
 
 
 }
@@ -77,6 +65,8 @@ subprojects {
 
       defaultConfig {
         buildConfigField("String", "IPFSD_SCHEME", "\"${Danbroid.IPFSD_SCHEME}\"")
+        buildConfigField("String", "IPFSD_API", "\"${Danbroid.IPFS_API}\"")
+
         manifestPlaceholders.put("ipfsdScheme", Danbroid.IPFSD_SCHEME)
       }
 

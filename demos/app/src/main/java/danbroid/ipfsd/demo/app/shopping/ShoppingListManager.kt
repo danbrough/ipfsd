@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import danbroid.ipfs.api.dagLink
-import danbroid.ipfsd.client.androidIPFS
+import danbroid.ipfsd.client.ipfsApi
 import danbroid.ipfsd.demo.app.IPFSApp
 import danbroid.ipfsd.demo.app.appID
 import danbroid.ipfsd.demo.app.appsDataStore
@@ -35,14 +35,16 @@ class ShoppingListManager(val context: Context) {
 
   suspend fun createList(name: String): ShoppingList = withContext(Dispatchers.IO) {
     log.info("createList() $name")
-    ShoppingList(name).also { list ->
-      list.description = IPFSApp.AppDescription(ShoppingList::class.java.name).dagLink(context.androidIPFS)
+    ShoppingList().also { list ->
+      list.title = name
+      list.description =
+        IPFSApp.AppDescription(ShoppingList::class.java.name).dagLink(context.ipfsApi)
       log.debug("getting cid ...")
-      val node = list.dagLink(context.androidIPFS)
+      val node = list.dagLink(context.ipfsApi)
       log.info("created list $list")
       log.info("cid is ${node.cid}")
       appsDataStore.dataStore.edit {
-        it[list.appID(context.androidIPFS)] = node.cid
+        it[list.appID(context.ipfsApi)] = node.cid
       }
     }
   }

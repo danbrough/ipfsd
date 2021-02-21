@@ -20,7 +20,7 @@ open class Request<T>(
   Call<IPFS.ApiResponse<T>> {
   val path = path.addUrlArgs(*args)
 
-  inline suspend fun <U> invoke(block: (IPFS.ApiResponse<T>) -> U): U = invoke().use(block)
+  suspend inline fun <U> invoke(block: (IPFS.ApiResponse<T>) -> U): U = invoke().use(block)
 
   override suspend fun invoke(): IPFS.ApiResponse<T> = executor.invoke(this)
 

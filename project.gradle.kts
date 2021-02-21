@@ -2,7 +2,7 @@ import java.io.FileInputStream
 
 fun initProps() {
   //println("initProps()")
-  val fis = FileInputStream("project.properties")
+  val fis = FileInputStream(file("project.properties"))
   val prop = java.util.Properties()
   prop.load(fis)
   fis.close()

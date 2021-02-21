@@ -12,8 +12,9 @@ open class IPFS(val executor: Executor) : CoroutineScope by executor.coroutineSc
     val errorMessage: String
     val stream: InputStream
     val reader: Reader
-    val text: String
-      get() = if (isSuccessful) reader.readText() else throw Exception(errorMessage)
+    suspend fun text(): String = withContext(Dispatchers.IO) {
+      reader.readText()
+    }
   }
 
   open var json: Json = Json

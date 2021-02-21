@@ -3,7 +3,7 @@ package danbroid.ipfsd.service
 import android.content.Context
 import danbroid.ipfs.api.flow
 import danbroid.ipfsd.IPFSD
-import danbroid.ipfsd.client.androidIPFS
+import danbroid.ipfsd.client.ipfsApi
 import danbroid.ipfsd.ui.snackBar
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
@@ -21,11 +21,10 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
     //icon = iconicsIcon(GoogleMaterial.Icon.gmd_play_arrow)
     //  icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_play)
     onClick = {
-      requireContext().androidIPFS.network.id().flow().collect {
+      requireContext().ipfsApi.network.id().flow().collect {
         log.warn("GOT RESULT: $it")
         requireActivity().snackBar("result: $it")
       }
-      consumed = true
     }
   }
 

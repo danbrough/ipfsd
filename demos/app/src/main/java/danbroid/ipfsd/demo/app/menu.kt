@@ -2,10 +2,9 @@ package danbroid.ipfsd.demo.app
 
 
 import android.content.Context
-import android.widget.Toast
 import com.mikepenz.iconics.typeface.library.materialdesigniconic.MaterialDesignIconic
 import danbroid.ipfs.api.json
-import danbroid.ipfsd.client.androidIPFS
+import danbroid.ipfsd.client.ipfsApi
 import danbroid.ipfsd.demo.app.shopping.ShoppingList
 import danbroid.ipfsd.demo.app.shopping.shoppingListManager
 import danbroid.util.menu.Icons.iconicsIcon
@@ -24,8 +23,6 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
 
   onCreate = {
     log.info("${URI_SHOPPING_LISTS}.onCreate()")
-
-
   }
 
   menu {
@@ -39,7 +36,7 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       titleID = R.string.title_new_shopping_list
       icon = Theme.icons.create_new
       onClick = {
-        log.debug("androidIPFS: ${requireContext().androidIPFS}")
+        log.debug("androidIPFS: ${requireContext().ipfsApi}")
         val listCount = context.appsDataStore.getAppIDS<ShoppingList>().size + 1
         context.shoppingListManager.createList("List_$listCount")
       }
@@ -51,8 +48,6 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       onClick = {
 
 
-
-        consumed = true
       }
     }
 
@@ -77,12 +72,17 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
       title = "Get ID"
       icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_folder_person)
       onClick = {
-        context.androidIPFS.network.id().json().also {
+        context.ipfsApi.network.id().json().also {
           log.info("ID: $it")
         }
-        consumed = true
       }
     }
+  }
+
+  menu {
+    id = ShoppingListNavGraph.deep_link.settings
+    titleID = R.string.lbl_settings
+    icon = iconicsIcon(MaterialDesignIconic.Icon.gmi_settings)
   }
 }
 

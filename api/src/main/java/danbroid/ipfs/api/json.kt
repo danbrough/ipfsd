@@ -13,7 +13,7 @@ import kotlinx.serialization.json.Json
 
 inline fun <reified T : Any> String.parseJson(json: Json = Json): T = json.decodeFromString(this)
 
-inline suspend fun <reified T : Any> Request<T>.json(json: Json = Json): T = invoke().text.parseJson(json)
+inline suspend fun <reified T : Any> Request<T>.json(json: Json = Json): T = invoke().text().parseJson(json)
 
 
 //inline fun <reified T : Any> JsonElement.parse(): T = Json.decodeFromJsonElement(this)
