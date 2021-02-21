@@ -24,8 +24,6 @@ public final class Repo implements Seq.Proxy {
 	private static native int __New();
 	
 	public native void close() throws Exception;
-	public native void enableNamesysPubsub();
-	public native void enablePubsubExperiment();
 	public native Config getConfig() throws Exception;
 	public native String getRootPath();
 	public native void setConfig(Config c) throws Exception;
