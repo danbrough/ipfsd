@@ -160,12 +160,14 @@ public class IPFS {
         try {
             openRepoIfClosed();
             node = Core.newNode(repo);
-            node.serveUnixSocketAPI(absSockPath);
+            //node.serveUnixSocketAPI(absSockPath);
+            node.serveTCPAPI("5001");
         } catch (Exception e) {
             throw new NodeStartException("Node start failed", e);
         }
 
-        shell = Core.newUDSShell(absSockPath);
+        //shell = Core.newUDSShell(absSockPath);
+        shell = Core.newTCPShell("5001");
     }
 
     /**
