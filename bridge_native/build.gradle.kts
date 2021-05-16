@@ -5,14 +5,15 @@ plugins {
 }
 
 android {
- // ndkVersion = ProjectVersions.NDK_VERSION
+  ndkVersion = ProjectVersions.NDK_VERSION
 
   compileSdk = ProjectVersions.SDK_VERSION
+
   defaultConfig {
     minSdk = ProjectVersions.MIN_SDK_VERSION
     targetSdk = ProjectVersions.SDK_VERSION
-  /*  versionCode = 1
-    versionName = Danbroid.bridge_version*/
+    /*  versionCode = 1
+      versionName = Danbroid.bridge_version*/
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
@@ -39,11 +40,11 @@ android {
 
   buildTypes {
     getByName("release") {
-      isMinifyEnabled = false
+      isMinifyEnabled = true
       proguardFiles(
         getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
       )
-      consumerProguardFiles("proguard-rules.pro")
+      // consumerProguardFiles("proguard-rules.pro")
       //signingConfig = signingConfigs.getByName("release")
     }
   }

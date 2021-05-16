@@ -44,8 +44,10 @@ fi
 git add .
 git commit -am "$VERSION_NAME"
 git tag "$VERSION_NAME" && git push && git push origin "$VERSION_NAME"
-sleep 1
-curl "https://jitpack.io/com/github/danbrough/ipfsd/$VERSION_NAME/build.log"
+sleep 5
+curl "https://jitpack.io/com/github/danbrough/ipfsd/$VERSION_NAME/build.log" &
+
+
 #
 #sleep 1
 #wget "https://jitpack.io/com/github/danbrough/util/${VERSION_NAME}/util-${VERSION_NAME}.jar" -O /tmp/rubbish.jar &
