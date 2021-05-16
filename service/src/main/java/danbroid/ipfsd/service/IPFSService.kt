@@ -14,6 +14,8 @@ import danbroid.ipfsd.IPFSD
 import danbroid.ipfsd.client.IPFSMessage
 import danbroid.ipfsd.client.toIPFSMessage
 import danbroid.ipfsd.service.settings.IPFSServicePrefs
+import danbroid.logging.AndroidLog
+import danbroid.logging.LogConfig
 import danbroid.util.format.humanReadableByteCount
 import ipfs.gomobile.android.IPFS
 import kotlinx.coroutines.*
@@ -41,6 +43,16 @@ class IPFSService : Service() {
     const val ACTION_STOP = "$pkg.ACTION_STOP"
     const val ACTION_CLEAR_NET_STATS = "$pkg.ACTION_CLEAR_NET_STATS"
 
+    val log = LogConfig.let {
+      val log = AndroidLog("IPFSD_SERVICE")
+      it.DEBUG = BuildConfig.DEBUG
+      it.COLOURED = BuildConfig.DEBUG
+      it.GET_LOG = { log }
+      log.debug("created log")
+      log
+    }
+
+
     @Volatile
     private var _ipfs: IPFS? = null
 
@@ -53,7 +65,7 @@ class IPFSService : Service() {
     fun resetStats(context: Context) = serviceAction(context, ACTION_CLEAR_NET_STATS)
 
     fun serviceAction(context: Context, action: String) =
-        context.startService(Intent(action).setPackage(IPFSD.SERVICE_PKG))
+      context.startService(Intent(action).setPackage(IPFSD.SERVICE_PKG))
 /*      context.startService(
         Intent(
           context,
@@ -187,9 +199,9 @@ class IPFSService : Service() {
     log.error("CONNECT MESSAGE: $connectMessage")
 
     notificationManager = NotificationManager(
-        this, CHANNEL_ID,
-        CHANNEL_NAME, CHANNEL_DESCRIPTION,
-        listener = notificationListener
+      this, CHANNEL_ID,
+      CHANNEL_NAME, CHANNEL_DESCRIPTION,
+      listener = notificationListener
     )
 
     messengerHandler = Handler(Looper.myLooper()!!, messengerCallback)
@@ -235,9 +247,9 @@ class IPFSService : Service() {
               newDataIn = 0
               newDataOut = 0
               Toast.makeText(
-                  this@IPFSService,
-                  R.string.msg_stats_reset,
-                  Toast.LENGTH_SHORT
+                this@IPFSService,
+                R.string.msg_stats_reset,
+                Toast.LENGTH_SHORT
               ).show()
             } else {
               newDataIn = prefs.dataIn + newDataIn
@@ -250,17 +262,17 @@ class IPFSService : Service() {
 
 
             sendMessage(
-                danbroid.ipfsd.client.IPFSMessage.BANDWIDTH(
-                    newDataIn,
-                    newDataOut,
-                    rateIn,
-                    rateOut
-                )
+              danbroid.ipfsd.client.IPFSMessage.BANDWIDTH(
+                newDataIn,
+                newDataOut,
+                rateIn,
+                rateOut
+              )
             )
 
             //val msg = "In: %02d Out:%02d (%.0f,%.0f)".format(totalIn, totalOut, rateIn, rateOut)
             val msg =
-                "${newDataIn.humanReadableByteCount()} in ${newDataOut.humanReadableByteCount()} out. Total: ${(newDataIn + newDataOut).humanReadableByteCount()}"
+              "${newDataIn.humanReadableByteCount()} in ${newDataOut.humanReadableByteCount()} out. Total: ${(newDataIn + newDataOut).humanReadableByteCount()}"
             setContentText(msg)
           }
         }
@@ -367,4 +379,3 @@ class IPFSService : Service() {
 }
 
 
-private val log = danbroid.logging.getLog(IPFSService::class)

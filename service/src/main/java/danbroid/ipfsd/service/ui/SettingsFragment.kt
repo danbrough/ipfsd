@@ -20,6 +20,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
   @ExperimentalIconicsDSL
   override fun setPreferenceScreen(preferenceScreen: PreferenceScreen) {
+    log.debug("setPreferencesScreen()")
 
     preferenceScreen.findPreference<PreferenceCategory>(getString(R.string.key_general))?.apply {
       //icon = requireContext().iconicsDrawable(GoogleMaterial.Icon.gmd_3d_rotation) {

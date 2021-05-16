@@ -10,12 +10,13 @@ import danbroid.util.menu.MenuActivity
 
 class MainActivity : MenuActivity() {
 
-  companion object{
+  companion object {
     val log = LogConfig.let {
       val log = AndroidLog("IPFSD")
       it.DEBUG = BuildConfig.DEBUG
       it.COLOURED = BuildConfig.DEBUG
-      it.GET_LOG = {log}
+      it.GET_LOG = { log }
+      log.debug("created log")
       log
     }
   }

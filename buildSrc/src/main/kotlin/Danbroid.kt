@@ -5,7 +5,7 @@ object Danbroid {
   const val bridge_version = "0.9.0_01"
   const val ipfsd_bridge = "com.github.danbrough.ipfsd:bridge:${bridge_version}"
   val IPFS_API = System.getenv().getOrDefault("IPFS_API", "")
-  val BRIDGE_BUILD = true
+
 
 
   object utils {

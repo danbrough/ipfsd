@@ -11,7 +11,7 @@ class MainActivity : MenuActivity() {
     val log = LogConfig.let {
       it.COLOURED = BuildConfig.DEBUG
       it.DETAILED = true
-      val log = AndroidLog(danbroid.ipfs.LOG_TAG)
+      val log = AndroidLog("IPFSD")
       it.GET_LOG = { log }
       log
     }

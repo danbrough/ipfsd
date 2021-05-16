@@ -49,40 +49,25 @@ class ServiceApiClient private constructor(
     const val DEFAULT_API_URL = "http://localhost:$DEFAULT_PORT/api/v0"
 
     fun getInstance(context: Context, executor: IPFS.Executor): ServiceApiClient =
-      getInstance(
-        Pair(
-          ServiceClient.getInstance(context),
-          executor,
-        )
-      )
+      getInstance(Pair(ServiceClient.getInstance(context), executor))
 
-/*    fun getInstance(ipfsdClient: ServiceClient, executor: CallExecutor): ServiceApiClient =
-      getInstance(Pair(ipfsdClient, executor))
-
-    fun getInstance(context: Context, executor: CallExecutor): ServiceApiClient =
-      getInstance(Pair(ServiceClient.getInstance(context), executor))*/
   }
 
 
 }
 
-object _androidIPFS : danbroid.ipfs.api.utils.SingletonHolder<IPFS, Context>({
+private object _androidIPFS : danbroid.ipfs.api.utils.SingletonHolder<IPFS, Context>({
   IPFS(
 /*    OkHttpExecutor {
       urlBase = "https://home.danbrough.org/api/v0"
       setCredentials("dan", "poiqwe098123")
     }*/
-    ServiceApiClient.getInstance(
-      it,
-      OkHttpExecutor()
-    )
+    ServiceApiClient.getInstance(it, OkHttpExecutor())
   )
 })
 
 val Context.ipfsApi: IPFS
   get() = _androidIPFS.getInstance(this)
-
-
 
 
 private val log = danbroid.logging.getLog(ServiceApiClient::class)

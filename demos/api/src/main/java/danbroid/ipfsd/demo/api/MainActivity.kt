@@ -3,7 +3,6 @@ package danbroid.ipfsd.demo.api
 import android.view.Menu
 import androidx.navigation.NavController
 import com.google.android.material.snackbar.Snackbar
-import danbroid.ipfs.LOG_TAG
 import danbroid.ipfsd.demo.api.activities.ActivityInterface
 import danbroid.ipfsd.demo.api.content.rootContent
 import danbroid.logging.AndroidLog
@@ -17,7 +16,7 @@ class MainActivity : MenuActivity(R.layout.activity_main), ActivityInterface {
 
   companion object {
     val log = LogConfig.let {
-      val log = AndroidLog(LOG_TAG)
+      val log = AndroidLog("IPFSD")
       it.DEBUG = BuildConfig.DEBUG
       it.COLOURED = BuildConfig.DEBUG
       it.GET_LOG = { log }

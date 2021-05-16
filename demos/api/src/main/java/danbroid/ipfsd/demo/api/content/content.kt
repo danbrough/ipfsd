@@ -147,7 +147,6 @@ fun MenuItemBuilder.commands() = menu {
     title = "Get ID"
     onClick = {
       log.debug(" ID: ${api.network.id().json()}")
-      proceed()
     }
   }
 
@@ -157,6 +156,8 @@ fun MenuItemBuilder.commands() = menu {
     title = "Profile Apply"
     onClick = {
       //TODO apiTest(api.config.profile.apply("lowpower"))
+
+      log.warn("todo: implement api.config.profile.apply(\"lowpower\")")
 
     }
   }
@@ -168,8 +169,9 @@ fun MenuItemBuilder.commands() = menu {
     onClick = {
       val msg = "Hello from the ipfs demo at ${Date()}.\n"
       log.trace("adding message: $msg")
-      //TODO apiTest(api.basic.add(msg, fileName = "ipfs_test_message.txt"), "added")
-
+      api.basic.add(msg, fileName = "ipfs_test_message.txt").json().also {
+        log.debug("created file: $it")
+      }
     }
   }
 

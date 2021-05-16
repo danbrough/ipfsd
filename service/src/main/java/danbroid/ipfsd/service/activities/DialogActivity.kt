@@ -5,11 +5,27 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import danbroid.ipfsd.IPFSD
+import danbroid.ipfsd.service.BuildConfig
 import danbroid.ipfsd.service.IPFSService
 import danbroid.ipfsd.service.R
+import danbroid.logging.AndroidLog
+import danbroid.logging.LogConfig
 
 
 class DialogActivity : AppCompatActivity() {
+
+  companion object {
+    val log = LogConfig.let {
+      val log = AndroidLog("IPFSD")
+      it.DEBUG = BuildConfig.DEBUG
+      it.COLOURED = BuildConfig.DEBUG
+      it.GET_LOG = { log }
+      log.debug("created log")
+      log
+    }
+  }
+
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     log.debug("intent: $intent")

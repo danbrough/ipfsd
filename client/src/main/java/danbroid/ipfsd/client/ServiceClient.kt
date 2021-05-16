@@ -114,12 +114,6 @@ open class ServiceClient(val context: Context) {
       log.debug("connecting ..")
       _connectionState.value = ConnectionState.CONNECTING
 
-
-      //val intent = Intent(context, IPFSService::class.java)
-/*
-      log.warn("starting service")
-      context.startService(intent)*/
-
       log.warn("binding to service ..")
       context.bindService(
         IPFSD.intent.service_intent,
