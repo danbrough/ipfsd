@@ -9,7 +9,6 @@ import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
 import kotlinx.coroutines.flow.collect
-import org.slf4j.LoggerFactory
 
 internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
   id = IPFSD.deep_link.ipfsd_home
@@ -68,4 +67,4 @@ internal fun rootContent(context: Context): MenuItemBuilder = context.rootMenu {
 }
 
 
-private val log = LoggerFactory.getLogger("danbroid.ipfsd.service")
+private val log = danbroid.logging.getLog("danbroid.ipfsd.service")

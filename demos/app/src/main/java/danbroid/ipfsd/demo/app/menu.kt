@@ -11,7 +11,6 @@ import danbroid.util.menu.Icons.iconicsIcon
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.menu
 import danbroid.util.menu.rootMenu
-import org.slf4j.LoggerFactory
 
 
 fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
@@ -88,5 +87,5 @@ fun rootContent(context: Context) = context.rootMenu<MenuItemBuilder> {
 
 private object Content
 
-private val log = LoggerFactory.getLogger(Content::class.java)
+private val log = danbroid.logging.getLog(Content::class)
 

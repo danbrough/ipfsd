@@ -367,4 +367,4 @@ class IPFSService : Service() {
 }
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(IPFSService::class.java)
+private val log = danbroid.logging.getLog(IPFSService::class)

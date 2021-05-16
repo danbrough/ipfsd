@@ -44,4 +44,4 @@ class DBContentProvider : ContentProvider() {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(DBContentProvider::class.java)
+private val log = danbroid.logging.getLog(DBContentProvider::class)

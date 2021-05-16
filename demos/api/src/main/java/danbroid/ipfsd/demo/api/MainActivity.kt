@@ -3,8 +3,11 @@ package danbroid.ipfsd.demo.api
 import android.view.Menu
 import androidx.navigation.NavController
 import com.google.android.material.snackbar.Snackbar
+import danbroid.ipfs.LOG_TAG
 import danbroid.ipfsd.demo.api.activities.ActivityInterface
 import danbroid.ipfsd.demo.api.content.rootContent
+import danbroid.logging.AndroidLog
+import danbroid.logging.LogConfig
 import danbroid.util.menu.MenuActivity
 import danbroid.util.menu.MenuItemBuilder
 import danbroid.util.menu.ui.MenuListAdapter
@@ -12,6 +15,15 @@ import danbroid.util.menu.ui.MenuListAdapter
 
 class MainActivity : MenuActivity(R.layout.activity_main), ActivityInterface {
 
+  companion object {
+    val log = LogConfig.let {
+      val log = AndroidLog(LOG_TAG)
+      it.DEBUG = BuildConfig.DEBUG
+      it.COLOURED = BuildConfig.DEBUG
+      it.GET_LOG = { log }
+      log
+    }
+  }
 
   override fun createNavGraph(navController: NavController) = navController.createDemoNavGraph(this)
 
@@ -68,6 +80,5 @@ class MainActivity : MenuActivity(R.layout.activity_main), ActivityInterface {
 
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(MainActivity::class.java)
 
 

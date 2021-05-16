@@ -9,15 +9,15 @@ android {
 
   ndkVersion = ProjectVersions.NDK_VERSION
 
-  compileSdkVersion(ProjectVersions.SDK_VERSION)
+  compileSdk = ProjectVersions.SDK_VERSION
 
   defaultConfig {
-    minSdkVersion(ProjectVersions.MIN_SDK_VERSION)
-    targetSdkVersion(ProjectVersions.SDK_VERSION)
-    versionCode = ProjectVersions.BUILD_VERSION
-    versionName = ProjectVersions.VERSION_NAME
+    minSdk =ProjectVersions.MIN_SDK_VERSION
+    targetSdk = ProjectVersions.SDK_VERSION
+    //versionCode = ProjectVersions.BUILD_VERSION
+    //versionName = ProjectVersions.VERSION_NAME
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    consumerProguardFiles("consumer-rules.pro")
+    //consumerProguardFiles("consumer-rules.pro")
   }
 
   buildTypes {
@@ -64,7 +64,6 @@ dependencies {
 
   implementation(project(":client"))
 
-  implementation("org.slf4j:slf4j-api:_")
 
   implementation(AndroidX.appCompat)
   implementation(Google.android.material)
@@ -76,8 +75,8 @@ dependencies {
     implementation(Danbroid.utils.menu)
     implementation(Danbroid.utils.misc)
   }
+  implementation(Danbroid.utils.logging)
 
-  implementation(Danbroid.utils.slf4j)
   //implementation("com.mikepenz:iconics-core:_")
   //implementation("com.mikepenz:library-typeface-api:5.2.4")
   implementation("com.mikepenz:iconics-core:_")
@@ -110,12 +109,10 @@ dependencies {
   testImplementation(Testing.junit4)
   testImplementation(AndroidX.test.core)
 
-  testImplementation("ch.qos.logback:logback-core:_")
-  testImplementation("ch.qos.logback:logback-classic:_")
+
   // testImplementation("net.sf.kxml:kxml2-min:_")
   //testImplementation(Libs.robolectric)
   androidTestImplementation(Testing.junit4)
-  androidTestImplementation(Danbroid.utils.slf4j)
 
   androidTestImplementation(AndroidX.test.core)
   androidTestImplementation(AndroidX.test.runner)

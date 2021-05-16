@@ -107,4 +107,3 @@ fun NavController.openBrowser(url: String) =
   navigate(DemoNavGraph.action.toBrowser, bundleOf(DemoNavGraph.args.url to url))
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(DemoNavGraph::class.java)

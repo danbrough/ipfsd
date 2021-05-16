@@ -11,21 +11,20 @@ plugins {
 
 android {
 
-  compileSdkVersion(ProjectVersions.SDK_VERSION)
+  compileSdk = ProjectVersions.SDK_VERSION
 
   defaultConfig {
 
-    minSdkVersion(ProjectVersions.MIN_SDK_VERSION)
-    targetSdkVersion(ProjectVersions.SDK_VERSION)
+    minSdk = ProjectVersions.MIN_SDK_VERSION
+    targetSdk = ProjectVersions.SDK_VERSION
     versionCode = ProjectVersions.BUILD_VERSION
     versionName = ProjectVersions.VERSION_NAME
     multiDexEnabled = true
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    consumerProguardFiles("consumer-rules.pro")
-
+   // consumerProguardFiles("consumer-rules.pro")
   }
 
-  lintOptions {
+  lint{
     isAbortOnError = false
   }
 
@@ -96,8 +95,9 @@ dependencies {
   implementation(AndroidX.appCompat)
 
 
+  //implementation("androidx.datastore:datastore-preferences:1.0.0-alpha08")
   implementation("androidx.datastore:datastore-preferences:_")
-  //implementation("androidx.datastore:datastore:_")
+
 
 
   //implementation("org.jetbrains.kotlin:kotlin-reflect:_")
@@ -109,7 +109,7 @@ dependencies {
   //sliding panel library
 
   //implementation(Libs.slf4j_android)
-  implementation("org.slf4j:slf4j-api:_")
+  //implementation("org.slf4j:slf4j-api:_")
   //implementation(Libs.slf4j)
 
 
@@ -127,7 +127,7 @@ dependencies {
     implementation(Danbroid.utils.misc)
   }
 
-  implementation(Danbroid.utils.slf4j)
+  implementation(Danbroid.utils.logging)
 
   implementation("com.google.zxing:android-core:_")
 
@@ -141,7 +141,7 @@ dependencies {
   testImplementation(Kotlin.Test.junit)
 
 
-  implementation("org.slf4j:slf4j-api:_")
+
 
   androidTestImplementation(Testing.junit4)
 
@@ -150,11 +150,9 @@ dependencies {
   androidTestImplementation(AndroidX.test.rules)
   androidTestImplementation(AndroidX.test.ext.junitKtx)
   androidTestImplementation("com.google.truth:truth:_")
-  androidTestImplementation(Danbroid.utils.slf4j)
 
 
-  testImplementation("ch.qos.logback:logback-classic:_")
-  testImplementation("ch.qos.logback:logback-core:_")
+
 //  testImplementation(testFixtures(project(":api")))
 
 

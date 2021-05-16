@@ -150,4 +150,4 @@ class AccountAuthenticator(val context: Context) : AbstractAccountAuthenticator(
   }*/
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(AccountAuthenticator::class.java)
+private val log = danbroid.logging.getLog(AccountAuthenticator::class)

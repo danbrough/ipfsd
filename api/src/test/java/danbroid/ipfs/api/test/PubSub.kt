@@ -70,4 +70,3 @@ class PubSub {
 }
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(PubSub::class.java)

@@ -17,4 +17,3 @@ class JsonTest {
 
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(JsonTest::class.java)

@@ -35,15 +35,17 @@ tasks.withType<Test> {
   }
 }
 
+repositories {
+  maven("https://h1.danbrough.org/maven")
+  maven("https://jitpack.io")
+}
+
 dependencies {
 
 
   testImplementation(Kotlin.Test.junit)
-  testImplementation("org.slf4j:slf4j-api:_")
-  testImplementation("ch.qos.logback:logback-core:_")
-  testImplementation("ch.qos.logback:logback-classic:_")
 
-  implementation("org.slf4j:slf4j-api:_")
+  api(Danbroid.utils.logging_core)
   implementation(Kotlin.stdlib.jdk8)
   implementation(KotlinX.coroutines.jdk8)
 
@@ -52,7 +54,7 @@ dependencies {
   implementation("com.google.code.gson:gson:_")
   api(Square.okHttp3.okHttp)
   implementation("com.github.ipld:java-cid:_")
-  implementation("com.github.ipfs:java-ipfs-http-client:v1.3.3")
+  implementation("com.github.ipfs:java-ipfs-http-client:_")
 
   //implementation(KotlinX.serialization.runtimeCommon)
 

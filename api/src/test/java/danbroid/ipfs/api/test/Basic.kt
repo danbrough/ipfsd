@@ -29,4 +29,3 @@ class Basic {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(Basic::class.java)

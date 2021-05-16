@@ -6,7 +6,8 @@ buildscript {
 
   repositories {
     google()
-    jcenter()
+    mavenCentral()
+  //  jcenter()
   }
 
   dependencies {
@@ -23,9 +24,10 @@ allprojects {
 
   repositories {
     google()
-    jcenter()
+    //jcenter()
     mavenCentral()
     maven("https://jitpack.io")
+    maven("https://h1.danbrough.org/maven")
   }
 
   tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {

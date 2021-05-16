@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.content.Context
 import androidx.annotation.StringRes
 import kotlinx.coroutines.*
-import org.slf4j.LoggerFactory
 import kotlin.coroutines.resume
 
 object Prompts {
@@ -34,4 +33,3 @@ object Prompts {
 
 }
 
-private val log = LoggerFactory.getLogger(Prompts::class.java)

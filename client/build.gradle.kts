@@ -9,15 +9,15 @@ plugins {
 
 android {
   ndkVersion = ProjectVersions.NDK_VERSION
+  compileSdk = ProjectVersions.SDK_VERSION
 
-  compileSdkVersion(ProjectVersions.SDK_VERSION)
   defaultConfig {
-    minSdkVersion(ProjectVersions.MIN_SDK_VERSION)
-    targetSdkVersion(ProjectVersions.SDK_VERSION)
-    versionCode = ProjectVersions.BUILD_VERSION
-    versionName = ProjectVersions.VERSION_NAME
+    minSdk = ProjectVersions.MIN_SDK_VERSION
+    targetSdk = ProjectVersions.SDK_VERSION
+    //versionCode = ProjectVersions.BUILD_VERSION
+    //versionName = ProjectVersions.VERSION_NAME
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    consumerProguardFiles("consumer-rules.pro")
+    //consumerProguardFiles("consumer-rules.pro")
 
     buildTypes {
 
@@ -41,7 +41,7 @@ android {
   kotlinOptions {
     jvmTarget = "1.8"
     //freeCompilerArgs = listOf("-Xjsr305=strict")
-    freeCompilerArgs += listOf(
+    freeCompilerArgs = freeCompilerArgs + listOf(
       "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
     )
   }
@@ -69,7 +69,8 @@ dependencies {
   /* api(project(":common_domain")) {
      exclude(group = "com.android", module = "android")
    }*/
-  api("org.slf4j:slf4j-api:_")
+
+
   implementation(AndroidX.appCompat)
   api(project(":api"))
 
@@ -95,12 +96,10 @@ dependencies {
   testImplementation(Testing.junit4)
   testImplementation(AndroidX.test.core)
 
-  testImplementation("ch.qos.logback:logback-core:_")
-  testImplementation("ch.qos.logback:logback-classic:_")
+
   // testImplementation("net.sf.kxml:kxml2-min:_")
   //testImplementation(Libs.robolectric)
   androidTestImplementation(Testing.junit4)
-  androidTestImplementation(Danbroid.utils.slf4j)
 
   androidTestImplementation(AndroidX.test.core)
   androidTestImplementation(AndroidX.test.runner)

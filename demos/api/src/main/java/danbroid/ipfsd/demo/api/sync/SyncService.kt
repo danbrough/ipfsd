@@ -59,4 +59,4 @@ class SyncService : Service() {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(SyncService::class.java)
+private val log = danbroid.logging.getLog(SyncService::class)

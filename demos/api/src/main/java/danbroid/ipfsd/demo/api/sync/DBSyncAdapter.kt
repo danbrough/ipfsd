@@ -61,5 +61,5 @@ class DBSyncAdapter @JvmOverloads constructor(
 
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(DBSyncAdapter::class.java)
+private val log = danbroid.logging.getLog(DBSyncAdapter::class)
 

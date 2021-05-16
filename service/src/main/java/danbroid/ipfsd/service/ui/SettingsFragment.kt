@@ -46,5 +46,5 @@ class SettingsFragment : PreferenceFragmentCompat() {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(SettingsFragment::class.java)
+private val log = danbroid.logging.getLog(SettingsFragment::class)
 

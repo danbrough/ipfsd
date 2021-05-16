@@ -82,6 +82,7 @@ object _androidIPFS : danbroid.ipfs.api.utils.SingletonHolder<IPFS, Context>({
 val Context.ipfsApi: IPFS
   get() = _androidIPFS.getInstance(this)
 
-private val log = org.slf4j.LoggerFactory.getLogger(ServiceApiClient::class.java)
 
 
+
+private val log = danbroid.logging.getLog(ServiceApiClient::class)

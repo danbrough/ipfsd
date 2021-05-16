@@ -86,7 +86,7 @@ open class OkHttpExecutor(
 
 
   companion object {
-    private val log = org.slf4j.LoggerFactory.getLogger(OkHttpExecutor::class.java)
+    private val log = danbroid.logging.getLog(OkHttpExecutor::class)
     val MEDIA_TYPE_APPLICATION = "application/octet-stream".toMediaType()
     val MEDIA_TYPE_DIRECTORY = "application/x-directory".toMediaType()
 

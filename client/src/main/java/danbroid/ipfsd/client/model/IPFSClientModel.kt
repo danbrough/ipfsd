@@ -59,4 +59,4 @@ val Fragment.ipfs: IPFS
   get() = ipfsModel.api
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(IPFSClientModel::class.java)
+private val log = danbroid.logging.getLog(IPFSClientModel::class)

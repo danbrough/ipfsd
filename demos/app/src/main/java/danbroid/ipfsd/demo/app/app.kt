@@ -26,7 +26,7 @@ abstract class IPFSApp() {
 }
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(IPFSApp::class.java)
+private val log = danbroid.logging.getLog(IPFSApp::class)
 
 
 

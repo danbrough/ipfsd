@@ -41,4 +41,3 @@ class ObjectTest {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(ObjectTest::class.java)

@@ -38,4 +38,3 @@ class Serial2 {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(Serial2::class.java)

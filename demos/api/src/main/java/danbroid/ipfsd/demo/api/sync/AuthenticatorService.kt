@@ -27,4 +27,4 @@ class AuthenticatorService : Service() {
   override fun onBind(intent: Intent?): IBinder = mAuthenticator.iBinder
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(AuthenticatorService::class.java)
+private val log = danbroid.logging.getLog(AuthenticatorService::class)

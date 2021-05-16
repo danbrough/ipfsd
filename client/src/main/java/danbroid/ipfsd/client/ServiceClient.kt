@@ -252,5 +252,5 @@ internal fun showIPFSDNotInstalledDialog(context: Context) {
 val Context.ipfsServiceClient: ServiceClient
   get() = ServiceClient.getInstance(this)
 
-private val log = org.slf4j.LoggerFactory.getLogger(ServiceClient::class.java)
+private val log = danbroid.logging.getLog(ServiceClient::class)
 

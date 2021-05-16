@@ -184,4 +184,4 @@ class BrowserFragment : Fragment() {
 }
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(BrowserFragment::class.java)
+private val log = danbroid.logging.getLog(BrowserFragment::class)

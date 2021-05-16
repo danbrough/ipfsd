@@ -13,4 +13,3 @@ MerkleNode addResult = ipfs.add(file).get(0);*/
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(Cid::class.java)

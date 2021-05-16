@@ -9,7 +9,6 @@ import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
-import org.slf4j.LoggerFactory
 
 @Target(AnnotationTarget.FIELD, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
@@ -60,7 +59,7 @@ data class DagLink<out T : Any>(
 suspend inline fun <reified T : Any> T.dagCid(api: IPFS, pin: Boolean = false): String =
   api.dag.putObject(this, pin = pin).json().Cid.path
 
-private val log = LoggerFactory.getLogger(DagLink::class.java)
+
 inline suspend fun <reified T : Any> T.dagLink(api: IPFS, pin: Boolean = false): DagLink<T> {
   return DagLink(dagCid(api, pin), T::class.serializer())
 }

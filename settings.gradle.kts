@@ -1,12 +1,8 @@
-import de.fayard.refreshVersions.bootstrapRefreshVersions
-
-buildscript {
-  repositories { gradlePluginPortal() }
-  dependencies.classpath("de.fayard.refreshVersions:refreshVersions:0.9.7")
+plugins {
+    id("de.fayard.refreshVersions") version "0.10.0"
 }
 
-bootstrapRefreshVersions()
-if (System.getenv().containsKey("JITPACK")) {
+if (System.getenv().containsKey("JITPACK") || true) {
   include(":bridge_native", ":bridge", ":client", ":api")
 } else {
   include(":service", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")

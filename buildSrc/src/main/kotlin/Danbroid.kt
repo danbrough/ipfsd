@@ -15,6 +15,8 @@ object Danbroid {
     const val misc = "$pkg:misc:_"
     const val menu = "$pkg:menu:_"
     const val slf4j = "$pkg:slf4j:_"
+    const val logging = "$pkg:logging:_"
+    const val logging_core = "$pkg:logging_core:_"
   }
 
 

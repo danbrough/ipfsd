@@ -20,7 +20,7 @@ android {
     versionName = ProjectVersions.VERSION_NAME
     multiDexEnabled = true
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    consumerProguardFiles("consumer-rules.pro")
+    //consumerProguardFiles("consumer-rules.pro")
 
   }
 
@@ -63,7 +63,7 @@ dependencies {
 
   implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(AndroidX.lifecycle.liveDataKtx)
-  implementation("androidx.core:core-ktx:1.5.0-beta01")
+  implementation("androidx.core:core-ktx:_")
   implementation(AndroidX.appCompatResources)
   implementation(AndroidX.appCompat)
   implementation(Kotlin.stdlib.jdk8)
@@ -83,7 +83,8 @@ dependencies {
     implementation(Danbroid.utils.misc)
   }
 
-  implementation(Danbroid.utils.slf4j)
+  implementation(Danbroid.utils.logging)
+
 
   implementation("com.google.zxing:android-core:_")
 
@@ -98,11 +99,7 @@ dependencies {
   androidTestImplementation(AndroidX.test.rules)
   androidTestImplementation(AndroidX.test.ext.junitKtx)
   androidTestImplementation("com.google.truth:truth:_")
-  androidTestImplementation(Danbroid.utils.slf4j)
 
-
-  testImplementation("ch.qos.logback:logback-classic:_")
-  testImplementation("ch.qos.logback:logback-core:_")
 
 
   implementation(AndroidX.navigation.fragmentKtx)

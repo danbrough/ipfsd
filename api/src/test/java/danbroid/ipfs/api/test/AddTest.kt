@@ -93,4 +93,3 @@ class AddTest {
 }
 
 
-private val log = org.slf4j.LoggerFactory.getLogger(AddTest::class.java)

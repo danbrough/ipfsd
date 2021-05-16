@@ -55,4 +55,3 @@ class InfuraTest {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(InfuraTest::class.java)

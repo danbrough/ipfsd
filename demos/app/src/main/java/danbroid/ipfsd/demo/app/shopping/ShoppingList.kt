@@ -17,4 +17,4 @@ class ShoppingList : IPFSApp() {
 
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(ShoppingList::class.java)
+private val log = danbroid.logging.getLog(ShoppingList::class)

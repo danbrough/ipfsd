@@ -44,4 +44,4 @@ class DialogActivity : AppCompatActivity() {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(DialogActivity::class.java)
+private val log = danbroid.logging.getLog(DialogActivity::class)

@@ -64,4 +64,4 @@ class ShoppingListManager(val context: Context) {
 val Context.shoppingListManager: ShoppingListManager
   get() = ShoppingListManager.getInstance(this)
 
-private val log = org.slf4j.LoggerFactory.getLogger(ShoppingListManager::class.java)
+private val log = danbroid.logging.getLog(ShoppingListManager::class)

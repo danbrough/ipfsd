@@ -108,4 +108,3 @@ class SerialTest2 {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(SerialTest2::class.java)

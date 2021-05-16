@@ -61,4 +61,4 @@ class QRCodeFragment : Fragment(R.layout.fragment_qrcode) {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(QRCodeFragment::class.java)
+private val log = danbroid.logging.getLog(QRCodeFragment::class)

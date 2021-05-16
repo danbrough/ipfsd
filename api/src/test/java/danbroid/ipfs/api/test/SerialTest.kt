@@ -8,7 +8,6 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import org.junit.Test
-import org.slf4j.LoggerFactory
 
 
 interface Project
@@ -78,4 +77,3 @@ class SerialTest {
 
 }
 
-private val log = LoggerFactory.getLogger(SerialTest::class.java)

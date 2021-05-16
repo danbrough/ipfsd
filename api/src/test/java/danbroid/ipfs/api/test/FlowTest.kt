@@ -41,4 +41,3 @@ class FlowTest {
   }
 }
 
-private val log = org.slf4j.LoggerFactory.getLogger(FlowTest::class.java)

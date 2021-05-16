@@ -16,7 +16,6 @@ import danbroid.ipfsd.demo.api.openBrowser
 import danbroid.util.menu.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.time.ExperimentalTime
 
@@ -26,7 +25,8 @@ const val dir_kitty = "/ipfs/QmaknW7EzautwWKE1q4rpR4tPnP1XuxMKGr8KiyRZKqC5T"
 
 private object Content
 
-val log = LoggerFactory.getLogger(Content::class.java)
+val log = danbroid.logging.getLog(Content::class)
+
 val MenuItemClickContext.api: IPFS
   get() = requireContext().ipfsApi
 
@@ -147,7 +147,7 @@ fun MenuItemBuilder.commands() = menu {
     title = "Get ID"
     onClick = {
       log.debug(" ID: ${api.network.id().json()}")
-      false
+      proceed()
     }
   }
 
@@ -177,7 +177,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Bandwidth"
     onClick = {
-      //TODO apiTest(api.stats.bw(), "bandwidth")
+      // apiTest(api.stats.bw(), "bandwidth")
 
     }
   }
