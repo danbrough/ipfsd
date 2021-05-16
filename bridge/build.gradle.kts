@@ -14,6 +14,7 @@ android {
     targetSdk = ProjectVersions.SDK_VERSION
     /*versionCode = 1
     versionName = Danbroid.bridge_version*/
+
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     consumerProguardFiles("consumer-rules.pro")
   }
