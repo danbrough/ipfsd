@@ -146,7 +146,7 @@ fun MenuItemBuilder.commands() = menu {
   menu {
     title = "Get ID"
     onClick = {
-      log.debug(" ID: ${api.network.id().json()}")
+      showSnackBar("ID: ${api.network.id().json()}")
     }
   }
 
@@ -170,7 +170,7 @@ fun MenuItemBuilder.commands() = menu {
       val msg = "Hello from the ipfs demo at ${Date()}.\n"
       log.trace("adding message: $msg")
       api.basic.add(msg, fileName = "ipfs_test_message.txt").json().also {
-        log.debug("created file: $it")
+        showSnackBar("created file: $it")
       }
     }
   }
@@ -189,6 +189,11 @@ fun MenuItemBuilder.commands() = menu {
   repoCommands()
 }
 
+
+fun MenuItemClickContext.showSnackBar(msg: String) {
+  log.info(msg)
+  fragment.activityInterface?.showSnackbar(msg)
+}
 
 /*
 inline suspend fun <T> Fragment.apiTest(

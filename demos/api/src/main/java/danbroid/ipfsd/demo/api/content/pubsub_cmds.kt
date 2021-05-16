@@ -13,7 +13,7 @@ fun MenuItemBuilder.pubSubCommands() = menu {
     title = "PubSub Publish"
     onClick = {
       api.pubsub.pub(
-        "poiqwe098123",
+        "secretgroup",
         "Hello from the IPFS app at ${Date()}\n "
       ).invoke().also {
         log.info("msg: ${it.text()}")
@@ -24,7 +24,7 @@ fun MenuItemBuilder.pubSubCommands() = menu {
   menu {
     title = "Pubsub Test Subscribe"
     onClick = {
-      api.pubsub.sub("poiqwe098123").flow().collect {
+      api.pubsub.sub("secretgroup").flow().collect {
         log.debug("result: $it")
       }
     }
