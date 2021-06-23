@@ -12,3 +12,4 @@ build
 /buildSrc/src/main/kotlin/KeystoreConfig.kt
 /go
 /stuff
+/tmp
