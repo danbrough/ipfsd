@@ -11,6 +11,7 @@ if (System.getenv().containsKey("JITPACK")) {
 
 rootProject.name = "ipfsd"
 
+
 if (false) {
   include(":menu", ":slf4j", ":misc")
   project(":menu").projectDir = file("../androidutils/menu")

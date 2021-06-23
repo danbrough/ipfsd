@@ -39,7 +39,7 @@ android {
   }
 
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
     //freeCompilerArgs = listOf("-Xjsr305=strict")
 
     freeCompilerArgs = mutableListOf("-Xopt-in=kotlin.ExperimentalStdlibApi").also {

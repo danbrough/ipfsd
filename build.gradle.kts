@@ -27,7 +27,7 @@ allprojects {
     //jcenter()
     mavenCentral()
     maven("https://jitpack.io")
-    maven("https://h1.danbrough.org/maven")
+   // maven("https://h1.danbrough.org/maven")
   }
 
   tasks.withType<org.jetbrains.dokka.gradle.DokkaTask>().configureEach {
@@ -45,8 +45,8 @@ subprojects {
   afterEvaluate {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
       kotlinOptions {
-        jvmTarget = "1.8"
-        languageVersion = "1.4"
+        jvmTarget = "11"
+       // languageVersion = "11"
         // freeCompilerArgs = listOf("-Xjvm-default=enable")
         freeCompilerArgs += listOf(
           //  "-Xopt-in=kotlinx.serialization.InternalSerializationApi",

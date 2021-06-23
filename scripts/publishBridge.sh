@@ -6,7 +6,7 @@ REPO_PATH="/srv/https/maven"
 
 cd `dirname $0` && cd ..
 
-./gradlew :bridge:publishReleasePublicationToMavenLocal || exit 1
+JITPACK=1 ./gradlew publishReleasePublicationToMavenLocal || exit 1
 
 cd ~/.m2/repository/
 cd $PKG_DIR
