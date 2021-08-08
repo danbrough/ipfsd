@@ -60,6 +60,7 @@ dependencies {
 
   implementation("com.github.danbrough.ipfsd:bridge:_")
 
+  implementation(project(":api"))
 
   implementation(project(":client"))
 

@@ -2,11 +2,11 @@ plugins {
   id("de.fayard.refreshVersions") version "0.11.0"
 }
 
-include(":client", ":api")
+include(":api")
 if (System.getenv().containsKey("JITPACK")) {
   include(":bridge_native", ":bridge")
 } else {
-  include(":service",":demos:app", ":demos:api", ":demos:shopping")
+  include(":client", ":service", ":demos:app", ":demos:api", ":demos:shopping")
   // include(":bridge_native", ":bridge")
 }
 
