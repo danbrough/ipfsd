@@ -5,13 +5,14 @@ import java.util.*
 object ProjectVersions {
   var SDK_VERSION = 30
   var MIN_SDK_VERSION = 23
-  val JAVA_VERSION = JavaVersion.VERSION_11
+  val JAVA_VERSION = JavaVersion.VERSION_1_8
   var BUILD_VERSION = 1
   var VERSION_OFFSET = 1
   var GROUP_ID = ""
   var VERSION_FORMAT = ""
+  val KOTLIN_JVM_VERSION = "1.8"
   val NDK_VERSION = "21.2.6472646"
-  var COMPOSE_VERSION = "1.0.0-alpha10"
+  var COMPOSE_VERSION = "1.1.0-alpha01"
 
   val VERSION_NAME: String
     get() = getVersionName()
