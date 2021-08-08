@@ -1,5 +1,6 @@
 package danbroid.ipfs.api.test
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
 class JsonTest {
@@ -12,7 +13,9 @@ class JsonTest {
   @Test
   fun test2() {
 
-
+    runBlocking {
+      api.dag.putObject()
+    }
   }
 
 }

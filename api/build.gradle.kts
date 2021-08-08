@@ -36,7 +36,7 @@ tasks.withType<Test> {
 }
 
 repositories {
-  maven("https://h1.danbrough.org/maven")
+  //maven("https://h1.danbrough.org/maven")
   maven("https://jitpack.io")
 }
 
@@ -73,7 +73,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     jvmTarget = ProjectVersions.KOTLIN_JVM_VERSION
     //languageVersion = "1.4"
     // freeCompilerArgs = listOf("-Xjvm-default=enable")
-    freeCompilerArgs += listOf(
+    freeCompilerArgs = freeCompilerArgs + listOf(
       "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
     )
   }

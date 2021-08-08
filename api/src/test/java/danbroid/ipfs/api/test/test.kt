@@ -4,7 +4,7 @@ import danbroid.ipfs.api.IPFS
 import danbroid.ipfs.api.okhttp.OkHttpExecutor
 
 
-object api : IPFS(OkHttpExecutor())
+object api : IPFS(OkHttpExecutor("http://192.168.1.4:5001/api/v0"))
 
 
 /*
