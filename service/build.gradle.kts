@@ -1,8 +1,9 @@
 plugins {
   id("com.android.application")
+
   kotlin("android")
   id("org.jetbrains.dokka")
-  `maven-publish`
+  // `maven-publish`
 }
 
 android {
@@ -12,7 +13,7 @@ android {
   compileSdk = ProjectVersions.SDK_VERSION
 
   defaultConfig {
-    minSdk =ProjectVersions.MIN_SDK_VERSION
+    minSdk = ProjectVersions.MIN_SDK_VERSION
     targetSdk = ProjectVersions.SDK_VERSION
     //versionCode = ProjectVersions.BUILD_VERSION
     //versionName = ProjectVersions.VERSION_NAME
@@ -56,11 +57,9 @@ dependencies {
      exclude(group = "com.android", module = "android")
    }*/
 
-  if (System.getenv().containsKey("JITPACK")) {
-    implementation(project(":bridge"))
-  } else {
-    implementation(Danbroid.ipfsd_bridge)
-  }
+
+  implementation("com.github.danbrough.ipfsd:bridge:_")
+
 
   implementation(project(":client"))
 

@@ -2,11 +2,12 @@ plugins {
   id("de.fayard.refreshVersions") version "0.11.0"
 }
 
+include(":client", ":api")
 if (System.getenv().containsKey("JITPACK")) {
-  include(":bridge_native", ":bridge", ":client", ":api")
+  include(":bridge_native", ":bridge")
 } else {
-  include(":service", ":client", ":api", ":demos:app", ":demos:api", ":demos:shopping")
- // include(":bridge_native", ":bridge")
+  include(":service",":demos:app", ":demos:api", ":demos:shopping")
+  // include(":bridge_native", ":bridge")
 }
 
 rootProject.name = "ipfsd"

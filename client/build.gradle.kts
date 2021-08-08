@@ -39,7 +39,7 @@ android {
 
 
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = ProjectVersions.KOTLIN_JVM_VERSION
     //freeCompilerArgs = listOf("-Xjsr305=strict")
     freeCompilerArgs = freeCompilerArgs + listOf(
       "-Xopt-in=kotlinx.serialization.InternalSerializationApi"
@@ -72,7 +72,7 @@ dependencies {
 
 
   implementation(AndroidX.appCompat)
-  api(project(":api"))
+  implementation(project(":api"))
 
   implementation(Danbroid.utils.misc)
 
@@ -88,7 +88,7 @@ dependencies {
 
   //implementation(AndroidX.lifecycle.runtimeKtx)
   implementation(KotlinX.coroutines.android)
-  api(Google.android.material)
+  implementation(Google.android.material)
 
 //  implementation(Square.okHttp3.okHttp)
 

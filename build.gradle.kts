@@ -45,10 +45,10 @@ subprojects {
   afterEvaluate {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
       kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = ProjectVersions.KOTLIN_JVM_VERSION
        // languageVersion = "11"
         // freeCompilerArgs = listOf("-Xjvm-default=enable")
-        freeCompilerArgs += listOf(
+        freeCompilerArgs = freeCompilerArgs + listOf(
           //  "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
           "-Xopt-in=kotlinx.serialization.InternalSerializationApi",
 
@@ -108,7 +108,7 @@ subprojects {
       }
 
 
-      if (this is com.android.build.gradle.LibraryExtension) {
+     // if (this is com.android.build.gradle.LibraryExtension) {
 
         val publishing =
           extensions.findByType(PublishingExtension::class.java) ?: return@afterEvaluate
@@ -130,13 +130,13 @@ subprojects {
                 artifactId = projectName
                 groupId = ProjectVersions.GROUP_ID
                // println("PROJECT NAME IS $projectName setting version to ${Danbroid.bridge_version}")
-                version = Danbroid.bridge_version
+                version = ProjectVersions.VERSION_NAME
               }
             }
           }
         }
 
-      }
+    //  }
     }
   }
 }
