@@ -85,7 +85,6 @@ class IPFSService : Service() {
     IPFSServicePrefs(this)
   }
 
-  private val ipfs: IPFS
     get() = getIPFS(this)
 
   private var coroutineScope = CoroutineScope(Dispatchers.IO)

@@ -1,5 +1,8 @@
 # Module ipfs_daemon
 
+# Deprecated.
+## Moved to [KIPFS](https://github.com/danbrough/kipfs)
+
 ## IPFS node service and client for android.
 
 Based on the [gomobile ipfs library](https://berty.tech/docs/gomobile-ipfs) 

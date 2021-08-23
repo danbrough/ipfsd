@@ -6,6 +6,7 @@ include(":api")
 if (System.getenv().containsKey("JITPACK")) {
   include(":bridge_native", ":bridge")
 } else {
+
   include(":client", ":service", ":demos:app", ":demos:api", ":demos:shopping")
   // include(":bridge_native", ":bridge")
 }

@@ -1,5 +1,6 @@
 package danbroid.ipfs.api.test
 
+import danbroid.ipfs.api.FilePart
 import danbroid.ipfs.api.blocking
 import danbroid.ipfs.api.json
 import kotlinx.serialization.Serializable
@@ -9,6 +10,7 @@ import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.put
 import org.junit.Test
+import java.io.File
 
 class DagTest {
 
@@ -52,7 +54,18 @@ class DagTest {
         }
       }
     }
+  }
 
+  @Test
+  fun fileTest() {
+    log.debug("fileTest()")
+    api.blocking {
+      dag.put(pin = true).apply {
+        add(FilePart(File("/tmp/test")))
+      }.json().also {
+        log.debug("CID: $it")
+      }
+    }
   }
 }
 
